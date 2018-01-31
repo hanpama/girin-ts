@@ -1,4 +1,4 @@
-import { ObjectTypeMetadata } from '../metadata/ObjectTypeMetadata';
+import { ObjectTypeMetadata, ObjectTypeMetadataConfig } from '../metadata/ObjectTypeMetadata';
 import { MetadataStorage } from '../metadata/MetadataStorage';
 import { GraphQLObjectTypeConfig, GraphQLFieldConfigMap } from 'graphql';
 
@@ -17,7 +17,17 @@ export interface ObjectTypeDecoratorOptions {
 
 export function ObjectType(options: ObjectTypeDecoratorOptions = {}) {
   return function(definitionClass: ObjectTypeDecoratorOptions & Function) {
-    const mergedConfig = Object.assign(options, definitionClass, { name: definitionClass.name, definitionClass });
+    const mergedConfig: ObjectTypeMetadataConfig ={
+      astNode: options.astNode || definitionClass.astNode,
+      description: options.description || definitionClass.description,
+      extensionASTNodes: options.extensionASTNodes || definitionClass.extensionASTNodes,
+      fields: options.fields || definitionClass.fields,
+      interfaces: options.interfaces || definitionClass.interfaces,
+      isTypeOf: options.isTypeOf || definitionClass.isTypeOf,
+      meta: options.meta || definitionClass.meta,
+      name: options.name || definitionClass.name,
+      definitionClass,
+    }
     ObjectTypeMetadata.create(mergedConfig);
   };
 }

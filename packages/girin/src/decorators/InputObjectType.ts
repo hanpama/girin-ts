@@ -1,7 +1,7 @@
 import { GraphQLInputFieldConfigMap, GraphQLInputObjectTypeConfig } from 'graphql';
 
 import { MetadataStorage } from '../metadata/MetadataStorage';
-import { InputObjectTypeMetadata } from '../metadata/InputObjectTypeMetadata';
+import { InputObjectTypeMetadata, InputObjectTypeMetadataConfig } from '../metadata/InputObjectTypeMetadata';
 
 
 export type InputObjectTypeDecoratorOptions = {
@@ -14,7 +14,14 @@ export type InputObjectTypeDecoratorOptions = {
 
 export function InputObjectType(options: InputObjectTypeDecoratorOptions = {}) {
   return function(definitionClass: InputObjectTypeDecoratorOptions & Function) {
-    const mergedConfig = Object.assign(options, definitionClass, { name: definitionClass.name, definitionClass });
+    const mergedConfig: InputObjectTypeMetadataConfig = {
+      name: options.name || definitionClass.name,
+      astNode: options.astNode || definitionClass.astNode,
+      description: options.description || definitionClass.description,
+      fields: options.fields || definitionClass.fields,
+      meta: options.meta || definitionClass.meta,
+      definitionClass,
+    }
     InputObjectTypeMetadata.create(mergedConfig);
   };
 }
