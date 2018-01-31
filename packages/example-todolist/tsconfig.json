@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+      "outDir": ".",
+      "declaration": false,
+      "sourceMap": false,
+      "jsx": "react"
+  },
+  "files": [
+    "./index.ts"
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "name": "girin",
+  "version": "0.1.0",
+  "description": "",
+  "main": "./lib/index.js",
+  "module": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "scripts": {
+    "prepublish": "npm run build",
+    "build": "tsc -p tsconfig.publish.json",
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/graphql": "^0.11.7",
+    "@types/jest": "^22.0.1",
+    "jest": "^22.0.5",
+    "ts-jest": "^22.0.1",
+    "typescript": "^2.7.0-rc"
+  },
+  "peerDependencies": {
+    "graphql": "^0.12.3"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testMatch": [
+      "**/test/**/*.test.ts",
+      "**/test/*.test.ts"
+    ],
+    "testPathIgnorePatterns": [
+      "<rootDir>/node_modules/",
+      "<rootDir>/lib/",
+      "<rootDir>/test/fixtures/"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ]
+  },
+  "dependencies": {
+    "reflect-metadata": "^0.1.12"
+  }
+}

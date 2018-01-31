@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Input object instantiation generates schema as expected 1`] = `
+"type Member {
+  id: Int!
+  username: String!
+  email: String!
+}
+
+input MemberInput {
+  profile: MemberProfileInput!
+  email: String!
+  username: String!
+}
+
+input MemberProfileInput {
+  lastName: String!
+  firstName: String!
+}
+
+type Mutation {
+  instantiateMemberInput(member: MemberInput!): Boolean!
+  getEmailFromInput(member: MemberInput!): String!
+  getUsernameFromInput(member: MemberInput!): String!
+}
+
+type Query {
+  getMember: Member!
+}
+"
+`;

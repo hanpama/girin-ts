@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Basic queries and schema generation generates schema as expected 1`] = `
+"type Query {
+  test: Test
+  erroneousTest: Test
+  testPassingSource: Test
+}
+
+type Test {
+  \\"\\"\\"description1\\"\\"\\"
+  resolverGotDefinitionInstance: Boolean!
+  greeting(greeting: String, name: String!): String!
+  bigGreeting(greeting: String, name: String!): String!
+  fieldWithDefaultResolver: String
+}
+"
+`;

@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Basic mutation and schema generation generates schema as expected 1`] = `
+"type Member {
+  id: Int!
+  name: String!
+  email: String!
+}
+
+type Mutation {
+  createMember(email: String!, name: String!): Member!
+}
+
+type Query {
+  getMember: Member!
+}
+"
+`;

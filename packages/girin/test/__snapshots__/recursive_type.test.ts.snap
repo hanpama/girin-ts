@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Schema generation and query of recursive types generates schema as expected 1`] = `
+"type Member {
+  id: Int!
+  name: String!
+  email: String!
+  friend: Member
+}
+
+type Query {
+  getMember(id: Int!): Member
+}
+"
+`;

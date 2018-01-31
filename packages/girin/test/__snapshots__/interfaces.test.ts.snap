@@ -1,0 +1,26 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`interfaces generates schema as expected 1`] = `
+"type Celebrity implements Person {
+  name: String!
+  id: Int!
+  email: String!
+}
+
+type Fan implements Person {
+  name: String!
+  id: Int!
+  email: String!
+  fanOf: Celebrity
+}
+
+interface Person {
+  name: String!
+  id: Int!
+}
+
+type Query {
+  person(id: Int!, type: String!): Person
+}
+"
+`;
