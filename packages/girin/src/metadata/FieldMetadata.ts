@@ -84,7 +84,7 @@ export class FieldMetadata {
 
       const instance = definitionInstance || this.definitionClass.prototype;
       if (instance[info.fieldName] instanceof Function) {
-        const reducedArguments = argumentReducer(args);
+        const reducedArguments = argumentReducer(args, context, info);
         return instance[info.fieldName](...reducedArguments, context, info);
       }
       return defaultFieldResolver(instance, args, context, info);
@@ -92,9 +92,9 @@ export class FieldMetadata {
   }
 
   protected buildArgumentReducer(argumentMetadata: ArgumentMetadata[]) {
-    return (args: any) => argumentMetadata.reduce((argsOrdered, meta, idx) => {
+    return (args: any, context: any, info: any) => argumentMetadata.reduce((argsOrdered, meta, idx) => {
       if (meta.build.targetMetadata instanceof InputObjectTypeMetadata) {
-        argsOrdered[meta.definedOrder] = meta.build.targetMetadata.build.instantiate(args[meta.name]);
+        argsOrdered[meta.definedOrder] = meta.build.targetMetadata.build.instantiate(args[meta.name], context, info);
       } else {
         argsOrdered[meta.definedOrder] = args[meta.name];
       }

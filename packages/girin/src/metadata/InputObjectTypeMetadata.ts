@@ -13,7 +13,7 @@ export interface InputObjectTypeMetadataConfig {
 
 export interface InputObjectTypeMetadataBuild {
   typeInstance: GraphQLInputObjectType;
-  instantiate: (args: any) => any;
+  instantiate: (args: any, context: any, info: any) => any;
 }
 
 export class InputObjectTypeMetadata {
@@ -67,17 +67,17 @@ export class InputObjectTypeMetadata {
   public buildInstantiator() {
     const inputFieldMetadata = this.meta.filterInputFieldMetadata(this.definitionClass);
 
-    return (argsObject: any) => {
+    return (argsObject: any, context: any, info: any) => {
       const constructorArgs = inputFieldMetadata.reduce((results, metadata) => {
         if (metadata.build.targetMetadata instanceof InputObjectTypeMetadata) {
-          results[metadata.definedOrder] = metadata.build.targetMetadata.build.instantiate(argsObject[metadata.fieldName]);
+          results[metadata.definedOrder] = metadata.build.targetMetadata.build.instantiate(argsObject[metadata.fieldName], context, info);
         } else {
           results[metadata.definedOrder] = argsObject[metadata.fieldName];
         }
         return results;
       }, [] as any[]);
       const ThisInputObjectSubclass: any = this.definitionClass;
-      return new ThisInputObjectSubclass(...constructorArgs);
+      return new ThisInputObjectSubclass(...constructorArgs, context, info);
     }
   }
 }
