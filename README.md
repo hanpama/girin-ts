@@ -8,6 +8,11 @@ it helps you write maintainable GraphQL schema with static types.
 
 * TypeScript(ES6) decorator based DSL for creating GraphQL schema
 
+## Installation
+
+```sh
+npm install girin graphql
+```
 
 ## ObjectType and Fields
 
@@ -48,7 +53,7 @@ class Greeting {
   @Field('String!')
   public greeting(
     @Argument("name: String!") name: string,
-    @Argument("greeting", { type: StringScalar }) greeting: string,
+    @Argument("greeting: String") greeting: string,
   ) {
     return `${greeting || 'Hello'}, ${name}`;
   }
@@ -117,4 +122,3 @@ class Mutation {
 
 You can decorate its constructor arguments to make them GraphQL input fields.
 Classes decorated with `@InputObjectType()` will be instantiated when resolver executed.
-
