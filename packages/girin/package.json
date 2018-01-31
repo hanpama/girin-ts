@@ -11,7 +11,9 @@
     "build": "tsc -p tsconfig.publish.json",
     "test": "jest"
   },
-  "tags": ["graphql"],
+  "tags": [
+    "graphql"
+  ],
   "license": "MIT",
   "devDependencies": {
     "@types/graphql": "^0.11.7",
