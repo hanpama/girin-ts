@@ -53,7 +53,7 @@ type Member {
 
 ## `getGraphQLType` function
 
-`getGraphQLType` function build a decorated class to plain `GraphQLType` instance, so you can
+`getGraphQLType` function builds a decorated class to plain `GraphQLType` instance, so you can
 use this in place where you want to get `GraphQLType` object like:
 
 ```typescript
