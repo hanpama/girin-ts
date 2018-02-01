@@ -36,6 +36,13 @@ class Member {
 You can define GraphQL ObjectTypes with TypeScript(ES6) classes.
 By decorating its property, you can easily transform class fields into GraphQL fields.
 
+```typescript
+import { GraphQLObjectType } from 'graphql';
+import { getGraphQLType } from 'girin';
+
+const MemberObjectType: GraphQLObjectType = getGraphQLType(Member);
+```
+
 ```graphql
 type Member {
   id: Int!
@@ -43,6 +50,28 @@ type Member {
   email: String!
 }
 ```
+
+## `getGraphQLType` function
+
+`getGraphQLType` function build a decorated class to plain `GraphQLType` instance, so you can
+use this in place where you want to get `GraphQLType` object like:
+
+```typescript
+import { GraphQLSchema } from 'graphql';
+import { ObjectType, Field, getGraphQLType } from 'girin';
+
+@ObjectType()
+class Query {
+  @Field('String!') greeting() {
+    return 'Hi!';
+  }
+}
+
+const schema = new GraphQLSchema({
+  query: getGraphQLType(Query)
+});
+```
+
 
 ## Resolvers and Field Arguments
 
