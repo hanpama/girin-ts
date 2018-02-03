@@ -1,10 +1,10 @@
 import { GraphQLInputObjectTypeConfig, GraphQLInputObjectType, GraphQLInputFieldConfigMap } from "graphql";
-import { MetadataStorage } from "./MetadataStorage";
+import { Metadata, MetadataConfig } from "./Metadata";
+import { InputFieldMetadata } from "./InputFieldMetadata";
 
 
-export interface InputObjectTypeMetadataConfig {
+export interface InputObjectTypeMetadataConfig extends MetadataConfig {
   name: string;
-  meta?: MetadataStorage;
   fields?: () => GraphQLInputFieldConfigMap;
   description?: string;
   astNode?: GraphQLInputObjectTypeConfig["astNode"];
@@ -16,34 +16,17 @@ export interface InputObjectTypeMetadataBuild {
   instantiate: (args: any, context: any, info: any) => any;
 }
 
-export class InputObjectTypeMetadata {
-  public static create(config: InputObjectTypeMetadataConfig) {
-    const metadata = new InputObjectTypeMetadata(config);
-    metadata.meta.inputObjectTypeMetadata.push(metadata);
-    return metadata;
-  }
+export class InputObjectTypeMetadata extends Metadata<InputObjectTypeMetadataConfig, InputObjectTypeMetadataBuild> {
 
-  public meta: MetadataStorage;
-  public definitionClass: Function;
-  public config: InputObjectTypeMetadataConfig;
-  public name: string;
+  public get definitionClass() { return this.config.definitionClass; }
 
-  protected constructor(config: InputObjectTypeMetadataConfig) {
-    this.definitionClass = config.definitionClass;
-    this.config = config;
-    this.name = config.name;
-    this.meta = config.meta || MetadataStorage.getMetadataStorage();
-  }
+  public get name() { return this.config.name; }
 
-  protected memoizedBuild: InputObjectTypeMetadataBuild
-  public get build() {
-    if (!this.memoizedBuild) {
-      this.memoizedBuild = {
-        typeInstance: this.buildTypeInstance(),
-        instantiate: this.buildInstantiator(),
-      }
-    }
-    return this.memoizedBuild;
+  protected buildMetadata() {
+    return  {
+      typeInstance: this.buildTypeInstance(),
+      instantiate: this.buildInstantiator(),
+    };
   }
 
   protected buildTypeInstance() {
@@ -57,15 +40,15 @@ export class InputObjectTypeMetadata {
   }
 
   protected fields(): GraphQLInputFieldConfigMap {
-    const fieldMetadata = this.meta.filterInputFieldMetadata(this.definitionClass);
+    const fieldMetadata = this.meta.filter(InputFieldMetadata, this.definitionClass);
     return fieldMetadata.reduce((results, metadata) => {
-      results[metadata.config.fieldName] = metadata.build.inputFieldConfig;
+      results[metadata.fieldName] = metadata.build.inputFieldConfig;
       return results;
     }, {} as GraphQLInputFieldConfigMap);
   }
 
   public buildInstantiator() {
-    const inputFieldMetadata = this.meta.filterInputFieldMetadata(this.definitionClass);
+    const inputFieldMetadata = this.meta.filter(InputFieldMetadata, this.definitionClass);
 
     return (argsObject: any, context: any, info: any) => {
       const constructorArgs = inputFieldMetadata.reduce((results, metadata) => {
@@ -81,4 +64,5 @@ export class InputObjectTypeMetadata {
     }
   }
 }
+
 

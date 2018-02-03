@@ -24,17 +24,17 @@
   "homepage": "https://github.com/hanpama/girin",
   "license": "MIT",
   "devDependencies": {
-    "@types/graphql": "^0.11.7",
-    "@types/jest": "^22.0.1",
-    "jest": "^22.0.5",
-    "ts-jest": "^22.0.1",
-    "typescript": "^2.7.0-rc"
+    "@types/graphql": "^0.12.3",
+    "@types/jest": "^22.1.1",
+    "ts-jest": "^22.0.3",
+    "graphql": "^0.12.3",
+    "typescript": "2.6.2"
   },
   "peerDependencies": {
     "graphql": "^0.12.3"
   },
   "jest": {
-    "testEnvironment": "node",
+    "mapCoverage": true,
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
@@ -51,5 +51,8 @@
       "ts",
       "js"
     ]
+  },
+  "dependencies": {
+    "jest": "^22.1.4"
   }
 }

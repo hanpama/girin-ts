@@ -1,13 +1,11 @@
-
 import { InputFieldMetadata } from "../metadata/InputFieldMetadata";
-import { MetadataStorage } from "../metadata/MetadataStorage";
 import { Generic } from "../metadata/Generic";
+import { globalMetadataStorage } from "../metadata/globalMetadataStorage";
 
 
 export interface InputFieldDecoratorOptions {
   defaultValue?: any;
   description?: string;
-  meta?: MetadataStorage;
 }
 
 export function InputField(nameAndType: string, options?: InputFieldDecoratorOptions): Function {
@@ -21,7 +19,7 @@ export function InputField(nameAndType: string, options?: InputFieldDecoratorOpt
       definitionClass: definitionClass,
       description: options && options.description,
       defaultValue: options && options.defaultValue,
-      meta: options && options.meta,
+      meta: globalMetadataStorage,
     });
   };
 }

@@ -1,5 +1,6 @@
 import { FieldMetadata } from '../metadata/FieldMetadata';
 import { Generic } from "../metadata/Generic";
+import { globalMetadataStorage } from "../metadata/globalMetadataStorage";
 
 export interface FieldDecoratorOptions {
   description?: string;
@@ -15,6 +16,7 @@ export function Field(type: string, options?: FieldDecoratorOptions): Function {
       description: options && options.description,
       deprecationReason: options && options.deprecationReason,
       generic: Generic.of(type),
+      meta: globalMetadataStorage,
     });
   };
 }

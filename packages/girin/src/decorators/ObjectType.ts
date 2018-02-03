@@ -1,11 +1,11 @@
-import { ObjectTypeMetadata, ObjectTypeMetadataConfig } from '../metadata/ObjectTypeMetadata';
-import { MetadataStorage } from '../metadata/MetadataStorage';
 import { GraphQLObjectTypeConfig, GraphQLFieldConfigMap } from 'graphql';
+
+import { ObjectTypeMetadata, ObjectTypeMetadataConfig } from '../metadata/ObjectTypeMetadata';
+import { globalMetadataStorage } from "../metadata/globalMetadataStorage";
 
 
 export interface ObjectTypeDecoratorOptions {
   name?: string;
-  meta?: MetadataStorage;
   fields?: () => GraphQLFieldConfigMap<any, any>;
 
   interfaces?: GraphQLObjectTypeConfig<any, any>["interfaces"];
@@ -24,9 +24,9 @@ export function ObjectType(options: ObjectTypeDecoratorOptions = {}) {
       fields: options.fields || definitionClass.fields,
       interfaces: options.interfaces || definitionClass.interfaces,
       isTypeOf: options.isTypeOf || definitionClass.isTypeOf,
-      meta: options.meta || definitionClass.meta,
       name: options.name || definitionClass.name,
       definitionClass,
+      meta: globalMetadataStorage,
     }
     ObjectTypeMetadata.create(mergedConfig);
   };

@@ -1,12 +1,11 @@
 import { GraphQLInputFieldConfigMap, GraphQLInputObjectTypeConfig } from 'graphql';
 
-import { MetadataStorage } from '../metadata/MetadataStorage';
 import { InputObjectTypeMetadata, InputObjectTypeMetadataConfig } from '../metadata/InputObjectTypeMetadata';
+import { globalMetadataStorage } from "../metadata/globalMetadataStorage";
 
 
 export type InputObjectTypeDecoratorOptions = {
   name?: string;
-  meta?: MetadataStorage;
   fields?: () => GraphQLInputFieldConfigMap;
   description?: string;
   astNode?: GraphQLInputObjectTypeConfig["astNode"];
@@ -19,8 +18,8 @@ export function InputObjectType(options: InputObjectTypeDecoratorOptions = {}) {
       astNode: options.astNode || definitionClass.astNode,
       description: options.description || definitionClass.description,
       fields: options.fields || definitionClass.fields,
-      meta: options.meta || definitionClass.meta,
       definitionClass,
+      meta: globalMetadataStorage,
     }
     InputObjectTypeMetadata.create(mergedConfig);
   };

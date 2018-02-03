@@ -1,14 +1,14 @@
-import { MetadataStorage } from '../metadata/MetadataStorage';
 import { ImplementsMetadata } from '../metadata/ImplementsMetadata';
+import { globalMetadataStorage } from "../metadata/globalMetadataStorage";
 
 
-export interface ImplementsDecoratorOptions {
-  meta?: MetadataStorage;
-}
 
-export function Implements(targetNameOrDefinitionClass: Function | string, options: ImplementsDecoratorOptions = {}) {
-  return function(definitionClass: Function & ImplementsDecoratorOptions) {
-    const mergedConfig = Object.assign(options, definitionClass, { definitionClass, targetNameOrDefinitionClass });
-    ImplementsMetadata.create(mergedConfig);
+export function Implements(targetDefinitionClass: Function) {
+  return function(definitionClass: Function) {
+    ImplementsMetadata.create({
+      definitionClass,
+      targetDefinitionClass,
+      meta: globalMetadataStorage,
+    });
   };
 }

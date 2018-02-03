@@ -1,11 +1,12 @@
 import { GraphQLObjectTypeConfig, GraphQLObjectType, GraphQLFieldConfigMap, GraphQLInterfaceType } from "graphql";
-import { MetadataStorage } from "./index";
+import { Metadata, MetadataConfig } from "./Metadata";
+import { ImplementsMetadata } from "./ImplementsMetadata";
+import { FieldMetadata } from "./FieldMetadata";
 
 
-export interface ObjectTypeMetadataConfig {
+export interface ObjectTypeMetadataConfig extends MetadataConfig {
   name: string;
-  meta?: MetadataStorage;
-  fields?: () => GraphQLFieldConfigMap<any, any>;
+  // fields?: () => GraphQLFieldConfigMap<any, any>;
 
   interfaces?: GraphQLObjectTypeConfig<any, any>["interfaces"];
   isTypeOf?: GraphQLObjectTypeConfig<any, any>["isTypeOf"];
@@ -19,41 +20,22 @@ export interface ObjectTypeMetadataBuild {
   typeInstance: GraphQLObjectType;
 }
 
-export class ObjectTypeMetadata {
-  public static create(config: ObjectTypeMetadataConfig) {
-    const metadata = new ObjectTypeMetadata(config);
-    metadata.meta.objectTypeMetadata.push(metadata);
-    return metadata;
-  }
+export class ObjectTypeMetadata extends Metadata<ObjectTypeMetadataConfig, ObjectTypeMetadataBuild> {
 
-  public meta: MetadataStorage;
-  public definitionClass: Function;
-  public config: ObjectTypeMetadataConfig;
-  public name: string;
+  public get definitionClass() { return this.config.definitionClass; }
+  public get name() { return this.config.name; }
 
-
-  protected constructor(config: ObjectTypeMetadataConfig) {
-    this.definitionClass = config.definitionClass;
-    this.config = config;
-    this.meta = config.meta || MetadataStorage.getMetadataStorage();
-    this.name = config.name;
-  }
-
-  protected memoziedBuild: ObjectTypeMetadataBuild;
-  get build() {
-    if (!this.memoziedBuild) {
-      this.memoziedBuild = {
-        typeInstance: this.buildTypeInstance(),
-      }
-    }
-    return this.memoziedBuild;
+  protected buildMetadata() {
+    return {
+      typeInstance: this.buildTypeInstance(),
+    };
   }
 
   protected buildTypeInstance() {
-    const { name, fields, interfaces, isTypeOf, description, astNode, extensionASTNodes } = this.config;
+    const { name, interfaces, isTypeOf, description, astNode, extensionASTNodes } = this.config;
     return new GraphQLObjectType({
       name,
-      fields: fields || this.fields.bind(this),
+      fields: this.fields.bind(this),
       isTypeOf: isTypeOf || this.isTypeOf.bind(this),
       interfaces: interfaces || this.getInterfaces(),
       description,
@@ -63,14 +45,14 @@ export class ObjectTypeMetadata {
   }
 
   protected getInterfaces(): GraphQLInterfaceType[] {
-    const implementsMetadata = this.meta.filterImplementsMetadata(this.definitionClass);
-    return implementsMetadata.map(meta => meta.getTargetTypeInstance());
+    const implementsMetadata = this.meta.filter(ImplementsMetadata, this.definitionClass);
+    return implementsMetadata.map(meta => meta.build.targetMetadata.build.typeInstance);
   }
 
   protected fields(): GraphQLFieldConfigMap<any, any> {
-    const fieldMetadata = this.meta.filterFieldMetadata(this.definitionClass);
+    const fieldMetadata = this.meta.filter(FieldMetadata, this.definitionClass);
     return fieldMetadata.reduce((results, metadata) => {
-      results[metadata.config.fieldName] = metadata.build.fieldConfig;
+      results[metadata.fieldName] = metadata.build.fieldConfig;
       return results;
     }, {} as GraphQLFieldConfigMap<any, any>);
   }

@@ -1,5 +1,7 @@
 import { GraphQLList, GraphQLNonNull, GraphQLType, isType } from "graphql";
-import { MetadataStorage } from "../index";
+import { MetadataStorage } from "./MetadataStorage";
+import { Metadata } from "./Metadata";
+import { globalMetadataStorage } from "../metadata/globalMetadataStorage";
 
 
 export interface GenericFunction {
@@ -51,7 +53,7 @@ export class Generic {
   protected meta: MetadataStorage;
 
   constructor(meta?: MetadataStorage) {
-    this.meta = meta || MetadataStorage.getMetadataStorage();
+    this.meta = meta || globalMetadataStorage;
     this.genericFn = this.DEFAULT_GENERIC_FUNCTION;
   }
 
@@ -60,11 +62,11 @@ export class Generic {
   protected rawTypeInstance?: GraphQLType;
   protected genericFn: GenericFunction;
 
-  public getTargetMetadata(): any { // TODO: ANY?
+  public getTargetMetadata(): any {
     if (this.definitionClass) {
-      return this.meta.getDefinitionMetadata(this.definitionClass);
+      return this.meta.getDefinitionMetadata(Metadata, this.definitionClass);
     } else if (this.targetTypeName) {
-      return this.meta.getDefinitionMetadata(this.targetTypeName);
+      return this.meta.getDefinitionMetadataByName(this.targetTypeName);
     } else {
       throw new Error('Generic type without definitionClass or targetTypeName has no targetMetadata');
     }

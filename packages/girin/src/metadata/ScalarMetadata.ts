@@ -1,27 +1,39 @@
 import { GraphQLBoolean, GraphQLString, GraphQLInt, GraphQLFloat, GraphQLID } from "graphql/type/scalars";
 import { GraphQLScalarType } from "graphql";
+import { Metadata, MetadataConfig } from "./Metadata";
+import { MetadataStorage } from "../index";
 
 
-export class ScalarMetadata {
-  protected typeInstance: GraphQLScalarType;
-  public name: string
-  public definitionClass: Function;
+export interface ScalarMetadataConfig extends MetadataConfig {
+  definitionClass: any;
+  typeInstance: GraphQLScalarType;
+}
 
-  constructor(typeInstance: GraphQLScalarType) {
-    this.typeInstance = typeInstance;
-    this.name = typeInstance.name;
+export interface ScalarMetadataBuild {
+  typeInstance: GraphQLScalarType;
+}
+
+export class ScalarMetadata extends Metadata<ScalarMetadataConfig, ScalarMetadataBuild> {
+
+  get name() {
+    return this.config.typeInstance.name;
   }
 
-  get build() {
-    return { typeInstance: this.typeInstance };
+  buildMetadata() {
+    return { typeInstance: this.config.typeInstance };
   }
 }
 
-
-export const builtInScalarMetadata = [
-  GraphQLBoolean,
-  GraphQLString,
-  GraphQLInt,
-  GraphQLFloat,
-  GraphQLID,
-].map(type => new ScalarMetadata(type));
+export function createScalarMetadata(meta: MetadataStorage) {
+  const definitionClass = GraphQLScalarType;
+  [
+    GraphQLBoolean,
+    GraphQLString,
+    GraphQLInt,
+    GraphQLFloat,
+    GraphQLID,
+  ].forEach(typeInstance => {
+    const config: ScalarMetadataConfig = { meta, definitionClass, typeInstance };
+    ScalarMetadata.create(config);
+  });
+}

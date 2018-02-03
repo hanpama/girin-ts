@@ -1,39 +1,32 @@
-import { MetadataStorage } from "../index";
 import { GraphQLInterfaceType } from "graphql";
 
-export interface ImplementsMetadataConfig {
-  meta?: MetadataStorage;
+import { Metadata, MetadataConfig } from "./Metadata";
+import { InterfaceTypeMetadata } from "./InterfaceTypeMetadata";
+
+export interface ImplementsMetadataConfig extends MetadataConfig {
   definitionClass: Function;
-  targetNameOrDefinitionClass: string | Function;
+  targetDefinitionClass: Function;
 }
 
+export interface ImplementsMetadataBuild {
+  targetMetadata: InterfaceTypeMetadata;
+  targetTypeInstance: GraphQLInterfaceType;
+}
 
-export class ImplementsMetadata {
+export class ImplementsMetadata extends Metadata<ImplementsMetadataConfig, ImplementsMetadataBuild> {
+  public get definitionClass() {
+    return this.config.definitionClass;
+  }
 
-  static create(config: ImplementsMetadataConfig) {
-    const metadata = new ImplementsMetadata(config);
-    metadata.meta.implementsMetadata.push(metadata);
+  protected buildMetadata() {
+    const targetMetadata = this.getTargetMetadata();
+    const targetTypeInstance = targetMetadata.build.typeInstance;
+    return { targetMetadata, targetTypeInstance };
+  }
+
+  protected getTargetMetadata(): InterfaceTypeMetadata {
+    const { targetDefinitionClass } = this.config;
+    const metadata = this.meta.getDefinitionMetadata(InterfaceTypeMetadata, targetDefinitionClass);
     return metadata;
-  }
-
-  get meta(): MetadataStorage {
-    return this.config.meta || MetadataStorage.getMetadataStorage();
-  }
-
-  get definitionClass() { return this.config.definitionClass }
-
-  protected config: ImplementsMetadataConfig;
-  protected constructor(config: ImplementsMetadataConfig) {
-    this.config = config;
-  }
-
-  getTargetTypeInstance(): GraphQLInterfaceType {
-    const { targetNameOrDefinitionClass } = this.config;
-    const metadata = this.meta.findInterfaceTypeMetadata(targetNameOrDefinitionClass);
-    if (!metadata) {
-      const targetName = (targetNameOrDefinitionClass as any).name || targetNameOrDefinitionClass.toString();
-      throw new Error(`${targetName} has no corresponding InterfaceType instance`);
-    }
-    return metadata.build.typeInstance;
   }
 }

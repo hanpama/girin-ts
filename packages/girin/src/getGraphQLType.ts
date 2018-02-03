@@ -1,25 +1,16 @@
 import { MetadataStorage } from "./metadata/MetadataStorage";
-import { GraphQLType, isType } from 'graphql';
+import { Metadata } from "./metadata/Metadata";
+import { globalMetadataStorage } from "./metadata/globalMetadataStorage";
 
 export interface TypeBuilderOptions {
   meta?: MetadataStorage;
 }
 
-export function getGraphQLType(definitionClassOrType: Function | GraphQLType, options?: TypeBuilderOptions): any {
-  let meta: MetadataStorage;
-  if (options && options.meta) {
-    meta = options.meta;
-  } else {
-    meta = MetadataStorage.getMetadataStorage();
-  }
+export function getGraphQLType(definitionClass: Function, options?: TypeBuilderOptions): any {
 
-  if (isType(definitionClassOrType)) {
-    return definitionClassOrType;
-  }
-
-  const typeMetadata = meta.getDefinitionMetadata(definitionClassOrType);
+  const typeMetadata = globalMetadataStorage.getDefinitionMetadata(Metadata, definitionClass);
   if (!typeMetadata) {
-    throw new Error(`Given class ${definitionClassOrType.name} has no corresponding metadata`);
+    throw new Error(`Given class ${definitionClass.name} has no corresponding metadata`);
   }
   return typeMetadata.build.typeInstance;
 }

@@ -1,20 +1,19 @@
 import { GraphQLArgumentConfig } from "graphql";
-import { MetadataStorage, InputMetadata } from "./MetadataStorage";
+
+import { Metadata, MetadataConfig } from "./Metadata";
 import { Generic } from "./Generic";
+import { InputMetadata } from "./types";
 
 
-export interface ArgumentMetadataConfig {
-  definitionClass: Function;
+export interface ArgumentMetadataConfig extends MetadataConfig {
   fieldName: string;
   definedOrder: number;
-  name: string;
+  argumentName: string;
 
   generic: Generic;
-
   defaultValue?: any;
   description?: string;
-
-  meta?: MetadataStorage;
+  definitionClass: Function;
 }
 
 export interface ArgumentMetadataBuild {
@@ -22,44 +21,29 @@ export interface ArgumentMetadataBuild {
   targetMetadata: InputMetadata,
 }
 
-export class ArgumentMetadata {
-  public static create(config: ArgumentMetadataConfig) {
-    const cls = this;
-    const metadata = new cls(config);
-    metadata.meta.argumentMetadata.push(metadata);
-    return metadata;
-  }
+export class ArgumentMetadata extends Metadata<ArgumentMetadataConfig, ArgumentMetadataBuild> {
 
-  get meta() {
-    return this.config.meta || MetadataStorage.getMetadataStorage();
-  }
-  get name() {
-    return this.config.name;
-  }
-  get fieldName() {
-    return this.config.fieldName;
-  }
-  get definitionClass() {
+  public get definitionClass() {
     return this.config.definitionClass;
   }
-  get definedOrder() {
+  public get argumentName() {
+    return this.config.argumentName;
+  }
+  public get fieldName() {
+    return this.config.fieldName;
+  }
+  public get definedOrder() {
     return this.config.definedOrder;
   }
 
-  protected constructor(public config: ArgumentMetadataConfig) {}
-
-  protected memoizedBuild: ArgumentMetadataBuild;
-  public get build() {
-    if (!this.memoizedBuild) {
-      this.memoizedBuild = {
-        argumentConfig: this.buildArgumentConfig(),
-        targetMetadata: this.config.generic.getTargetMetadata(),
-      };
+  protected buildMetadata() {
+    return {
+      argumentConfig: this.buildArgumentConfig(),
+      targetMetadata: this.config.generic.getTargetMetadata(),
     }
-    return this.memoizedBuild;
   }
 
-  public buildArgumentConfig(): GraphQLArgumentConfig {
+  protected buildArgumentConfig(): GraphQLArgumentConfig {
     const { generic, defaultValue, description } = this.config;
     const type = generic.getTypeInstance();
     return { type, defaultValue, description };
