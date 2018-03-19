@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+      "outDir": ".",
+      "lib": [
+        "dom", "es2015"
+      ],
+      "declaration": false,
+      "sourceMap": false,
+      "jsx": "react"
+  },
+  "files": [
+    "src/index.tsx"
+  ]
+}
