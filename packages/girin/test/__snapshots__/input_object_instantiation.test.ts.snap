@@ -8,14 +8,14 @@ exports[`Input object instantiation generates schema as expected 1`] = `
 }
 
 input MemberInput {
-  profile: MemberProfileInput!
-  email: String!
   username: String!
+  email: String!
+  profile: MemberProfileInput!
 }
 
 input MemberProfileInput {
-  lastName: String!
   firstName: String!
+  lastName: String!
 }
 
 type Mutation {

@@ -8,7 +8,7 @@ exports[`Basic mutation and schema generation generates schema as expected 1`] =
 }
 
 type Mutation {
-  createMember(email: String!, name: String!): Member!
+  createMember(name: String!, email: String!): Member!
 }
 
 type Query {

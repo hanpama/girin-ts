@@ -1,0 +1,26 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`field with GraphQLType generates schema as expected 1`] = `
+"enum Baz {
+  A
+  B
+  C
+}
+
+type Item {
+  name: String
+  info: ItemInfo
+}
+
+type ItemInfo {
+  description: String
+}
+
+type Query {
+  item: Item
+  nonNullItem: Item!
+  baz: Baz
+  erroneousBaz: Baz
+}
+"
+`;

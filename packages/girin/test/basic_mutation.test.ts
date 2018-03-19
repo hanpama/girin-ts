@@ -1,44 +1,40 @@
 import { graphql, GraphQLSchema, printSchema } from 'graphql';
 
-import { Field } from '../src/decorators/Field';
-import { Argument } from '../src/decorators/Argument';
-import { ObjectType } from '../src/decorators/ObjectType';
-import { getGraphQLType } from '../src/getGraphQLType';
+import { Definition, gql, getGraphQLType } from '../src';
 
-interface MemberSource {
+
+@Definition(gql`
+  type Member {
+    id: Int!
+    name: String!
+    email: String!
+  }
+`)
+class Member {
   id: number;
   name: string;
   email: string;
 }
 
-@ObjectType()
-class Member {
-  constructor(source: MemberSource) {
-    this.id = source.id;
-    this.name = source.name;
-    this.email = source.email;
+@Definition(gql`
+  type Query {
+    getMember: ${Member}!
   }
-  @Field('Int!') id: number;
-  @Field('String!') name: string;
-  @Field('String!') email: string;
-}
-
-@ObjectType()
+`)
 class Query {
-  @Field('Member!')
-  public getMember() {
-    return new Member({ id: 1, name: 'Jonghyun', email: 'j@example.com' });
+  public static getMember() {
+    return { id: 1, name: 'Jonghyun', email: 'j@example.com' };
   }
 }
 
-@ObjectType()
+@Definition(gql`
+  type Mutation {
+    createMember(name: String!, email: String!): ${Member}!
+  }
+`)
 class Mutation {
-  @Field('Member!')
-  public createMember(
-    @Argument("name: String!") name: string,
-    @Argument("email: String!") email: string,
-  ) {
-    return new Member({ id: 2, name, email });
+  public static createMember(source: null, { name, email }: { name: string, email: string }) {
+    return { id: 2, name, email };
   }
 }
 
@@ -64,9 +60,8 @@ describe('Basic mutation and schema generation', async () => {
         }
       }
     `});
-    expect(result.data!.createMember.id).toBe(2);
-    expect(result.data!.createMember.name).toBe("Key");
-    expect(result.data!.createMember.email).toBe("k@example.com");
+    expect(result).toEqual({ data: {
+      createMember: { id: 2, name: 'Key', email: 'k@example.com' }
+    }});
   });
-
 });

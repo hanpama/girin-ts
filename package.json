@@ -1,9 +1,14 @@
 {
-	"devDependencies": {
-		"lerna": "^2.5.1",
-		"graphql": "^0.12.3",
-		"jest": "^22.1.4",
-		"ts-jest": "^22.0.1",
-		"typescript": "^2.6.2"
-	}
+  "scripts": {
+    "bootstrap": "npm i && lerna bootstrap"
+  },
+  "devDependencies": {
+    "@types/graphql": "^0.12.3",
+    "@types/jest": "^22.1.1",
+    "graphql": "^0.13.1",
+    "jest": "^22.1.4",
+    "lerna": "^2.9.0",
+    "ts-jest": "^22.0.3",
+    "typescript": "2.6.2"
+  }
 }

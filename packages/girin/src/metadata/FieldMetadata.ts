@@ -1,80 +1,75 @@
-import { GraphQLFieldConfig, GraphQLFieldConfigArgumentMap } from "graphql";
+import { GraphQLFieldConfig, GraphQLFieldConfigArgumentMap, GraphQLOutputType } from "graphql";
 import { defaultFieldResolver } from "graphql/execution/execute";
 
-import { Generic } from "./Generic";
-import { Metadata, MetadataConfig } from "./Metadata";
 import { ArgumentMetadata } from "./ArgumentMetadata";
-import { InputObjectTypeMetadata } from "./InputObjectTypeMetadata";
+import { GenericMetadata, GenericMetadataConfig } from "../base/GenericMetadata";
+import { isPromise } from "../types";
 
 
-export interface FieldMetadataConfig extends MetadataConfig {
-  definitionClass: Function;
+export interface FieldMetadataConfig extends GenericMetadataConfig {
   fieldName: string;
-
-  generic: Generic;
-
   description?: string;
   deprecationReason?: string;
+  resolver?: Function;
 }
 
-export interface FieldMetadataBuild {
-  fieldConfig: GraphQLFieldConfig<any, any>;
-}
+export class FieldMetadata extends GenericMetadata<FieldMetadataConfig> {
 
-export class FieldMetadata extends Metadata<FieldMetadataConfig, FieldMetadataBuild> {
-
-  public get definitionClass() {
-    return this.config.definitionClass;
-  }
   public get fieldName() {
     return this.config.fieldName;
   }
 
-  protected buildMetadata() {
-    const argumentMetadata = this.meta
+  protected findArgumentMetadata(): ArgumentMetadata[] {
+    return this.storage
       .filter(ArgumentMetadata, this.definitionClass)
       .filter(meta => meta.fieldName === this.config.fieldName);
-
-    return { fieldConfig: this.buildFieldConfig(argumentMetadata) };
   }
 
-  protected buildFieldConfig(argumentMetadata: ArgumentMetadata[]) {
-    const args = argumentMetadata.reduce((results, metadata) => {
-      results[metadata.argumentName] = metadata.build.argumentConfig;
+  public get fieldConfig() {
+    const argumentMetadata = this.findArgumentMetadata();
+    const type = this.type as GraphQLOutputType;
+    const resolve = this.resolve;
+
+    const args = argumentMetadata.reduce((results, metadataObj) => {
+      results[metadataObj.argumentName] = metadataObj.argumentConfig;
       return results;
     }, {} as GraphQLFieldConfigArgumentMap);
 
-    const { generic, description, deprecationReason } = this.config;
-    const type = generic.getTypeInstance();
-    const resolve = this.buildResolver(argumentMetadata);
+    const { description, deprecationReason } = this.config;
 
     const fieldConfig: GraphQLFieldConfig<any, any> = { type, args, description, deprecationReason, resolve };
-      // subscribe: this.subscribe,
     return fieldConfig;
   }
 
-  protected buildResolver(argumentMetadata: ArgumentMetadata[]) {
-    const argumentReducer = this.buildArgumentReducer(argumentMetadata);
-
-    return (definitionInstance: any, args: any, context: any, info: any) => {
-
-      const instance = definitionInstance || this.definitionClass.prototype;
-      if (instance[info.fieldName] instanceof Function) {
-        const reducedArguments = argumentReducer(args, context, info);
-        return instance[info.fieldName](...reducedArguments, context, info);
-      }
-      return defaultFieldResolver(instance, args, context, info);
-    }
+  protected get completeArguments() {
+    const argumentMetadata = this.findArgumentMetadata();
+    return (args: any, context: any, info: any) => argumentMetadata.reduce((completeArgs, meta) => {
+      completeArgs[meta.argumentName] = meta.instantiate(args[meta.argumentName], context, info);
+      return completeArgs;
+    }, {} as any);
   }
 
-  protected buildArgumentReducer(argumentMetadata: ArgumentMetadata[]) {
-    return (args: any, context: any, info: any) => argumentMetadata.reduce((argsOrdered, meta, idx) => {
-      if (meta.build.targetMetadata instanceof InputObjectTypeMetadata) {
-        argsOrdered[meta.definedOrder] = meta.build.targetMetadata.build.instantiate(args[meta.argumentName], context, info);
+  public get resolve() {
+    const { resolver, definitionClass } = this.config;
+    const { completeArguments, instantiate } = this;
+
+    return (source: any, args: any, context: any, info: any) => {
+      const completeArgs = completeArguments(args, context, info);
+      let resolved: any;
+      if (resolver) {
+        resolved = resolver.apply(definitionClass, [source, completeArgs, context, info]);
+      } else if (source) {
+        resolved = defaultFieldResolver(source, completeArgs, context, info);
       } else {
-        argsOrdered[meta.definedOrder] = args[meta.argumentName];
+        return source;
       }
-      return argsOrdered;
-    }, [] as any[]);
+
+      if (!resolved) {
+        return resolved;
+      } else if (isPromise(resolved)) {
+        return resolved.then(instantiate);
+      }
+      return instantiate(resolved);
+    }
   }
 }

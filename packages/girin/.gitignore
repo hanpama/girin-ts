@@ -1,7 +1,17 @@
 node_modules/
+.DS_Store
+
+/coverage/
 
 /decorators/
 /metadata/
+/builtins/
+/base/
+/execution/
+/utilities/
+/type-expression/
+/sdl/
 /index.*
-/utils.*
+/types.*
 /getGraphQLType.*
+/globalMetadataStorage.*

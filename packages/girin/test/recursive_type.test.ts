@@ -1,9 +1,7 @@
 import { graphql, GraphQLSchema, printSchema } from 'graphql';
 
-import { ObjectType } from '../src/decorators/ObjectType';
-import { Field } from '../src/decorators/Field';
-import { Argument } from '../src/decorators/Argument';
-import { getGraphQLType } from '../src/getGraphQLType';
+import { Definition, gql, getGraphQLType } from '../src';
+
 
 interface MemberSource {
   id: number;
@@ -17,37 +15,34 @@ const members: MemberSource[] = [
   { id: 1, name: 'Jonghyun', email: 'j@example.com', friendId: 0 },
 ]
 
-@ObjectType()
-class Member {
-  constructor(private source: MemberSource) {
-    this.id = source.id;
-    this.name = source.name;
-    this.email = source.email;
+@Definition(gql`
+  type Member {
+    id: Int!
+    name: String!
+    email: String!
+    friend: Member
   }
+`)
+class Member {
+  id: number;
+  name: string;
+  email: string;
 
-  @Field('Int!') id: number;
+  private friendId: number;
 
-  @Field('String!') name: string;
-
-  @Field('String!') email: string;
-
-  @Field('Member') friend() {
-    const memberSource = members.find(m => m.id === this.source.friendId);
-    if (memberSource) {
-      return new Member(memberSource);
-    }
-    return null;
+  friend() {
+    return members.find(m => m.id === this.friendId);
   }
 }
 
-@ObjectType()
+@Definition(gql`
+  type Query {
+    getMember(id: Int!): ${Member}
+  }
+`)
 class Query {
-  @Field('Member')
-  public getMember(
-    @Argument('id: Int!') id: number,
-  ) {
-    const source = members.find(m => m.id === id);
-    return source ? new Member(source) : null;
+  public static getMember(source: null, { id }: { id: number }) {
+    return members.find(m => m.id === id);
   }
 }
 
@@ -73,9 +68,17 @@ describe('Schema generation and query of recursive types', async () => {
         }
       }
     `});
-    expect(result.data!.getMember.id).toBe(0);
-    expect(result.data!.getMember.friend.id).toBe(1);
-    expect(result.data!.getMember.friend.friend.id).toBe(0);
+    expect(result).toEqual({ data: {
+      getMember: {
+        id: 0,
+        friend: {
+          id: 1,
+          friend: {
+            id: 0
+          }
+        }
+      }
+    }});
   });
 
 });

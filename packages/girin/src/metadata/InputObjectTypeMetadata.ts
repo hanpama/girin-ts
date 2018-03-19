@@ -1,68 +1,51 @@
-import { GraphQLInputObjectTypeConfig, GraphQLInputObjectType, GraphQLInputFieldConfigMap } from "graphql";
-import { Metadata, MetadataConfig } from "./Metadata";
+import { GraphQLInputObjectType, GraphQLInputFieldConfigMap } from "graphql";
 import { InputFieldMetadata } from "./InputFieldMetadata";
+import { DefinitionMetadata, DefinitionMetadataConfig } from "../base/DefinitionMetadata";
+import { memoizedGetter as builder } from "../utilities/memoize";
+import { DefinitionClass, Instantiator } from "../types";
 
 
-export interface InputObjectTypeMetadataConfig extends MetadataConfig {
-  name: string;
-  fields?: () => GraphQLInputFieldConfigMap;
+export interface InputObjectTypeMetadataConfig extends DefinitionMetadataConfig {
+  definitionClass: DefinitionClass;
   description?: string;
-  astNode?: GraphQLInputObjectTypeConfig["astNode"];
-  definitionClass: Function;
 }
 
-export interface InputObjectTypeMetadataBuild {
-  typeInstance: GraphQLInputObjectType;
-  instantiate: (args: any, context: any, info: any) => any;
-}
+export class InputObjectTypeMetadata extends DefinitionMetadata<InputObjectTypeMetadataConfig> {
 
-export class InputObjectTypeMetadata extends Metadata<InputObjectTypeMetadataConfig, InputObjectTypeMetadataBuild> {
 
-  public get definitionClass() { return this.config.definitionClass; }
-
-  public get name() { return this.config.name; }
-
-  protected buildMetadata() {
-    return  {
-      typeInstance: this.buildTypeInstance(),
-      instantiate: this.buildInstantiator(),
-    };
+  protected findInputFieldMetadata(): InputFieldMetadata[] {
+    return this.storage.filter(InputFieldMetadata, this.definitionClass);
   }
 
-  protected buildTypeInstance() {
-    const { astNode, description, name } = this.config;
-    return new GraphQLInputObjectType({
-      name,
-      fields: this.config.fields || this.fields.bind(this),
-      astNode,
-      description
-    });
+  @builder
+  public get typeInstance() {
+    const name = this.typeName;
+    const fields = () => this.fields;
+    const description = this.description;
+    return new GraphQLInputObjectType({ name, fields, description });
   }
 
-  protected fields(): GraphQLInputFieldConfigMap {
-    const fieldMetadata = this.meta.filter(InputFieldMetadata, this.definitionClass);
-    return fieldMetadata.reduce((results, metadata) => {
-      results[metadata.fieldName] = metadata.build.inputFieldConfig;
+  protected get fields(): GraphQLInputFieldConfigMap {
+    const inputFieldMetadata = this.findInputFieldMetadata();
+    return inputFieldMetadata.reduce((results, metadata) => {
+      results[metadata.fieldName] = metadata.inputFieldConfig;
       return results;
     }, {} as GraphQLInputFieldConfigMap);
   }
 
-  public buildInstantiator() {
-    const inputFieldMetadata = this.meta.filter(InputFieldMetadata, this.definitionClass);
+  public get instantiate(): Instantiator {
+    const { definitionClass } = this;
+    const inputFieldMetadata = this.findInputFieldMetadata();
 
-    return (argsObject: any, context: any, info: any) => {
-      const constructorArgs = inputFieldMetadata.reduce((results, metadata) => {
-        if (metadata.build.targetMetadata instanceof InputObjectTypeMetadata) {
-          results[metadata.definedOrder] = metadata.build.targetMetadata.build.instantiate(argsObject[metadata.fieldName], context, info);
-        } else {
-          results[metadata.definedOrder] = argsObject[metadata.fieldName];
-        }
+    if (definitionClass.instantiate) {
+      return definitionClass.instantiate.bind(definitionClass);
+    }
+    return function (argsObject: any, context: any, info: any) {
+      const instance = Object.create(definitionClass.prototype);
+      return inputFieldMetadata.reduce((results, metadata) => {
+        results[metadata.fieldName] = metadata.instantiate(argsObject[metadata.fieldName]);
         return results;
-      }, [] as any[]);
-      const ThisInputObjectSubclass: any = this.definitionClass;
-      return new ThisInputObjectSubclass(...constructorArgs, context, info);
+      }, instance);
     }
   }
 }
-
-

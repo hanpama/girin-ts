@@ -1,81 +1,73 @@
 import { graphql, GraphQLSchema, printSchema } from 'graphql';
 
-import { Field } from '../src/decorators/Field';
-import { Argument } from '../src/decorators/Argument';
-import { InputField } from '../src/decorators/InputField';
-import { ObjectType } from '../src/decorators/ObjectType';
-import { InputObjectType } from '../src/decorators/InputObjectType';
-import { getGraphQLType } from '../src/getGraphQLType';
+import { Definition, gql, getGraphQLType } from '../src';
 
 
-interface MemberSource {
+@Definition(gql`
+  type Member {
+    id: Int!
+    username: String!
+    email: String!
+  }
+`)
+class Member {
   id: number;
   username: string;
   email: string;
 }
 
-@ObjectType()
-class Member {
-  constructor(source: MemberSource) {
-    this.id = source.id;
-    this.username = source.username;
-    this.email = source.email;
+@Definition(gql`
+  input MemberProfileInput {
+    firstName: String!
+    lastName: String!
   }
-  @Field('Int!') id: number;
-  @Field('String!') username: string;
-  @Field('String!') email: string;
-}
-
-@InputObjectType()
+`)
 class MemberProfileInput {
-  constructor(
-    @InputField("firstName: String!")
-    public firstName: string,
-    @InputField("lastName: String!")
-    public lastName: string,
-  ) { }
+  public firstName: string;
+  public lastName: string;
 }
 
-@InputObjectType()
+@Definition(gql`
+  input MemberInput {
+    username: String!
+    email: String!
+    profile: MemberProfileInput!
+  }
+`)
 class MemberInput {
-  constructor(
-    @InputField("username: String!")
-    public username: string,
-    @InputField("email: String!")
-    public email: string,
-    @InputField('profile: MemberProfileInput!')
-    public profile: MemberProfileInput,
-  ) { }
+  public username: string;
+  public email: string;
+  public profile: MemberProfileInput;
 }
 
-@ObjectType()
+@Definition(gql`
+  type Query {
+    getMember: Member!
+  }
+`)
 class Query {
-  @Field('Member!')
-  public getMember() {
-    return new Member({ id: 1, username: 'Jonghyun', email: 'j@example.com' });
+  public static getMember(): Member {
+    return { id: 1, username: 'Jonghyun', email: 'j@example.com' };
   }
 }
 
-@ObjectType()
-class Mutation {
-  @Field('Boolean!')
-  public instantiateMemberInput(
-    @Argument("member: MemberInput!") member: MemberInput,
-  ) {
-    return member instanceof MemberInput && member.profile instanceof MemberProfileInput;
+@Definition(gql`
+  type Mutation {
+    instantiateMemberInput(member: MemberInput!): Boolean!
+    getEmailFromInput(member: MemberInput!): String!
+    getUsernameFromInput(member: MemberInput!): String!
   }
-
-  @Field('String!')
-  public getEmailFromInput(
-    @Argument("member: MemberInput!") member: MemberInput,
-  ) {
+`)
+class Mutation {
+  public static instantiateMemberInput(source: null, { member }: { member: MemberInput }) {
+    const result = member instanceof MemberInput && member.profile instanceof MemberProfileInput;
+    return result;
+  }
+  public static getEmailFromInput(source: null, { member }: {member: MemberInput }) {
     return member.email;
   }
 
-  @Field('String!')
-  public getUsernameFromInput(
-    @Argument("member: MemberInput!") member: MemberInput,
-  ) {
+  public static getUsernameFromInput(source: null, { member }: { member: MemberInput }) {
     return member.username;
   }
 }
@@ -111,9 +103,10 @@ describe('Input object instantiation', () => {
         })
       }
     `});
-    // console.log(JSON.stringify(result, null, '  '));
-    expect(result.data!.getUsernameFromInput).toBe("Key");
-    expect(result.data!.getEmailFromInput).toBe("k@example.com");
-    expect(result.data!.instantiateMemberInput).toBe(true);
+    expect(result).toEqual({ data: {
+      getUsernameFromInput: "Key",
+      getEmailFromInput: "k@example.com",
+      instantiateMemberInput: true,
+    }})
   });
 });

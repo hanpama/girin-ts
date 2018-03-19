@@ -1,61 +1,51 @@
 import { graphql, GraphQLSchema, printSchema } from 'graphql';
 
-import { ObjectType } from '../src/decorators/ObjectType';
-import { Field } from '../src/decorators/Field';
-import { Argument } from '../src/decorators/Argument';
-import { getGraphQLType } from '../src/getGraphQLType';
+import { Definition, gql, getGraphQLType } from '../src';
 
 
 interface TestSource {
   fieldWithDefaultResolver?: string;
 }
 
-@ObjectType()
+@Definition(gql`
+  type Test {
+    """description1"""
+    resolverGotDefinitionInstance: Boolean!
+
+    greeting(greeting: String, name: String!): String!
+    bigGreeting(greeting: String, name: String!): String!
+    fieldWithDefaultResolver: String
+  }
+`)
 class Test {
   constructor(public source: TestSource) {
     this.fieldWithDefaultResolver = source.fieldWithDefaultResolver;
   }
 
-  @Field('Boolean!', {
-    description: 'description1',
-  })
   public resolverGotDefinitionInstance() {
     return this instanceof Test;
   }
-
-  @Field('String!')
-  public greeting(
-    @Argument('name: String!') name: string,
-    @Argument('greeting: String') greeting: string,
-  ) {
+  public greeting({ name, greeting }: { name: string, greeting: string }) {
     return `${greeting || 'Hello'}, ${name}`;
   }
-
-  @Field('String!')
-  public bigGreeting(
-    @Argument("name: String!") name: string,
-    @Argument("greeting: String") greeting: string,
-  ) {
-    return this.greeting(name, greeting) + '!';
+  public bigGreeting(arg: { name: string, greeting: string }) {
+    return this.greeting(arg) + '!';
   }
-
-  @Field('String') fieldWithDefaultResolver?: string;
+  public fieldWithDefaultResolver?: string;
 }
 
-@ObjectType()
+@Definition(gql`
+  type Query {
+    test: ${Test}
+    erroneousTest: ${Test}
+    testPassingSource: ${Test}
+  }
+`)
 class Query {
-  @Field('Test')
-  public test() {
+  public static test() {
     return new Test({});
   }
-
-  @Field('Test')
-  public erroneousTest() {
-    return {};
-  }
-
-  @Field('Test')
-  public testPassingSource() {
+  public static testPassingSource() {
     return new Test({ fieldWithDefaultResolver: 'Ohayo' });
   }
 }
@@ -71,10 +61,9 @@ describe('Basic queries and schema generation', async () => {
   });
 
   it('passes source and args to its resolver', async () => {
-    const result = await graphql({ schema, source: `
+    let result = await graphql({ schema, source: `
       query {
         test {
-          resolverGotDefinitionInstance
           greeting(name: "Suzuki")
           bigGreeting(name: "Suzuki")
           fieldWithDefaultResolver
@@ -84,24 +73,28 @@ describe('Basic queries and schema generation', async () => {
         }
       }
     `});
-    expect(result.data!.test.resolverGotDefinitionInstance).toBe(true);
-    expect(result.data!.test.greeting).toBe('Hello, Suzuki');
-    expect(result.data!.test.bigGreeting).toBe('Hello, Suzuki!');
-    expect(result.data!.test.fieldWithDefaultResolver).toBe(null);
-    expect(result.data!.testPassingSource.fieldWithDefaultResolver).toBe('Ohayo');
-  });
+    expect(result).toEqual({ data: {
+      test: {
+        greeting: 'Hello, Suzuki',
+        bigGreeting: 'Hello, Suzuki!',
+        fieldWithDefaultResolver: null,
+      },
+      testPassingSource: {
+        fieldWithDefaultResolver: 'Ohayo',
+      },
+    } });
 
-  it('checks its source is an instance of definition class', async () => {
-    const result = await graphql({ schema, source: `
+    result = await graphql({ schema, source: `
       query {
-        erroneousTest {
+        test {
           resolverGotDefinitionInstance
-          greeting(name: "Suzuki")
         }
       }
     `});
-    expect(result.errors![0].message).toBe(
-      `Expected value of type \"Test\" but got: [object Object].`
-     );
+    expect(result).toEqual({ data : {
+      test: {
+        resolverGotDefinitionInstance: true
+      }
+    }});
   });
 });

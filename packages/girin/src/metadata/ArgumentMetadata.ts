@@ -1,51 +1,34 @@
-import { GraphQLArgumentConfig } from "graphql";
+import { GraphQLArgumentConfig, GraphQLInputType } from "graphql";
 
-import { Metadata, MetadataConfig } from "./Metadata";
-import { Generic } from "./Generic";
-import { InputMetadata } from "./types";
+import { GenericMetadataConfig, GenericMetadata } from "../base/GenericMetadata";
+import { memoizedGetter as builder } from "../utilities/memoize";
 
 
-export interface ArgumentMetadataConfig extends MetadataConfig {
+export interface ArgumentMetadataConfig extends GenericMetadataConfig {
   fieldName: string;
-  definedOrder: number;
+
   argumentName: string;
 
-  generic: Generic;
   defaultValue?: any;
   description?: string;
-  definitionClass: Function;
 }
 
-export interface ArgumentMetadataBuild {
-  argumentConfig: GraphQLArgumentConfig,
-  targetMetadata: InputMetadata,
-}
+export class ArgumentMetadata extends GenericMetadata<ArgumentMetadataConfig> {
 
-export class ArgumentMetadata extends Metadata<ArgumentMetadataConfig, ArgumentMetadataBuild> {
-
-  public get definitionClass() {
-    return this.config.definitionClass;
-  }
   public get argumentName() {
     return this.config.argumentName;
   }
   public get fieldName() {
     return this.config.fieldName;
   }
-  public get definedOrder() {
-    return this.config.definedOrder;
-  }
 
-  protected buildMetadata() {
+  @builder
+  public get argumentConfig(): GraphQLArgumentConfig {
+    const { defaultValue, description } = this.config;
     return {
-      argumentConfig: this.buildArgumentConfig(),
-      targetMetadata: this.config.generic.getTargetMetadata(),
-    }
-  }
-
-  protected buildArgumentConfig(): GraphQLArgumentConfig {
-    const { generic, defaultValue, description } = this.config;
-    const type = generic.getTypeInstance();
-    return { type, defaultValue, description };
+      type: this.type as GraphQLInputType,
+      defaultValue,
+      description,
+    };
   }
 }
