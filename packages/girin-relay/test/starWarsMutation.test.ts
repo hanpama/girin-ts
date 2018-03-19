@@ -10,7 +10,6 @@
 
 import { StarWarsSchema } from './starWarsSchema';
 import { graphql } from 'graphql';
-import { globalMetadataStorage } from 'girin/globalMetadataStorage';
 
 
 describe('Star Wars mutations', () => {

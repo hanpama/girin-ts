@@ -24,7 +24,7 @@
   "homepage": "https://github.com/hanpama/girin",
   "license": "MIT",
   "dependencies": {
-    "girin": "^0.2.1",
+    "girin": "^0.1.3",
     "graphql-relay": "^0.5.4"
   },
   "devDependencies": {

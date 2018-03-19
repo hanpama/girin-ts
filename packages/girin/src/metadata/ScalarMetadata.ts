@@ -1,6 +1,4 @@
 import { GraphQLScalarType } from "graphql";
-import { Metadata, MetadataConfig } from "./Metadata";
-import { MetadataStorage } from "../index";
 
 import { DefinitionMetadata, DefinitionMetadataConfig } from "../base/DefinitionMetadata";
 
