@@ -2,11 +2,14 @@
   "scripts": {
     "bootstrap": "npm i && lerna bootstrap",
     "test": "lerna run -- test",
-    "build": "lerna run -- build"
+    "build": "lerna run -- build",
+    "coverage": "lerna run -- coverage",
+    "coverage:upload": "codecov"
   },
   "devDependencies": {
     "@types/graphql": "^0.12.3",
     "@types/jest": "^22.1.1",
+    "codecov": "^3.0.0",
     "graphql": "^0.13.1",
     "jest": "^22.1.4",
     "lerna": "^2.9.0",

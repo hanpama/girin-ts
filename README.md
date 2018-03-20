@@ -2,6 +2,12 @@
 
 Girin is a GraphQL framework written in TypeScript.
 
+* Seamless integration between GraphQL SDL and TypeScript classes
+* Modularization of GraphQL type definitions
+
+[![Build Status](https://travis-ci.org/hanpama/girin.svg?branch=master)](https://travis-ci.org/hanpama/girin)
+
+
 ```typescript
 @Definition(gql`
   type Member {
@@ -23,9 +29,6 @@ class Member {
   }
 }
 ```
-
-* Seamless integration between GraphQL SDL and TypeScript classes
-* Modularization of GraphQL type definitions
 
 ## Installation
 
