@@ -44,8 +44,5 @@
       "ts",
       "js"
     ]
-  },
-  "dependencies": {
-    "jest": "^22.1.4"
   }
 }
