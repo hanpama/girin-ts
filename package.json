@@ -1,6 +1,8 @@
 {
   "scripts": {
-    "bootstrap": "npm i && lerna bootstrap"
+    "bootstrap": "npm i && lerna bootstrap",
+    "test": "lerna run -- test",
+    "build": "lerna run -- build"
   },
   "devDependencies": {
     "@types/graphql": "^0.12.3",
