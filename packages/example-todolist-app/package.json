@@ -1,6 +1,6 @@
 {
   "name": "example-todolist-static",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "",
   "main": "index.js",
   "private": true,
@@ -17,7 +17,7 @@
     "@types/react-dom": "^16.0.3",
     "apollo-client-preset": "^1.0.6",
     "apollo-link-schema": "^1.0.2",
-    "girin": "^0.2.0",
+    "girin": "^0.2.1",
     "graphql-tag": "^2.6.1",
     "parcel-bundler": "1.2.1",
     "react": "^16.2.0",
