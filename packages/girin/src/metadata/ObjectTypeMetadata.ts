@@ -11,6 +11,9 @@ export interface ObjectTypeMetadataConfig extends DefinitionMetadataConfig {
   interfaces?: TypeExpression[];
 }
 
+/**
+ * Metadata type for ObjectType
+ */
 export class ObjectTypeMetadata<TConfig extends ObjectTypeMetadataConfig = ObjectTypeMetadataConfig> extends DefinitionMetadata<TConfig> {
 
   protected getFieldMetadata() {
@@ -27,6 +30,9 @@ export class ObjectTypeMetadata<TConfig extends ObjectTypeMetadataConfig = Objec
     );
   }
 
+  /**
+   * Build GraphQLObjectType instance from metadata.
+   */
   @builder
   public get typeInstance(): GraphQLObjectType {
     const name = this.typeName;
@@ -38,6 +44,10 @@ export class ObjectTypeMetadata<TConfig extends ObjectTypeMetadataConfig = Objec
     return new GraphQLObjectType({ name, fields, isTypeOf, interfaces, description });
   }
 
+  /**
+   * Default source type validator
+   * @param source
+   */
   public isTypeOf(source: any) {
     return source instanceof this.definitionClass;
   }
@@ -50,6 +60,9 @@ export class ObjectTypeMetadata<TConfig extends ObjectTypeMetadataConfig = Objec
     );
   }
 
+  /**
+   * Get the instantiator function from definition class or return default
+   */
   public get instantiate(): Instantiator {
     const { definitionClass } = this;
 

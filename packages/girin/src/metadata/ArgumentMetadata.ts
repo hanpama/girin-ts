@@ -6,13 +6,14 @@ import { memoizedGetter as builder } from "../utilities/memoize";
 
 export interface ArgumentMetadataConfig extends GenericMetadataConfig {
   fieldName: string;
-
   argumentName: string;
-
   defaultValue?: any;
   description?: string;
 }
 
+/**
+ * Metadata type for arguments
+ */
 export class ArgumentMetadata extends GenericMetadata<ArgumentMetadataConfig> {
 
   public get argumentName() {

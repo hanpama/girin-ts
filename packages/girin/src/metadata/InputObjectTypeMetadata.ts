@@ -10,13 +10,19 @@ export interface InputObjectTypeMetadataConfig extends DefinitionMetadataConfig 
   description?: string;
 }
 
-export class InputObjectTypeMetadata extends DefinitionMetadata<InputObjectTypeMetadataConfig> {
 
+/**
+ * Metadata type for InputObjectType
+ */
+export class InputObjectTypeMetadata extends DefinitionMetadata<InputObjectTypeMetadataConfig> {
 
   protected findInputFieldMetadata(): InputFieldMetadata[] {
     return this.storage.filter(InputFieldMetadata, this.definitionClass);
   }
 
+  /**
+   * Build GraphQLInterfaceType instance from metadata.
+   */
   @builder
   public get typeInstance() {
     const name = this.typeName;
@@ -33,6 +39,9 @@ export class InputObjectTypeMetadata extends DefinitionMetadata<InputObjectTypeM
     }, {} as GraphQLInputFieldConfigMap);
   }
 
+  /**
+   * Get the instantiator function from definition class or return default
+   */
   public get instantiate(): Instantiator {
     const { definitionClass } = this;
     const inputFieldMetadata = this.findInputFieldMetadata();

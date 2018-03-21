@@ -7,6 +7,9 @@ export interface ScalarMetadataConfig extends DefinitionMetadataConfig {
   typeInstance: GraphQLScalarType;
 }
 
+/**
+ * Metadata type for ScalarType
+ */
 export class ScalarMetadata extends DefinitionMetadata<ScalarMetadataConfig> {
   public get typeName(): string {
     return this.config.typeInstance.name;

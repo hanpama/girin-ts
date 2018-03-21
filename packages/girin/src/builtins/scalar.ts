@@ -10,6 +10,10 @@ export class IntScalar {}
 export class IDScalar {}
 
 
+/**
+ * Load all the built in scalar types into a given [[MetadataStorage]].
+ * @param storage
+ */
 export function loadBuiltInScalar(storage: MetadataStorage) {
   (new ScalarMetadata({
     definitionClass: StringScalar,

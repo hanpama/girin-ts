@@ -12,6 +12,9 @@ export interface InputFieldMetadataConfig extends GenericMetadataConfig {
   definitionClass: Function;
 }
 
+/**
+ * Metadata type for InputField
+ */
 export class InputFieldMetadata extends GenericMetadata<InputFieldMetadataConfig> {
 
   get fieldName() {

@@ -7,6 +7,10 @@ import { createMetadataFromAST } from './ast-to-metadata';
 
 const storage = globalMetadataStorage;
 
+/**
+ * Register definition metadata and generic metadata from its given parse result
+ * @param parseResult
+ */
 export function Definition(parseResult: ASTParseResult) {
   const { documentNode, substitutionMap } = parseResult;
   const node = documentNode.definitions[0];

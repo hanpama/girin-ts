@@ -5,6 +5,11 @@ import { Lazy } from '../types';
 import { ASTParseResult, TypeSubstitutionMap } from './types';
 
 
+/**
+ * Parse GraphQL SDL and pick type references into [[TypeSubstitutionMap]].
+ * @param strings GraphQL SDL strings to parse
+ * @param typeArgs
+ */
 export function gql(strings: TemplateStringsArray, ...typeArgs: Array<TypeExpression | TypeArg | Lazy<TypeArg>>): ASTParseResult {
   const result = [];
 

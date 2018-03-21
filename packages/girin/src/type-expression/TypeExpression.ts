@@ -1,12 +1,15 @@
 import { GraphQLType, isType } from "graphql";
 import { MetadataStorage } from "../base/MetadataStorage";
-import { isLazy, Lazy, Instantiator } from "../types";
+import { isLazy, Lazy, Instantiator, defaultInstantiator } from "../types";
 import { DefinitionMetadata } from "../base/DefinitionMetadata";
 
 
 export type TypeArg = GraphQLType | string | Function;
 
-
+/**
+ * Contain an argument which can be resolved to GraphQLType instance.
+ * Find a instantiator from associated class instance or return default instantiator
+ */
 export class TypeExpression {
   protected options: TypeArg | Lazy<TypeArg>;
 
@@ -36,7 +39,7 @@ export class TypeExpression {
   public buildInstantiator(storage: MetadataStorage): Instantiator {
     const completeTypeArg = this.getCompleteTypeArg();
     if (isType(completeTypeArg)) {
-      return (value: any) => value;
+      return defaultInstantiator;
     }
     const { instantiate, definitionClass } = this.resolveDefinitionMetadata(storage);
 

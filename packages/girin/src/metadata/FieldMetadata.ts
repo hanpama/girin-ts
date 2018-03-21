@@ -13,6 +13,9 @@ export interface FieldMetadataConfig extends GenericMetadataConfig {
   resolver?: Function;
 }
 
+/**
+ * Metadata type for fields
+ */
 export class FieldMetadata extends GenericMetadata<FieldMetadataConfig> {
 
   public get fieldName() {

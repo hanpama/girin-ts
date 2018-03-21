@@ -11,6 +11,9 @@ export interface InterfaceTypeMetadataConfig extends DefinitionMetadataConfig {
   description?: string;
 }
 
+/**
+ * Metadata type for InterfaceType
+ */
 export class InterfaceTypeMetadata extends DefinitionMetadata<InterfaceTypeMetadataConfig> {
 
   protected getFieldMetadata() {
@@ -34,6 +37,9 @@ export class InterfaceTypeMetadata extends DefinitionMetadata<InterfaceTypeMetad
     }, {} as GraphQLFieldConfigMap<any, any>);
   }
 
+  /**
+   * Get the instantiator function from definition class or return default
+   */
   public get instantiate(): Instantiator {
     const { definitionClass } = this;
     return definitionClass.instantiate
