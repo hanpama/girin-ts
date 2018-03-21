@@ -9,6 +9,7 @@ Girin is a GraphQL framework written in TypeScript.
 [![Build Status](https://travis-ci.org/hanpama/girin.svg?branch=master)](https://travis-ci.org/hanpama/girin)
 [![codecov](https://codecov.io/gh/hanpama/girin/branch/master/graph/badge.svg)](https://codecov.io/gh/hanpama/girin)
 
+* Documentation: https://hanpama.github.io/girin
 
 ```typescript
 @Definition(gql`

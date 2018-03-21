@@ -2,6 +2,13 @@
 
 Girin is a GraphQL framework written in TypeScript.
 
+* Seamless integration between GraphQL SDL and TypeScript classes
+* Modularization of GraphQL type definitions
+
+[![npm version](https://badge.fury.io/js/girin.svg)](https://badge.fury.io/js/girin)
+[![Build Status](https://travis-ci.org/hanpama/girin.svg?branch=master)](https://travis-ci.org/hanpama/girin)
+[![codecov](https://codecov.io/gh/hanpama/girin/branch/master/graph/badge.svg)](https://codecov.io/gh/hanpama/girin)
+
 ```typescript
 @Definition(gql`
   type Member {
@@ -24,11 +31,23 @@ class Member {
 }
 ```
 
-* Seamless integration between GraphQL SDL and TypeScript classes
-* Modularization of GraphQL type definitions
-
 ## Installation
 
 ```sh
 npm install girin graphql
 ```
+
+## Examples
+
+### Todolist App
+
+Working example of simple todolist
+
+* [Demo](https://todolist.giringraphql.com/)
+* [Source Code](https://github.com/hanpama/girin/tree/master/packages/example-todolist-app)
+
+
+### Starwars Schema
+
+* [Starwars Schema](https://github.com/hanpama/girin/tree/master/packages/girin/test/starwars/starWarsSchema.ts)
+* [Starwars Schema Relay](https://github.com/hanpama/girin/tree/master/packages/girin-relay/test/starWarsSchema.ts)
