@@ -46,7 +46,7 @@ npm install girin graphql
 Working example of simple todolist
 
 * [Demo](https://todolist.giringraphql.com/)
-* [Source Code](https://github.com/hanpama/girin/tree/master/packages/example-todolist-app)
+* [Source Code](https://github.com/hanpama/girin/tree/master/examples/todolist-apollo)
 
 
 ### Starwars Schema
