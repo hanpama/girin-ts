@@ -5,6 +5,11 @@ Example todolist app with [Girin framework](https://github.com/hanpama/girin)
 ## Schema
 
 ```typescript
+import { Definition, gql, getGraphQLType } from 'girin';
+import { GraphQLSchema } from 'graphql';
+import { TodoDatabase } from './database';
+
+
 @Definition(gql`
   type Todo {
     id: Int!
@@ -12,12 +17,11 @@ Example todolist app with [Girin framework](https://github.com/hanpama/girin)
     done: Boolean!
   }
 `)
-class Todo implements TodoSource {
+class Todo {
   id: number;
   body: string;
   done: boolean;
 }
-
 
 @Definition(gql`
   type Query {
@@ -26,38 +30,28 @@ class Todo implements TodoSource {
 `)
 class Query {
   static allTodos() {
-    return todos;
+    return TodoDatabase.findAll()
   }
 }
-
 
 @Definition(gql`
   type Mutation {
     createTodo(body: String!): ${Todo}!
-    toggleTodo(id: Int!): Todo!
+    toggleTodo(id: Int!): ${Todo}!
     deleteTodo(id: Int!): Int!
   }
 `)
 class Mutation {
   static createTodo(source: null, { body }: { body: string }) {
-    const id = todos.length > 0 ? Math.max(...todos.map(todo => todo.id)) + 1 : 1;
-    const newTodoSource = { id, body, done: false };
-    todos.push(newTodoSource);
-    return newTodoSource;
+    return TodoDatabase.insert(body);
   }
 
   static toggleTodo(source: null, { id }: { id: number }) {
-    const found = todos.find(todo => todo.id === id);
-    if (!found) { throw new Error('Todo item not found'); }
-    found.done = !found.done;
-    return found;
+    return TodoDatabase.toggle(id);
   }
 
   static deleteTodo(source: null, { id }: { id: number }) {
-    const found = todos.findIndex(todo => todo.id === id);
-    if (found === -1) { throw new Error('Todo item not found'); }
-    todos = [...todos.slice(0, found), ...todos.slice(found + 1, todos.length)];
-    return id;
+    return TodoDatabase.delete(id);
   }
 }
 

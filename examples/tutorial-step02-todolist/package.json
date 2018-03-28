@@ -1,0 +1,19 @@
+{
+  "name": "girin-todolist-yoga",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "tsc && node build/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "girin": "^0.2.1",
+    "graphql": "^0.13.2",
+    "graphql-yoga": "^1.7.0",
+    "typescript": "^2.8.1"
+  }
+}

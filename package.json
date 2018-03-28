@@ -4,7 +4,8 @@
     "test": "lerna run -- test",
     "build": "lerna run -- build",
     "coverage": "lerna run -- coverage",
-    "coverage:upload": "codecov"
+    "coverage:upload": "codecov",
+    "docs": "docsify serve docs"
   },
   "devDependencies": {
     "@types/graphql": "^0.12.3",

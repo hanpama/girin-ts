@@ -1,4 +1,7 @@
 * [Home](/)
+* Tutorial
+  * [Step 01: Hello World](/tutorial/step01-hello-world.md)
+  * [Step 02: Todolist](/tutorial/step02-todolist.md)
 * Guides
   * [Object Types and Fields](/guides/objecttypes.md)
   * [Lists and Non-Null](/guides/lists-and-non-null.md)
