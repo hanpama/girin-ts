@@ -78,8 +78,7 @@ export function createObjectTypeMetadataFromAST(
     createTypeExpressionFromAST(interfaceNode, substitutionMap)
   ))
 
-  const definition = new ObjectTypeMetadata({
-    definitionClass,
+  const definition = new ObjectTypeMetadata(definitionClass, {
     interfaces: interfacesTypeExpressions,
     typeName: name.value,
     description: description && description.value,
@@ -99,9 +98,8 @@ export function createInterfaceTypeMetadataFromAST(
     results.concat(createFieldMetadataFromAST(fieldNode, definitionClass, substitutionMap))
   ), [] as GenericMetadata[]);
 
-  const definition = new InterfaceTypeMetadata({
+  const definition = new InterfaceTypeMetadata(definitionClass, {
     typeName: name.value,
-    definitionClass,
     description: description && description.value,
   });
 
@@ -119,9 +117,8 @@ export function createInputObjectTypeMetadataFromAST(
     results.concat(createInputFieldMetadataFromAST(fieldNode, definitionClass, substitutionMap))
   ), [] as GenericMetadata[]);
 
-  const definition = new InputObjectTypeMetadata({
+  const definition = new InputObjectTypeMetadata(definitionClass, {
     typeName: name.value,
-    definitionClass,
     description: description && description.value,
   });
 
@@ -147,8 +144,7 @@ function createFieldMetadataFromAST(
     ? describedFunction
     : undefined;
 
-  const fieldMetadata = new FieldMetadata({
-    definitionClass,
+  const fieldMetadata = new FieldMetadata(definitionClass, {
     typeExpression: createTypeExpressionFromAST(type, substitutionMap),
     resolver,
     fieldName: name.value,
@@ -166,8 +162,7 @@ function createArgumentMetadataFromAST(
 ): ArgumentMetadata {
   const { name, type, description } = node;
 
-  return new ArgumentMetadata({
-    definitionClass,
+  return new ArgumentMetadata(definitionClass, {
     fieldName,
     description: description && description.value,
     argumentName: name.value,
@@ -182,8 +177,7 @@ function createInputFieldMetadataFromAST(
 ): InputFieldMetadata {
   const { name, type, description } = node;
 
-  return new InputFieldMetadata({
-    definitionClass,
+  return new InputFieldMetadata(definitionClass, {
     fieldName: name.value,
     description: description && description.value,
     typeExpression: createTypeExpressionFromAST(type, substitutionMap),
