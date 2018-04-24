@@ -1,8 +1,8 @@
-import { Definition, gql, getGraphQLType } from "../src";
 import { GraphQLSchema, graphql } from "graphql";
+import { defineType, gql, getGraphQLType } from "../src";
 
 
-@Definition(gql`
+@defineType(gql`
   type Query {
     foo: String
   }
@@ -14,7 +14,7 @@ class Query {
 }
 
 
-@Definition(gql`
+@defineType(gql`
   extends type Query {
     bar: String
   }

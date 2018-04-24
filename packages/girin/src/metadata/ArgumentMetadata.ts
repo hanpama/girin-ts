@@ -14,7 +14,7 @@ export interface ArgumentMetadataConfig extends GenericMetadataConfig {
 /**
  * Metadata type for arguments
  */
-export class ArgumentMetadata extends GenericMetadata<ArgumentMetadataConfig> {
+export class ArgumentMetadata<T extends ArgumentMetadataConfig = ArgumentMetadataConfig> extends GenericMetadata<T> {
 
   public get argumentName() {
     return this.config.argumentName;

@@ -10,13 +10,12 @@ export interface FieldMetadataConfig extends GenericMetadataConfig {
   fieldName: string;
   description?: string;
   deprecationReason?: string;
-  resolver?: Function;
 }
 
 /**
  * Metadata type for fields
  */
-export class FieldMetadata extends GenericMetadata<FieldMetadataConfig> {
+export class FieldMetadata<T extends FieldMetadataConfig = FieldMetadataConfig> extends GenericMetadata<T> {
 
   public get fieldName() {
     return this.config.fieldName;
@@ -24,7 +23,7 @@ export class FieldMetadata extends GenericMetadata<FieldMetadataConfig> {
 
   protected findArgumentMetadata(): ArgumentMetadata[] {
     return this.storage
-      .filter(ArgumentMetadata, this.definitionClass)
+      .findGenericMetadata(ArgumentMetadata, this.definitionClass)
       .filter(meta => meta.fieldName === this.config.fieldName);
   }
 
@@ -53,8 +52,15 @@ export class FieldMetadata extends GenericMetadata<FieldMetadataConfig> {
   }
 
   public get resolve() {
-    const { resolver, definitionClass } = this.config;
+    const { definitionClass } = this;
+    const { fieldName } = this.config;
     const { completeArguments, instantiate } = this;
+
+    const descriptor = Object.getOwnPropertyDescriptor(definitionClass, fieldName);
+    const describedFunction = descriptor && (descriptor.value || descriptor.get);
+    const resolver = describedFunction instanceof Function
+      ? describedFunction
+      : undefined;
 
     return (source: any, args: any, context: any, info: any) => {
       const completeArgs = completeArguments(args, context, info);

@@ -9,34 +9,14 @@ export class FloatScalar {}
 export class IntScalar {}
 export class IDScalar {}
 
-
 /**
  * Load all the built in scalar types into a given [[MetadataStorage]].
  * @param storage
  */
 export function loadBuiltInScalar(storage: MetadataStorage) {
-  (new ScalarMetadata({
-    definitionClass: StringScalar,
-    typeInstance: GraphQLString,
-  })).registerToStorage(storage);
-
-  (new ScalarMetadata({
-    definitionClass: BooleanScalar,
-    typeInstance: GraphQLBoolean,
-  })).registerToStorage(storage);
-
-  (new ScalarMetadata({
-    definitionClass: FloatScalar,
-    typeInstance: GraphQLFloat,
-  })).registerToStorage(storage);
-
-  (new ScalarMetadata({
-    definitionClass: IntScalar,
-    typeInstance: GraphQLInt,
-  })).registerToStorage(storage);
-
-  (new ScalarMetadata({
-    definitionClass: IDScalar,
-    typeInstance: GraphQLID,
-  })).registerToStorage(storage);
+  (new ScalarMetadata(StringScalar, { typeInstance: GraphQLString })).registerToStorage(storage);
+  (new ScalarMetadata(BooleanScalar, { typeInstance: GraphQLBoolean })).registerToStorage(storage);
+  (new ScalarMetadata(FloatScalar, { typeInstance: GraphQLFloat })).registerToStorage(storage);
+  (new ScalarMetadata(IntScalar, { typeInstance: GraphQLInt })).registerToStorage(storage);
+  (new ScalarMetadata(IDScalar, { typeInstance: GraphQLID })).registerToStorage(storage);
 }

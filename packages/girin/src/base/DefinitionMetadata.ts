@@ -1,16 +1,15 @@
-import { GraphQLType } from "graphql";
+import { GraphQLNamedType } from "graphql";
 import { MetadataConfig, Metadata } from "./Metadata";
 import { DefinitionClass, defaultInstantiator, Instantiator } from "../types";
 
 
 export interface DefinitionMetadataConfig extends MetadataConfig {
-  definitionClass: DefinitionClass;
   typeName?: string;
   description?: string;
 }
 
 /**
- * Contain options required to build named GraphQL types.
+ * Contain configs required to build named GraphQL types.
  * Guarantee its type instance only created once.
  */
 export class DefinitionMetadata<TConfig extends DefinitionMetadataConfig = DefinitionMetadataConfig> extends Metadata<TConfig> {
@@ -27,7 +26,7 @@ export class DefinitionMetadata<TConfig extends DefinitionMetadataConfig = Defin
   /**
    * Build GraphQLType instance from metadata.
    */
-  public get typeInstance(): GraphQLType {
+  public get typeInstance(): GraphQLNamedType {
     throw new Error(`Should implement typeInstance getter in ${this.constructor.name}`);
   };
 

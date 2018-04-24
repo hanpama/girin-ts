@@ -2,22 +2,18 @@ import { GraphQLInputObjectType, GraphQLInputFieldConfigMap } from "graphql";
 import { InputFieldMetadata } from "./InputFieldMetadata";
 import { DefinitionMetadata, DefinitionMetadataConfig } from "../base/DefinitionMetadata";
 import { memoizedGetter as builder } from "../utilities/memoize";
-import { DefinitionClass, Instantiator } from "../types";
+import { Instantiator } from "../types";
 
 
-export interface InputObjectTypeMetadataConfig extends DefinitionMetadataConfig {
-  definitionClass: DefinitionClass;
-  description?: string;
-}
-
+export interface InputObjectTypeMetadataConfig extends DefinitionMetadataConfig {}
 
 /**
  * Metadata type for InputObjectType
  */
-export class InputObjectTypeMetadata extends DefinitionMetadata<InputObjectTypeMetadataConfig> {
+export class InputObjectTypeMetadata<T extends InputObjectTypeMetadataConfig = InputObjectTypeMetadataConfig> extends DefinitionMetadata<T> {
 
   protected findInputFieldMetadata(): InputFieldMetadata[] {
-    return this.storage.filter(InputFieldMetadata, this.definitionClass);
+    return this.storage.findGenericMetadata(InputFieldMetadata, this.definitionClass);
   }
 
   /**

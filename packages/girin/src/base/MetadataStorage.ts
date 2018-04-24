@@ -8,8 +8,8 @@ import { DefinitionMetadata } from './DefinitionMetadata';
  */
 export class MetadataStorage {
 
-  protected readonly genericMetadata: any[] = [];
-  protected readonly definitionMetadata: any[] = [];
+  public readonly genericMetadata: any[] = [];
+  public readonly definitionMetadata: DefinitionMetadata[] = [];
 
   /**
    * Add a new [[Metadata]] object to storage.
@@ -28,7 +28,7 @@ export class MetadataStorage {
    * @param metadataClass A [[DefinitionMetadata]] subclass to query
    * @param definitionClass A class associated with metadata to query
    */
-  getDefinitionMetadata<T extends Metadata>(metadataClass: { new (...args: any[]): T; }, definitionClass: Function) {
+  getDefinitionMetadata<T extends DefinitionMetadata>(metadataClass: { new (...args: any[]): T; }, definitionClass: Function) {
     const foundMetadata = this.definitionMetadata.find(metadata => {
       return isSubClassOf(definitionClass, metadata.definitionClass) && metadata instanceof metadataClass
     });
@@ -55,7 +55,7 @@ export class MetadataStorage {
    * @param metadataClass A [[GenericMetadata]] subclass to query
    * @param definitionClass A class associated with metadata to query
    */
-  filter<T extends Metadata>(metadataClass: { new (...args: any[]): T; }, definitionClass: Function) {
+  findGenericMetadata<T extends Metadata>(metadataClass: { new (...args: any[]): T; }, definitionClass: Function) {
     const filterdMetadata = this.genericMetadata.filter(metadata => {
       return isSubClassOf(definitionClass, metadata.definitionClass) && metadata instanceof metadataClass
     });

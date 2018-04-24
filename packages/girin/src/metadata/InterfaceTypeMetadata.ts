@@ -14,10 +14,10 @@ export interface InterfaceTypeMetadataConfig extends DefinitionMetadataConfig {
 /**
  * Metadata type for InterfaceType
  */
-export class InterfaceTypeMetadata extends DefinitionMetadata<InterfaceTypeMetadataConfig> {
+export class InterfaceTypeMetadata<T extends InterfaceTypeMetadataConfig = InterfaceTypeMetadataConfig> extends DefinitionMetadata<T> {
 
-  protected getFieldMetadata() {
-    return this.storage.filter(FieldMetadata, this.definitionClass);
+  protected getFieldMetadata(): FieldMetadata[] {
+    return this.storage.findGenericMetadata(FieldMetadata, this.definitionClass);
   }
 
   @builder

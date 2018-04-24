@@ -1,3 +1,2 @@
-export { Definition } from './Definition';
-export { AbstractDefinition } from './AbstractDefinition';
-export { gql } from './gql';
+export { defineType, defineAbstractType } from './definition';
+export { gql } from './ast';

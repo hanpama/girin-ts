@@ -1,9 +1,9 @@
 import { graphql, GraphQLSchema, printSchema } from 'graphql';
 
-import { Definition, gql, getGraphQLType } from '../src';
+import { defineType, gql, getGraphQLType } from '../src';
 
 
-@Definition(gql`
+@defineType(gql`
   type Member {
     id: Int!
     username: String!
@@ -16,7 +16,7 @@ class Member {
   email: string;
 }
 
-@Definition(gql`
+@defineType(gql`
   input MemberProfileInput {
     firstName: String!
     lastName: String!
@@ -27,7 +27,7 @@ class MemberProfileInput {
   public lastName: string;
 }
 
-@Definition(gql`
+@defineType(gql`
   input MemberInput {
     username: String!
     email: String!
@@ -40,7 +40,7 @@ class MemberInput {
   public profile: MemberProfileInput;
 }
 
-@Definition(gql`
+@defineType(gql`
   type Query {
     getMember: Member!
   }
@@ -51,7 +51,7 @@ class Query {
   }
 }
 
-@Definition(gql`
+@defineType(gql`
   type Mutation {
     instantiateMemberInput(member: MemberInput!): Boolean!
     getEmailFromInput(member: MemberInput!): String!

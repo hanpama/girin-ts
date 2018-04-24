@@ -1,6 +1,6 @@
 import { TypeExpression } from '../src/type-expression/TypeExpression';
 import { globalMetadataStorage } from '../src/globalMetadataStorage';
-import { Definition, gql, List } from '../src';
+import { defineType, gql, List } from '../src';
 
 
 describe('createFromTypeString', () => {
@@ -12,7 +12,7 @@ describe('createFromTypeString', () => {
 
   test('default InputObjectType instantiator', () => {
 
-    @Definition(gql`
+    @defineType(gql`
       input MemberInput {
         name: String!
         email: String!
@@ -34,7 +34,7 @@ describe('createFromTypeString', () => {
 
   test('default ObjectType instantiator', () => {
 
-    @Definition(gql`
+    @defineType(gql`
       type Member {
         name: String!
         email: String!
@@ -55,7 +55,7 @@ describe('createFromTypeString', () => {
   });
 
   test('custom instantiators and structure types', () => {
-    @Definition(gql`
+    @defineType(gql`
       input GreetingInput {
         greeting: String
         name: String!

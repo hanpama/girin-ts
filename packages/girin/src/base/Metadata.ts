@@ -1,8 +1,9 @@
 import { MetadataStorage } from "./MetadataStorage";
+import { DefinitionClass } from "../types";
 
 
-export interface MetadataConfig {
-  definitionClass: Function;
+export interface MetadataConfig<T = any> {
+  directives?: T;
 }
 
 /**
@@ -10,9 +11,13 @@ export interface MetadataConfig {
  * Registered to [[MetadataStorage]] and keep the reference of the storage where it's in.
  */
 export abstract class Metadata<TConfig extends MetadataConfig = any> {
+
+  public readonly definitionClass: DefinitionClass;
   protected readonly config: TConfig
-  public constructor(config: TConfig) {
+
+  public constructor(definitionClass: Function, config: TConfig) {
     this.config = config;
+    this.definitionClass = definitionClass;
   }
 
   public registerToStorage(storage: MetadataStorage): void {
@@ -21,8 +26,4 @@ export abstract class Metadata<TConfig extends MetadataConfig = any> {
   }
 
   protected storage: MetadataStorage;
-
-  public get definitionClass(): TConfig["definitionClass"] {
-    return this.config.definitionClass;
-  }
 }

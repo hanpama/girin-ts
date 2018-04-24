@@ -16,8 +16,8 @@ export interface ObjectTypeMetadataConfig extends DefinitionMetadataConfig {
  */
 export class ObjectTypeMetadata<TConfig extends ObjectTypeMetadataConfig = ObjectTypeMetadataConfig> extends DefinitionMetadata<TConfig> {
 
-  protected getFieldMetadata() {
-    return this.storage.filter(FieldMetadata, this.definitionClass);
+  protected getFieldMetadata(): FieldMetadata[] {
+    return this.storage.findGenericMetadata(FieldMetadata, this.definitionClass);
   }
 
   public fields(): GraphQLFieldConfigMap<any, any> {

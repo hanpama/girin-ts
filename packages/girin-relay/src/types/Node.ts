@@ -1,9 +1,9 @@
-import { Definition, gql } from "girin"
+import { gql, defineType } from "girin"
 import { GraphQLResolveInfo } from "graphql";
 import { toGlobalId } from "graphql-relay";
 
 
-@Definition(gql`
+@defineType(gql`
   interface Node {
     """The id of the object."""
     id: ID!

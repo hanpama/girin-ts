@@ -1,7 +1,7 @@
-import { AbstractDefinition, gql } from 'girin';
+import { defineAbstractType, gql } from 'girin';
 
 
-@AbstractDefinition(gql`
+@defineAbstractType(gql`
   type Edge {
     """
     A cursor for use in pagination

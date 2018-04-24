@@ -1,9 +1,9 @@
 import { graphql, GraphQLSchema, printSchema } from 'graphql';
 
-import { Definition, gql, getGraphQLType } from '../src';
+import { defineType, gql, getGraphQLType } from '../src';
 
 
-@Definition(gql`
+@defineType(gql`
   type Member {
     id: Int!
     name: String!
@@ -16,7 +16,7 @@ class Member {
   email: string;
 }
 
-@Definition(gql`
+@defineType(gql`
   type Query {
     getMember: ${Member}!
   }
@@ -27,7 +27,7 @@ class Query {
   }
 }
 
-@Definition(gql`
+@defineType(gql`
   type Mutation {
     createMember(name: String!, email: String!): ${Member}!
   }

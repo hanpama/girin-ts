@@ -1,9 +1,9 @@
-import { gql, AbstractDefinition } from "girin";
+import { gql, defineAbstractType } from "girin";
 
 import { PageInfo } from './PageInfo';
 
 
-@AbstractDefinition(gql`
+@defineAbstractType(gql`
   type Connection {
     """
     Information to aid in pagination.

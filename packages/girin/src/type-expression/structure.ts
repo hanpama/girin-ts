@@ -1,12 +1,12 @@
 import { TypeExpression, TypeArg } from "./TypeExpression";
 import { GraphQLList, GraphQLType, GraphQLResolveInfo, GraphQLNonNull } from "graphql";
 import { MetadataStorage } from "../base/MetadataStorage";
-import { Instantiator, isPromise } from "../types";
+import { Instantiator, isPromise, ConcreteClass } from "../types";
 
 
-export class List extends TypeExpression {
-  public static of(innerType: TypeExpression | TypeArg) {
-    return new List(innerType instanceof TypeExpression ? innerType: new TypeExpression(innerType));
+export abstract class Structure extends TypeExpression {
+  public static of<T extends Structure>(this: ConcreteClass<T>, innerType: TypeExpression | TypeArg) {
+    return new this(innerType instanceof TypeExpression ? innerType: new TypeExpression(innerType));
   }
 
   constructor(innerType: TypeExpression) {
@@ -14,8 +14,10 @@ export class List extends TypeExpression {
     this.innerType = innerType;
   }
 
-  protected innerType: TypeExpression;
+  public innerType: TypeExpression;
+}
 
+export class List extends Structure {
   public buildInstantiator(storage: MetadataStorage): Instantiator {
     const innerInstantiator = this.innerType.buildInstantiator(storage);
     return (value: any[], context: any, info: GraphQLResolveInfo) => (
@@ -31,18 +33,7 @@ export class List extends TypeExpression {
   }
 }
 
-export class NonNull extends TypeExpression {
-  public static of(innerType: TypeExpression | TypeArg) {
-    return new NonNull(innerType instanceof TypeExpression ? innerType: new TypeExpression(innerType));
-  }
-
-  constructor(innerType: TypeExpression) {
-    super(innerType.typeArg);
-    this.innerType = innerType;
-  }
-
-  protected innerType: TypeExpression;
-
+export class NonNull extends Structure {
   public buildTypeInstance(storage: MetadataStorage): GraphQLType {
     const innerTypeInstance = this.innerType.buildTypeInstance(storage);
     return new GraphQLNonNull(innerTypeInstance);

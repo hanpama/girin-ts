@@ -1,7 +1,7 @@
-import { Definition, gql } from 'girin';
+import { defineType, gql } from 'girin';
 
 
-@Definition(gql`
+@defineType(gql`
   """
   Information about pagination in a connection.
   """

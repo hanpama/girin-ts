@@ -1,7 +1,7 @@
 import { GraphQLEnumType, GraphQLSchema } from "graphql";
 
 import { getFriends, getHero, getHuman, getDroid, EpisodeValue, CharacterSource } from "./starWarsData";
-import { Definition, gql, getGraphQLType } from '../../src';
+import { defineType, gql, getGraphQLType } from '../../src';
 
 
 const episodeEnum = new GraphQLEnumType({
@@ -24,7 +24,7 @@ const episodeEnum = new GraphQLEnumType({
 });
 
 
-@Definition(gql`
+@defineType(gql`
 """
 A character in the Star Wars Trilogy
 """
@@ -70,8 +70,11 @@ abstract class Character {
 }
 
 
-@Definition(gql`
-  type Human implements Character {
+@defineType(gql`
+  """
+  A humanoid creature in the Star Wars universe.
+  """
+  type Human implements ${Character} {
     """
     The home planet of the human, or null if unknown.
     """
@@ -81,7 +84,6 @@ abstract class Character {
   }
 `)
 class Human extends Character {
-  static description = 'A humanoid creature in the Star Wars universe.';
 
   public friendIds: string[];
 
@@ -97,7 +99,7 @@ class Human extends Character {
 }
 
 
-@Definition(gql`
+@defineType(gql`
   """
   A mechanical creature in the Star Wars universe.
   """
@@ -127,7 +129,7 @@ class Droid extends Character {
 }
 
 
-@Definition(gql`
+@defineType(gql`
   type Query {
     hero(
       """If omitted, returns the hero of the whole saga. If provided, returns the hero of that particular episode."""

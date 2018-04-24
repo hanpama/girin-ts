@@ -2,12 +2,12 @@ import { fromGlobalId, connectionFromArray, ConnectionArguments } from "graphql-
 import { GraphQLSchema } from "graphql";
 
 import { getRebels, getEmpire, getFaction, getShip, createShip } from "./starWarsData";
-import { Definition, gql, getGraphQLType } from "girin";
+import { defineType, gql, getGraphQLType } from "girin";
 
 import { Node, Connection, Edge } from "../src";
 
 
-@Definition(gql`
+@defineType(gql`
   """
   A ship in the Star Wars saga
   """
@@ -22,7 +22,7 @@ export class Ship extends Node {
   name: string;
 }
 
-@Definition(gql`
+@defineType(gql`
   type ShipEdge {
     node: Ship
   }
@@ -31,7 +31,7 @@ class ShipEdge extends Edge<Ship> {
   node: Ship;
 }
 
-@Definition(gql`
+@defineType(gql`
   type ShipConnection {
     edges: [${ShipEdge}]
   }
@@ -40,7 +40,7 @@ class ShipConnection extends Connection<ShipEdge> {
   edges: ShipEdge[];
 }
 
-@Definition(gql`
+@defineType(gql`
   """
   A faction in the Star Wars saga
   """
@@ -64,7 +64,7 @@ export class Faction extends Node {
   }
 }
 
-@Definition(gql`
+@defineType(gql`
   type Query {
     rebels: ${Faction}
     empire: ${Faction}
@@ -93,7 +93,7 @@ class Query {
 }
 
 
-@Definition(gql`
+@defineType(gql`
   input IntroduceShipInput {
     clientMutationId: String
     shipName: String!
@@ -106,7 +106,7 @@ class IntroduceShipInput {
   factionId: string;
 }
 
-@Definition(gql`
+@defineType(gql`
   type IntroduceShipPayload {
     clientMutationId: String
     ship: ${Ship}!
@@ -128,7 +128,7 @@ class IntroduceShipPayload {
 }
 
 
-@Definition(gql`
+@defineType(gql`
   type Mutation {
     introduceShip(input: ${IntroduceShipInput}): ${IntroduceShipPayload}
   }
