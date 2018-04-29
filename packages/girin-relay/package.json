@@ -1,6 +1,6 @@
 {
   "name": "girin-relay",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Girin relay integration",
   "author": "Max Choi <hanpama@gmail.com>",
   "main": "./lib/index.js",
@@ -25,7 +25,7 @@
   "homepage": "https://github.com/hanpama/girin",
   "license": "MIT",
   "dependencies": {
-    "girin": "^0.3.2",
+    "girin": "^0.3.3",
     "graphql-relay": "^0.5.4"
   },
   "devDependencies": {
