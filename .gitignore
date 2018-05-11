@@ -2,5 +2,5 @@ node_modules/
 build/
 lib
 .DS_Store
-*.explore
+*.explore.*
 *.log

@@ -4,14 +4,14 @@ node_modules/
 /coverage/
 
 /decorators/
-/metadata/
-/builtins/
 /base/
+/builtins/
 /execution/
-/utilities/
-/type-expression/
+/metadata/
 /sdl/
-/index.*
-/types.*
+/type-expression/
+/utilities/
 /getGraphQLType.*
 /globalMetadataStorage.*
+/index.*
+/types.*

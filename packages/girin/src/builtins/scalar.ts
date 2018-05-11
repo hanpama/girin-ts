@@ -1,4 +1,4 @@
-import { GraphQLString, GraphQLBoolean, GraphQLFloat, GraphQLInt, GraphQLID } from "graphql/type/scalars";
+import { GraphQLString, GraphQLBoolean, GraphQLFloat, GraphQLInt, GraphQLID } from "graphql";
 import { ScalarMetadata } from "../metadata/ScalarMetadata";
 import { MetadataStorage } from "../base/MetadataStorage";
 
