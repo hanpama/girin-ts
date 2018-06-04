@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Fields should create and execute schema as expected 1`] = `
+"type Host {
+  rooms(count: Int): [Room]
+  name: String!
+}
+
+type Query {
+  host: Host
+}
+
+type Room {
+  tags: [String]
+  name: String!
+}
+"
+`;

@@ -1,14 +1,14 @@
 import { GraphQLType, isType } from "graphql";
-import { MetadataStorage } from "../base/MetadataStorage";
-import { isLazy, Lazy, Instantiator, defaultInstantiator } from "../types";
+import { MetadataStorage, DefinitionMetadataEntry } from "../base/MetadataStorage";
+import { isLazy, Lazy } from "../types";
 import { DefinitionMetadata } from "../base/DefinitionMetadata";
+import { formatObjectInfo } from "../utilities/formatObjectInfo";
 
 
 export type TypeArg = GraphQLType | string | Function;
 
 /**
  * Contain an argument which can be resolved to GraphQLType instance.
- * Find a instantiator from associated class instance or return default instantiator
  */
 export class TypeExpression {
   protected options: TypeArg | Lazy<TypeArg>;
@@ -24,7 +24,7 @@ export class TypeExpression {
 
   public typeArg: TypeArg | Lazy<TypeArg>;
 
-  public resolveDefinitionMetadata(storage: MetadataStorage): DefinitionMetadata {
+  public getDefinitionMetadataEntry(storage: MetadataStorage): DefinitionMetadataEntry {
     const completeTypeArg = this.getCompleteTypeArg();
 
     if (completeTypeArg instanceof Function) {
@@ -32,19 +32,7 @@ export class TypeExpression {
     } else if (typeof completeTypeArg === 'string'){
       return storage.getDefinitionMetadataByName(completeTypeArg);
     } else {
-      throw new Error(`Cannot find any DefinitionMetadata with TypeExpression of ${completeTypeArg}`);
-    }
-  }
-
-  public buildInstantiator(storage: MetadataStorage): Instantiator {
-    const completeTypeArg = this.getCompleteTypeArg();
-    if (isType(completeTypeArg)) {
-      return defaultInstantiator;
-    }
-    const { instantiate, definitionClass } = this.resolveDefinitionMetadata(storage);
-
-    return function (source, context, info) {
-      return source instanceof definitionClass ? source : instantiate(source);
+      throw new Error(`Cannot find any DefinitionMetadata with TypeExpression of ${formatObjectInfo(completeTypeArg)}`);
     }
   }
 
@@ -54,7 +42,17 @@ export class TypeExpression {
     if (isType(completeTypeArg)) {
       return completeTypeArg;
     }
-    const metadata = this.resolveDefinitionMetadata(storage);
-    return metadata.typeInstance;
+    const entry = this.getDefinitionMetadataEntry(storage);
+
+    let typeInstance = storage.memoizedTypeInstanceMap.get(entry.definitionClass);
+    if (!typeInstance) {
+      const typeMetadata = storage.getDefinitionMetadata(DefinitionMetadata, entry.definitionClass);
+      if (!typeMetadata) {
+        throw new Error(`Given class ${entry.definitionClass.name} has no corresponding metadata`);
+      }
+      typeInstance = typeMetadata.metadata.buildTypeInstance(storage, entry.definitionClass);
+      storage.memoizedTypeInstanceMap.set(entry.definitionClass, typeInstance);
+    }
+    return typeInstance;
   }
 }

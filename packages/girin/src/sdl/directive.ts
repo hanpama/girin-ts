@@ -22,7 +22,7 @@ function completeArgumentsOrObjectFields(nodes: Array<ArgumentNode | ObjectField
   }, {} as any);
 }
 
-function completeValueNode(node: ValueNode): any {
+export function completeValueNode(node: ValueNode): any {
   if (node.kind === 'ObjectValue') {
     return completeArgumentsOrObjectFields(node.fields);
   } else if (node.kind === 'NullValue') {

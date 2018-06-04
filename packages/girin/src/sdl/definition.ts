@@ -5,10 +5,10 @@ import { globalMetadataStorage } from '../globalMetadataStorage';
 import { MetadataStorage } from '../base/MetadataStorage';
 import { ObjectTypeMetadata, ObjectTypeMetadataConfig } from '../metadata/ObjectTypeMetadata';
 import { InterfaceTypeMetadataConfig, InterfaceTypeMetadata } from '../metadata/InterfaceTypeMetadata';
-import { InputFieldMetadataConfig, InputFieldMetadata } from '../metadata/InputFieldMetadata';
-import { InputObjectTypeMetadataConfig, InputObjectTypeMetadata } from '../metadata/InputObjectTypeMetadata';
-import { FieldMetadataConfig, FieldMetadata } from '../metadata/FieldMetadata';
-import { ArgumentMetadata, ArgumentMetadataConfig } from '../metadata/ArgumentMetadata';
+import { FieldReference } from '../field/Field';
+import { InputFieldReference } from '../field/InputField';
+import { InputTypeMetadata, InputTypeMetadataConfig } from '../metadata/InputTypeMetadata';
+
 
 /**
  * Register definition metadata and generic metadata from its given parse result
@@ -23,7 +23,6 @@ export class TypeDefinition {
     this.handleInterfaceType = this.handleInterfaceType.bind(this);
     this.handleInputObjectType = this.handleInputObjectType.bind(this);
     this.handleField = this.handleField.bind(this);
-    this.handleArgument = this.handleArgument.bind(this);
     this.handleInputField = this.handleInputField.bind(this);
   }
   protected definitionClass: DefinitionClass;
@@ -31,27 +30,23 @@ export class TypeDefinition {
   protected parser: ASTParser;
 
   protected handleObjectType(config: ObjectTypeMetadataConfig) {
-    (new ObjectTypeMetadata(this.definitionClass, config)).registerToStorage(this.storage);
+    this.storage.register(new ObjectTypeMetadata(config), this.definitionClass);
   }
 
   protected handleInterfaceType(config: InterfaceTypeMetadataConfig) {
-    (new InterfaceTypeMetadata(this.definitionClass, config)).registerToStorage(this.storage);
+    this.storage.register(new InterfaceTypeMetadata(config), this.definitionClass);
   }
 
-  protected handleInputObjectType(config: InputObjectTypeMetadataConfig) {
-    (new InputObjectTypeMetadata(this.definitionClass, config)).registerToStorage(this.storage);
+  protected handleInputObjectType(config: InputTypeMetadataConfig) {
+    this.storage.register(new InputTypeMetadata(config), this.definitionClass);
   }
 
-  protected handleField(config: FieldMetadataConfig) {
-    (new FieldMetadata(this.definitionClass, config)).registerToStorage(this.storage);
+  protected handleField(config: FieldReference) {
+    this.storage.registerFieldReference(config, this.definitionClass);
   }
 
-  protected handleArgument(config: ArgumentMetadataConfig) {
-    (new ArgumentMetadata(this.definitionClass, config)).registerToStorage(this.storage);
-  }
-
-  protected handleInputField(config: InputFieldMetadataConfig) {
-    (new InputFieldMetadata(this.definitionClass, config)).registerToStorage(this.storage);
+  protected handleInputField(config: InputFieldReference) {
+    this.storage.registerInputFieldReference(config, this.definitionClass);
   }
 
   public decorate(definitionClass: DefinitionClass) {
@@ -62,7 +57,6 @@ export class TypeDefinition {
       interfaceTypeMetadataConfigs,
       inputObjectTypeMetadataConfigs,
       fieldMetadataConfigs,
-      argumentMetadataConfigs,
       inputFieldMetadataConfigs,
     } = this.parser;
 
@@ -70,7 +64,6 @@ export class TypeDefinition {
     interfaceTypeMetadataConfigs.forEach(this.handleInterfaceType);
     inputObjectTypeMetadataConfigs.forEach(this.handleInputObjectType);
     fieldMetadataConfigs.forEach(this.handleField);
-    argumentMetadataConfigs.forEach(this.handleArgument);
     inputFieldMetadataConfigs.forEach(this.handleInputField);
   }
 
@@ -84,7 +77,7 @@ export class TypeDefinition {
 export class AbstractTypeDefinition extends TypeDefinition {
   protected handleObjectType(config: ObjectTypeMetadataConfig) {}
   protected handleInterfaceType(config: InterfaceTypeMetadataConfig) {}
-  protected handleInputObjectType(config: InputObjectTypeMetadataConfig) {}
+  protected handleInputObjectType(config: InputTypeMetadataConfig) {}
 }
 
 export const defineType: typeof TypeDefinition["createDecorator"] = TypeDefinition.createDecorator.bind(TypeDefinition);

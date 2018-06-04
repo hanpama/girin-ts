@@ -15,7 +15,7 @@ export class ScalarMetadata<T extends ScalarMetadataConfig = ScalarMetadataConfi
     return this.config.typeInstance.name;
   }
 
-  public get typeInstance() {
+  public buildTypeInstance() {
     return this.config.typeInstance;
   }
 }

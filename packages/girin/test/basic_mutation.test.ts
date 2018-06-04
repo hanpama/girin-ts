@@ -11,9 +11,11 @@ import { defineType, gql, getGraphQLType } from '../src';
   }
 `)
 class Member {
-  id: number;
-  name: string;
-  email: string;
+  constructor(
+    public id: number,
+    public name: string,
+    public email: string,
+  ){ }
 }
 
 @defineType(gql`
@@ -23,7 +25,7 @@ class Member {
 `)
 class Query {
   public static getMember() {
-    return { id: 1, name: 'Jonghyun', email: 'j@example.com' };
+    return new Member(1, 'Jonghyun', 'j@example.com');
   }
 }
 
@@ -34,7 +36,7 @@ class Query {
 `)
 class Mutation {
   public static createMember(source: null, { name, email }: { name: string, email: string }) {
-    return { id: 2, name, email };
+    return new Member(2, name, email);
   }
 }
 

@@ -31,7 +31,12 @@ class Member {
   private friendId: number;
 
   friend() {
-    return members.find(m => m.id === this.friendId);
+    return Member.find(this.friendId);
+  }
+
+  static find(id: number) {
+    const member = members.find(m => m.id === id);
+    return member && Object.assign(new Member, member);
   }
 }
 
@@ -42,7 +47,7 @@ class Member {
 `)
 class Query {
   public static getMember(source: null, { id }: { id: number }) {
-    return members.find(m => m.id === id);
+    return Member.find(id);
   }
 }
 

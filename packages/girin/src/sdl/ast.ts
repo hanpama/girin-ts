@@ -11,15 +11,15 @@ import {
   ObjectTypeDefinitionNode,
 } from 'graphql';
 
-import { ArgumentMetadataConfig } from '../metadata/ArgumentMetadata';
-import { FieldMetadataConfig } from '../metadata/FieldMetadata';
-import { InputFieldMetadataConfig } from '../metadata/InputFieldMetadata';
-import { InputObjectTypeMetadataConfig } from '../metadata/InputObjectTypeMetadata';
+import { Field, FieldReference } from '../field/Field';
+import { InputTypeMetadataConfig } from '../metadata/InputTypeMetadata';
 import { List, NonNull } from '../type-expression/structure';
 import { ObjectTypeMetadataConfig } from '../metadata/ObjectTypeMetadata';
-import { completeDirectives } from './directive';
+import { completeDirectives, completeValueNode } from './directive';
 import { TypeArg, TypeExpression } from '../type-expression/TypeExpression';
 import { Lazy } from '../types';
+import { InterfaceTypeMetadataConfig } from '../metadata/InterfaceTypeMetadata';
+import { InputField, InputFieldReference } from '../field/InputField';
 
 
 export interface TypeSubstitutionMap {
@@ -49,12 +49,11 @@ export function gql(strings: TemplateStringsArray, ...typeArgs: Array<TypeExpres
 export class ASTParser {
 
   public readonly objectTypeMetadataConfigs: ObjectTypeMetadataConfig[] = [];
-  public readonly interfaceTypeMetadataConfigs: InputObjectTypeMetadataConfig[] = [];
-  public readonly inputObjectTypeMetadataConfigs: InputObjectTypeMetadataConfig[] = [];
+  public readonly interfaceTypeMetadataConfigs: InterfaceTypeMetadataConfig[] = [];
+  public readonly inputObjectTypeMetadataConfigs: InputTypeMetadataConfig[] = [];
 
-  public readonly fieldMetadataConfigs: FieldMetadataConfig[] = [];
-  public readonly argumentMetadataConfigs: ArgumentMetadataConfig[] = [];
-  public readonly inputFieldMetadataConfigs: InputFieldMetadataConfig[] = [];
+  public readonly fieldMetadataConfigs: FieldReference[] = [];
+  public readonly inputFieldMetadataConfigs: InputFieldReference[] = [];
 
   constructor(
     rootNode: DefinitionNode,
@@ -150,40 +149,51 @@ export class ASTParser {
   }
 
   protected appendFieldMetadataConfig(node: FieldDefinitionNode): void {
-    const { name, type, description } = node;
+    const { name, type, description, directives } = node;
 
-    node.arguments.forEach(argumentNode => (
-      this.appendArgumentMetadataConfig(argumentNode, name.value)
+    const argumentRefs = node.arguments.map(argumentNode => (
+      this.createArgumentReference(argumentNode)
     ));
+    const field = new Field(this.completeTypeExpression(type), argumentRefs);
 
     this.fieldMetadataConfigs.push({
-      typeExpression: this.completeTypeExpression(type),
-      fieldName: name.value,
-      description: description && description.value,
-      directives: node.directives && completeDirectives(node.directives),
+      field,
+      name: name.value,
+      props: {
+        description: description && description.value,
+        directives: directives && completeDirectives(directives),
+      },
     });
   }
 
-  protected appendArgumentMetadataConfig(node: InputValueDefinitionNode, fieldName: string): void {
-    const { name, type, description } = node;
+  protected createArgumentReference(node: InputValueDefinitionNode): InputFieldReference {
+    const { name, type, description, defaultValue, directives } = node;
 
-    this.argumentMetadataConfigs.push({
-      fieldName,
-      description: description && description.value,
-      argumentName: name.value,
-      typeExpression: this.completeTypeExpression(type),
-      directives: node.directives && completeDirectives(node.directives),
-    });
+    const field = new InputField(this.completeTypeExpression(type));
+    return {
+      field,
+      name: name.value,
+      props: {
+        description: description && description.value,
+        directives: directives && completeDirectives(directives),
+        defaultValue: defaultValue && completeValueNode(defaultValue),
+      }
+    };
   }
 
   protected appendInputFieldMetadataConfig(node: InputValueDefinitionNode): void {
-    const { name, type, description } = node;
+    const { name, type, description, defaultValue } = node;
+
+    const field = new InputField(this.completeTypeExpression(type));
 
     this.inputFieldMetadataConfigs.push({
-      fieldName: name.value,
-      description: description && description.value,
-      typeExpression: this.completeTypeExpression(type),
-      directives: node.directives && completeDirectives(node.directives),
+      field,
+      name: name.value,
+      props: {
+        description: description && description.value,
+        directives: node.directives && completeDirectives(node.directives),
+        defaultValue: defaultValue && completeValueNode(defaultValue),
+      }
     });
   }
 }

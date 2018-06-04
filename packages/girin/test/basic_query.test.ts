@@ -50,9 +50,8 @@ class Query {
   }
 }
 
-const schema = new GraphQLSchema({
-  query: getGraphQLType(Query),
-});
+const schema = new GraphQLSchema({ query: getGraphQLType(Query) });
+
 
 describe('Basic queries and schema generation', async () => {
 

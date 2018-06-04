@@ -1,9 +1,8 @@
-import { GraphQLFieldConfigMap, GraphQLTypeResolver, GraphQLInterfaceType } from "graphql";
+import { GraphQLFieldConfigMap, GraphQLTypeResolver, GraphQLInterfaceType, GraphQLFieldConfig } from "graphql";
 
 import { DefinitionMetadata, DefinitionMetadataConfig } from "../base/DefinitionMetadata";
-import { FieldMetadata } from "./FieldMetadata";
-import { memoizedGetter as builder } from "../utilities/memoize";
-import { defaultInstantiator, Instantiator } from "../types";
+import { MetadataStorage, FieldReferenceEntry } from "../base/MetadataStorage";
+import { DefinitionClass } from "../types";
 
 
 export interface InterfaceTypeMetadataConfig extends DefinitionMetadataConfig {
@@ -16,34 +15,41 @@ export interface InterfaceTypeMetadataConfig extends DefinitionMetadataConfig {
  */
 export class InterfaceTypeMetadata<T extends InterfaceTypeMetadataConfig = InterfaceTypeMetadataConfig> extends DefinitionMetadata<T> {
 
-  protected getFieldMetadata(): FieldMetadata[] {
-    return this.storage.findGenericMetadata(FieldMetadata, this.definitionClass);
+  public buildFieldConfig(storage: MetadataStorage, definitionClass: DefinitionClass, entry: FieldReferenceEntry): GraphQLFieldConfig<any, any> {
+    const { name } = entry.reference;
+    const config = Object.assign({}, entry.reference.field.buildConfig(storage), entry.reference.props);
+    if ((definitionClass as any)[name] instanceof Function) {
+      config.resolve = (definitionClass as any)[name];
+    }
+    return config;
   }
 
-  @builder
-  public get typeInstance() {
+  public buildFieldConfigMap(storage: MetadataStorage, definitionClass: DefinitionClass): GraphQLFieldConfigMap<any, any> {
+    const refs = storage.queryFieldReferences(definitionClass);
+    return (
+      refs.reduce((results, entry) => {
+        results[entry.reference.name] = this.buildFieldConfig(storage, definitionClass, entry);
+        return results;
+      }, {} as GraphQLFieldConfigMap<any, any>)
+    );
+  }
+
+  public buildTypeInstance(storage: MetadataStorage, definitionClass: DefinitionClass): GraphQLInterfaceType {
     const name = this.typeName;
+    const fields = this.buildFieldConfigMap.bind(this, storage, definitionClass);
+    // const isTypeOf = this.isTypeOf.bind(this);
+
     const description = this.description;
-    const fields = () => this.fields;
-
     return new GraphQLInterfaceType({ name, fields, description });
-  }
-
-  public get fields(): GraphQLFieldConfigMap<any, any> {
-    const fieldMetadata = this.getFieldMetadata();
-    return fieldMetadata.reduce((results, metadata) => {
-      results[metadata.fieldName] = metadata.fieldConfig;
-      return results;
-    }, {} as GraphQLFieldConfigMap<any, any>);
   }
 
   /**
    * Get the instantiator function from definition class or return default
    */
-  public get instantiate(): Instantiator {
-    const { definitionClass } = this;
-    return definitionClass.instantiate
-      ? definitionClass.instantiate.bind(definitionClass)
-      : defaultInstantiator;
-  }
+  // public get instantiate(): Instantiator {
+  //   const { definitionClass } = this;
+  //   return definitionClass.instantiate
+  //     ? definitionClass.instantiate.bind(definitionClass)
+  //     : defaultInstantiator;
+  // }
 }

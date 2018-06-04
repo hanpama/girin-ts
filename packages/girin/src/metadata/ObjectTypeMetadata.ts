@@ -1,9 +1,9 @@
-import { GraphQLObjectType, GraphQLFieldConfigMap, GraphQLInterfaceType } from "graphql";
+import { GraphQLObjectType, GraphQLFieldConfigMap, GraphQLInterfaceType, GraphQLFieldConfig } from "graphql";
+
 import { DefinitionMetadata, DefinitionMetadataConfig } from "../base/DefinitionMetadata";
-import { FieldMetadata } from "./FieldMetadata";
-import { memoizedGetter as builder } from "../utilities/memoize";
-import { Instantiator } from "../types";
+import { MetadataStorage, FieldReferenceEntry } from "../base/MetadataStorage";
 import { TypeExpression } from "../type-expression/TypeExpression";
+import { DefinitionClass } from "../types";
 
 
 export interface ObjectTypeMetadataConfig extends DefinitionMetadataConfig {
@@ -16,15 +16,20 @@ export interface ObjectTypeMetadataConfig extends DefinitionMetadataConfig {
  */
 export class ObjectTypeMetadata<TConfig extends ObjectTypeMetadataConfig = ObjectTypeMetadataConfig> extends DefinitionMetadata<TConfig> {
 
-  protected getFieldMetadata(): FieldMetadata[] {
-    return this.storage.findGenericMetadata(FieldMetadata, this.definitionClass);
+  public buildFieldConfig(storage: MetadataStorage, definitionClass: DefinitionClass, entry: FieldReferenceEntry): GraphQLFieldConfig<any, any> {
+    const { name } = entry.reference;
+    const config = Object.assign({}, entry.reference.field.buildConfig(storage), entry.reference.props);
+    if ((definitionClass as any)[name] instanceof Function) {
+      config.resolve = (definitionClass as any)[name];
+    }
+    return config;
   }
 
-  public fields(): GraphQLFieldConfigMap<any, any> {
-    const fieldMetadata = this.getFieldMetadata();
+  public buildFieldConfigMap(storage: MetadataStorage, definitionClass: DefinitionClass): GraphQLFieldConfigMap<any, any> {
+    const refs = storage.queryFieldReferences(definitionClass);
     return (
-      fieldMetadata.reduce((results, metadata) => {
-        results[metadata.fieldName] = metadata.fieldConfig;
+      refs.reduce((results, entry) => {
+        results[entry.reference.name] = this.buildFieldConfig(storage, definitionClass, entry);
         return results;
       }, {} as GraphQLFieldConfigMap<any, any>)
     );
@@ -33,45 +38,26 @@ export class ObjectTypeMetadata<TConfig extends ObjectTypeMetadataConfig = Objec
   /**
    * Build GraphQLObjectType instance from metadata.
    */
-  @builder
-  public get typeInstance(): GraphQLObjectType {
+  public buildTypeInstance(storage: MetadataStorage, definitionClass: DefinitionClass): GraphQLObjectType {
     const name = this.typeName;
-    const fields = () => this.fields();
-    const isTypeOf = this.isTypeOf.bind(this);
-    const interfaces = this.interfaces;
+    const fields = this.buildFieldConfigMap.bind(this, storage, definitionClass);
+    // const isTypeOf = this.isTypeOf.bind(this);
+    const interfaces = this.findInterfaces(storage);
     const description = this.description;
-
-    return new GraphQLObjectType({ name, fields, isTypeOf, interfaces, description });
+    const isTypeOf = this.buildIsTypeOf(storage, definitionClass);
+    return new GraphQLObjectType({ name, fields, interfaces, description, isTypeOf });
   }
 
-  /**
-   * Default source type validator
-   * @param source
-   */
-  public isTypeOf(source: any) {
-    return source instanceof this.definitionClass;
-  }
 
-  public get interfaces(): GraphQLInterfaceType[] | undefined {
+  public findInterfaces(storage: MetadataStorage): GraphQLInterfaceType[] | undefined {
     const { interfaces } = this.config;
-    const { storage } = this;
+    // const { storage } = this;
     return interfaces && interfaces.map(i => (
       i.buildTypeInstance(storage) as GraphQLInterfaceType)
     );
   }
 
-  /**
-   * Get the instantiator function from definition class or return default
-   */
-  public get instantiate(): Instantiator {
-    const { definitionClass } = this;
-
-    if (definitionClass.instantiate) {
-      return definitionClass.instantiate.bind(definitionClass);
-    }
-    return function (sourceObject, context, info) {
-      const instance = Object.create(definitionClass.prototype);
-      return Object.assign(instance, sourceObject);
-    }
+  public buildIsTypeOf(storage: MetadataStorage, definitionClass: DefinitionClass) {
+    return (source: any) => (source instanceof definitionClass);
   }
 }

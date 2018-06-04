@@ -1,7 +1,7 @@
 import { TypeExpression, TypeArg } from "./TypeExpression";
-import { GraphQLList, GraphQLType, GraphQLResolveInfo, GraphQLNonNull } from "graphql";
+import { GraphQLList, GraphQLType, GraphQLNonNull } from "graphql";
 import { MetadataStorage } from "../base/MetadataStorage";
-import { Instantiator, isPromise, ConcreteClass } from "../types";
+import { ConcreteClass } from "../types";
 
 
 export abstract class Structure extends TypeExpression {
@@ -18,15 +18,6 @@ export abstract class Structure extends TypeExpression {
 }
 
 export class List extends Structure {
-  public buildInstantiator(storage: MetadataStorage): Instantiator {
-    const innerInstantiator = this.innerType.buildInstantiator(storage);
-    return (value: any[], context: any, info: GraphQLResolveInfo) => (
-      value.map(innerValue => isPromise(innerValue)
-        ? innerValue.then(resolved => innerInstantiator(resolved, context, info))
-        : innerInstantiator(innerValue, context, info)
-      )
-    );
-  }
   public buildTypeInstance(storage: MetadataStorage): GraphQLType {
     const innerTypeInstance = super.buildTypeInstance(storage);
     return new GraphQLList(innerTypeInstance);

@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Input type generates schema as expected 1`] = `
+"input NameInput {
+  firstName: String!
+  lastName: String!
+}
+
+type Query {
+  formatFullName(input: NameInput): String!
+}
+"
+`;

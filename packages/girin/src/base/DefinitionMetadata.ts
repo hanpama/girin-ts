@@ -1,36 +1,41 @@
 import { GraphQLNamedType } from "graphql";
-import { MetadataConfig, Metadata } from "./Metadata";
-import { DefinitionClass, defaultInstantiator, Instantiator } from "../types";
+import { MetadataStorage } from "./MetadataStorage";
+import { DefinitionClass } from "../types";
 
 
-export interface DefinitionMetadataConfig extends MetadataConfig {
+export interface DefinitionMetadataConfig {
   typeName?: string;
   description?: string;
+  directives?: any;
 }
 
 /**
  * Contain configs required to build named GraphQL types.
  * Guarantee its type instance only created once.
  */
-export class DefinitionMetadata<TConfig extends DefinitionMetadataConfig = DefinitionMetadataConfig> extends Metadata<TConfig> {
+export class DefinitionMetadata<TConfig extends DefinitionMetadataConfig = DefinitionMetadataConfig> {
+
+  // public readonly definitionClass: DefinitionClass;
+  protected readonly config: TConfig
+
+  public constructor(config: TConfig) {
+    this.config = config;
+  }
 
   public get typeName(): string  {
-    const { definitionClass } = this;
-    return this.config.typeName || (definitionClass as DefinitionClass).typeName || definitionClass.name;
+    const { typeName } = this.config;
+    if (!typeName) { throw new Error('Should have typeName'); }
+    return typeName
   }
 
   public get description(): string | undefined {
-    return this.config.description || (this.definitionClass as DefinitionClass).description;
+    return this.config.description;
   }
 
   /**
    * Build GraphQLType instance from metadata.
    */
-  public get typeInstance(): GraphQLNamedType {
+  public buildTypeInstance(storage: MetadataStorage, definitionClass: DefinitionClass): GraphQLNamedType {
     throw new Error(`Should implement typeInstance getter in ${this.constructor.name}`);
   };
-
-  public get instantiate(): Instantiator {
-    return defaultInstantiator;
-  }
 }

@@ -9,6 +9,7 @@ node_modules/
 /execution/
 /metadata/
 /sdl/
+/field/
 /type-expression/
 /utilities/
 /getGraphQLType.*

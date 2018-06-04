@@ -1,6 +1,6 @@
 import { GraphQLEnumType, GraphQLSchema } from "graphql";
 
-import { getFriends, getHero, getHuman, getDroid, EpisodeValue, CharacterSource } from "./starWarsData";
+import { getFriends, getHero, getHuman, getDroid, EpisodeValue, CharacterSource, HumanSource, DroidSource } from "./starWarsData";
 import { defineType, gql, getGraphQLType } from '../../src';
 
 
@@ -60,12 +60,19 @@ abstract class Character {
   name: string;
   friends: any;
   appearsIn: EpisodeValue[];
-  secretBackstory: string;
 
-  static instantiate(source: CharacterSource) {
-    return source.type === 'Human'
-      ? Object.assign(new Human(), source)
-      : Object.assign(new Droid(), source)
+  get secretBackstory(): string {
+    throw new Error('secretBackstory is secret.')
+  }
+
+  static fromSource(source: CharacterSource): Human | Droid | null {
+    if (source.type === 'Human') {
+      return Human.fromSource(source as HumanSource);
+    } else if (source.type === 'Droid') {
+      return Droid.fromSource(source as DroidSource);
+    } else {
+      return null;
+    }
   }
 }
 
@@ -88,14 +95,14 @@ class Human extends Character {
   public friendIds: string[];
 
   get friends() {
-    return getFriends(this);
-  }
-
-  get secretBackstory(): string {
-    throw new Error('secretBackstory is secret.')
+    return getFriends(this).map(promise => promise.then(source => (source && Character.fromSource(source))));
   }
 
   homePlanet?: string;
+
+  static fromSource(source: HumanSource) {
+    return source && Object.assign(new Human(), source);
+  }
 }
 
 
@@ -115,17 +122,17 @@ class Human extends Character {
 `)
 class Droid extends Character {
 
-  get secretBackstory(): string {
-    throw new Error('secretBackstory is secret.')
-  }
-
   public friendIds: string[];
 
   get friends() {
-    return getFriends(this);
+    return getFriends(this).map(promise => promise.then(source => (source && Character.fromSource(source))));
   }
 
   primaryFunction: string;
+
+  static fromSource(source: DroidSource) {
+    return source && Object.assign(new Droid(), source);
+  }
 }
 
 
@@ -149,13 +156,13 @@ class Droid extends Character {
 `)
 class Query {
   public static hero(source: null, { episode }: { episode: number }) {
-    return getHero(episode);
+    return Character.fromSource(getHero(episode));
   }
   public static human(source: null, { id }: { id: string }) {
-    return getHuman(id);
+    return Human.fromSource(getHuman(id)!);
   }
   public static droid(source: null, { id }: { id: string }) {
-    return getDroid(id);
+    return Droid.fromSource(getDroid(id)!);
   }
 }
 

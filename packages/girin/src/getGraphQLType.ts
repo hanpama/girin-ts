@@ -1,6 +1,5 @@
 import { MetadataStorage } from "./base/MetadataStorage";
-import { DefinitionMetadata } from "./base/DefinitionMetadata";
-import { globalMetadataStorage } from "./globalMetadataStorage";
+import { TypeArg, TypeExpression } from "./type-expression/TypeExpression";
 
 
 /**
@@ -9,10 +8,8 @@ import { globalMetadataStorage } from "./globalMetadataStorage";
  * @param targetClass
  * @param options
  */
-export function getGraphQLType(targetClass: Function, storage?: MetadataStorage): any {
-  const typeMetadata = (storage || globalMetadataStorage).getDefinitionMetadata(DefinitionMetadata, targetClass);
-  if (!typeMetadata) {
-    throw new Error(`Given class ${targetClass.name} has no corresponding metadata`);
-  }
-  return typeMetadata.typeInstance;
+export function getGraphQLType(typeArg: TypeArg, storage?: MetadataStorage): any {
+  storage = storage || require('./globalMetadataStorage').globalMetadataStorage;
+  const typeExpression = new TypeExpression(typeArg);
+  return typeExpression.buildTypeInstance(storage!);
 }
