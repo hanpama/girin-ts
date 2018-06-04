@@ -4,7 +4,7 @@ import { DirectiveNode, ArgumentNode, ObjectFieldNode, ValueNode } from "graphql
 export type DirectiveMap = { [key: string]: any };
 
 
-export function completeDirectives(directiveNodes: DirectiveNode[]): DirectiveMap {
+export function completeDirectives(directiveNodes: ReadonlyArray<DirectiveNode>): DirectiveMap {
   return directiveNodes.reduce((results, node) => {
     if (node.arguments instanceof Array) {
       results[node.name.value] = completeArgumentsOrObjectFields(node.arguments);
@@ -15,7 +15,7 @@ export function completeDirectives(directiveNodes: DirectiveNode[]): DirectiveMa
   }, {} as {[key: string]: any});
 }
 
-function completeArgumentsOrObjectFields(nodes: Array<ArgumentNode | ObjectFieldNode>): any {
+function completeArgumentsOrObjectFields(nodes: ReadonlyArray<ArgumentNode | ObjectFieldNode>): any {
   return nodes.reduce((results, node) => {
     results[node.name.value] = completeValueNode(node.value);
     return results;

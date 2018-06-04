@@ -108,9 +108,11 @@ export class ASTParser {
   }
 
   protected appendObjectTypeConfig(node: ObjectTypeDefinitionNode): void {
-    const { name, description, interfaces } = node;
+    const { name, description, interfaces, fields } = node;
 
-    node.fields.forEach(fieldNode => this.appendFieldMetadataConfig(fieldNode))
+    if (fields) {
+      fields.forEach(fieldNode => this.appendFieldMetadataConfig(fieldNode));
+    }
 
     const interfacesTypeExpressions = interfaces && interfaces.map(interfaceNode => (
       this.completeTypeExpression(interfaceNode)
@@ -125,9 +127,11 @@ export class ASTParser {
   }
 
   protected appendInterfaceTypeMetadataConfig(node: InterfaceTypeDefinitionNode): void {
-    const { name, description } = node;
+    const { name, description, fields } = node;
 
-    node.fields.forEach(fieldNode => this.appendFieldMetadataConfig(fieldNode))
+    if (fields) {
+      fields.forEach(fieldNode => this.appendFieldMetadataConfig(fieldNode));
+    }
 
     this.interfaceTypeMetadataConfigs.push({
       typeName: name.value,
@@ -137,9 +141,11 @@ export class ASTParser {
   }
 
   protected appendInputObjectTypeMetadataConfig(node: InputObjectTypeDefinitionNode): void {
-    const { name, description } = node;
+    const { name, description, fields } = node;
 
-    node.fields.forEach(fieldNode => this.appendInputFieldMetadataConfig(fieldNode))
+    if (fields) {
+      fields.forEach(fieldNode => this.appendInputFieldMetadataConfig(fieldNode))
+    }
 
     this.inputObjectTypeMetadataConfigs.push({
       typeName: name.value,
@@ -149,9 +155,9 @@ export class ASTParser {
   }
 
   protected appendFieldMetadataConfig(node: FieldDefinitionNode): void {
-    const { name, type, description, directives } = node;
+    const { name, type, description, directives, arguments: args } = node;
 
-    const argumentRefs = node.arguments.map(argumentNode => (
+    const argumentRefs = args && args.map(argumentNode => (
       this.createArgumentReference(argumentNode)
     ));
     const field = new Field(this.completeTypeExpression(type), argumentRefs);
