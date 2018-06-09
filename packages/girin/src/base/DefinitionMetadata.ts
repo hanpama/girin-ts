@@ -1,6 +1,7 @@
 import { GraphQLNamedType } from "graphql";
 import { MetadataStorage } from "./MetadataStorage";
 import { DefinitionClass } from "../types";
+import { ASTParser } from "../sdl/ast";
 
 
 export interface DefinitionMetadataConfig {
@@ -14,6 +15,15 @@ export interface DefinitionMetadataConfig {
  * Guarantee its type instance only created once.
  */
 export class DefinitionMetadata<TConfig extends DefinitionMetadataConfig = DefinitionMetadataConfig> {
+
+  public static define(astParser: ASTParser, storage?: MetadataStorage) {
+    const targetStorage: MetadataStorage = storage || require('../globalMetadataStorage').globalMetadataStorage;
+    return (definitionClass: DefinitionClass) => this.decorate(astParser, targetStorage, definitionClass);
+  }
+
+  protected static decorate(astParser: ASTParser, storage: MetadataStorage, definitionClass: DefinitionClass) {
+    throw new Error('Not implemented');
+  }
 
   // public readonly definitionClass: DefinitionClass;
   protected readonly config: TConfig

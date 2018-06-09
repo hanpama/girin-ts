@@ -1,13 +1,12 @@
 import { DefinitionClass } from '../types';
 
 import { ASTParser } from './ast';
-import { globalMetadataStorage } from '../globalMetadataStorage';
 import { MetadataStorage } from '../base/MetadataStorage';
-import { ObjectTypeMetadata, ObjectTypeMetadataConfig } from '../metadata/ObjectTypeMetadata';
-import { InterfaceTypeMetadataConfig, InterfaceTypeMetadata } from '../metadata/InterfaceTypeMetadata';
+import { ObjectType, ObjectTypeMetadataConfig } from '../metadata/ObjectType';
+import { InterfaceTypeMetadataConfig, InterfaceType } from '../metadata/InterfaceType';
 import { FieldReference } from '../field/Field';
 import { InputFieldReference } from '../field/InputField';
-import { InputTypeMetadata, InputTypeMetadataConfig } from '../metadata/InputTypeMetadata';
+import { InputType, InputTypeMetadataConfig } from '../metadata/InputType';
 
 
 /**
@@ -30,15 +29,15 @@ export class TypeDefinition {
   protected parser: ASTParser;
 
   protected handleObjectType(config: ObjectTypeMetadataConfig) {
-    this.storage.register(new ObjectTypeMetadata(config), this.definitionClass);
+    this.storage.register(new ObjectType(config), this.definitionClass);
   }
 
   protected handleInterfaceType(config: InterfaceTypeMetadataConfig) {
-    this.storage.register(new InterfaceTypeMetadata(config), this.definitionClass);
+    this.storage.register(new InterfaceType(config), this.definitionClass);
   }
 
   protected handleInputObjectType(config: InputTypeMetadataConfig) {
-    this.storage.register(new InputTypeMetadata(config), this.definitionClass);
+    this.storage.register(new InputType(config), this.definitionClass);
   }
 
   protected handleField(config: FieldReference) {
@@ -68,6 +67,7 @@ export class TypeDefinition {
   }
 
   public static createDecorator(parser: ASTParser, storage?: MetadataStorage) {
+    let globalMetadataStorage = require('../globalMetadataStorage');
     return (definitionClass: DefinitionClass) => {
       (new this(parser, storage || globalMetadataStorage)).decorate(definitionClass);
     }

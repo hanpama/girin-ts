@@ -3,6 +3,7 @@ import { GraphQLFieldConfigMap, GraphQLTypeResolver, GraphQLInterfaceType, Graph
 import { DefinitionMetadata, DefinitionMetadataConfig } from "../base/DefinitionMetadata";
 import { MetadataStorage, FieldReferenceEntry } from "../base/MetadataStorage";
 import { DefinitionClass } from "../types";
+import { ASTParser } from "../sdl/ast";
 
 
 export interface InterfaceTypeMetadataConfig extends DefinitionMetadataConfig {
@@ -13,7 +14,16 @@ export interface InterfaceTypeMetadataConfig extends DefinitionMetadataConfig {
 /**
  * Metadata type for InterfaceType
  */
-export class InterfaceTypeMetadata<T extends InterfaceTypeMetadataConfig = InterfaceTypeMetadataConfig> extends DefinitionMetadata<T> {
+export class InterfaceType<T extends InterfaceTypeMetadataConfig = InterfaceTypeMetadataConfig> extends DefinitionMetadata<T> {
+
+  static decorate(astParser: ASTParser, storage: MetadataStorage, definitionClass: DefinitionClass) {
+    astParser.interfaceTypeMetadataConfigs.forEach(config => {
+      storage.register(new this(config), definitionClass);
+    });
+    astParser.fieldMetadataConfigs.forEach(config => {
+      storage.registerFieldReference(config, definitionClass);
+    });
+  }
 
   public buildFieldConfig(storage: MetadataStorage, definitionClass: DefinitionClass, entry: FieldReferenceEntry): GraphQLFieldConfig<any, any> {
     const { name } = entry.reference;
@@ -37,19 +47,8 @@ export class InterfaceTypeMetadata<T extends InterfaceTypeMetadataConfig = Inter
   public buildTypeInstance(storage: MetadataStorage, definitionClass: DefinitionClass): GraphQLInterfaceType {
     const name = this.typeName;
     const fields = this.buildFieldConfigMap.bind(this, storage, definitionClass);
-    // const isTypeOf = this.isTypeOf.bind(this);
 
     const description = this.description;
     return new GraphQLInterfaceType({ name, fields, description });
   }
-
-  /**
-   * Get the instantiator function from definition class or return default
-   */
-  // public get instantiate(): Instantiator {
-  //   const { definitionClass } = this;
-  //   return definitionClass.instantiate
-  //     ? definitionClass.instantiate.bind(definitionClass)
-  //     : defaultInstantiator;
-  // }
 }

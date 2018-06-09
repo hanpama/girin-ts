@@ -51,8 +51,6 @@ export class MetadataStorage {
     this.inputFieldReferences.push({ reference, definitionClass });
   }
 
-  // registerInputFieldReference()
-
   /**
    * Get a [[DefinitionMetadata]] object which is instance of the `metadataClass` and associated to `definitionClass`
    * @param metadataClass A [[DefinitionMetadata]] subclass to query

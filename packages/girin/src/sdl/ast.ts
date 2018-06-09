@@ -12,13 +12,13 @@ import {
 } from 'graphql';
 
 import { Field, FieldReference } from '../field/Field';
-import { InputTypeMetadataConfig } from '../metadata/InputTypeMetadata';
+import { InputTypeMetadataConfig } from '../metadata/InputType';
 import { List, NonNull } from '../type-expression/structure';
-import { ObjectTypeMetadataConfig } from '../metadata/ObjectTypeMetadata';
+import { ObjectTypeMetadataConfig } from '../metadata/ObjectType';
 import { completeDirectives, completeValueNode } from './directive';
 import { TypeArg, TypeExpression } from '../type-expression/TypeExpression';
 import { Lazy } from '../types';
-import { InterfaceTypeMetadataConfig } from '../metadata/InterfaceTypeMetadata';
+import { InterfaceTypeMetadataConfig } from '../metadata/InterfaceType';
 import { InputField, InputFieldReference } from '../field/InputField';
 
 

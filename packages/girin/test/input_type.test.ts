@@ -1,8 +1,10 @@
-import { defineType, gql, getGraphQLType } from "../src";
+import { gql, getGraphQLType } from "../src";
 import { GraphQLSchema, graphql, printSchema } from "graphql";
+import { ObjectType } from "../src/metadata/ObjectType";
+import { InputType } from "../src/metadata/InputType";
 
 
-@defineType(gql`
+@InputType.define(gql`
   input NameInput {
     firstName: String!
     lastName: String!
@@ -13,7 +15,7 @@ class NameInput {
   lastName: string;
 }
 
-@defineType(gql`
+@ObjectType.define(gql`
   type Query {
     formatFullName(input: ${NameInput}): String!
   }

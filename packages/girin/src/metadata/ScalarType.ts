@@ -10,7 +10,7 @@ export interface ScalarMetadataConfig extends DefinitionMetadataConfig {
 /**
  * Metadata type for ScalarType
  */
-export class ScalarMetadata<T extends ScalarMetadataConfig = ScalarMetadataConfig> extends DefinitionMetadata<T> {
+export class ScalarType<T extends ScalarMetadataConfig = ScalarMetadataConfig> extends DefinitionMetadata<T> {
   public get typeName(): string {
     return this.config.typeInstance.name;
   }

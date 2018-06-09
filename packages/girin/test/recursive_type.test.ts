@@ -1,6 +1,7 @@
 import { graphql, GraphQLSchema, printSchema } from 'graphql';
 
-import { defineType, gql, getGraphQLType } from '../src';
+import { gql, getGraphQLType } from '../src';
+import { ObjectType } from '../src/metadata/ObjectType';
 
 
 interface MemberSource {
@@ -15,7 +16,7 @@ const members: MemberSource[] = [
   { id: 1, name: 'Jonghyun', email: 'j@example.com', friendId: 0 },
 ]
 
-@defineType(gql`
+@ObjectType.define(gql`
   type Member {
     id: Int!
     name: String!
@@ -40,7 +41,7 @@ class Member {
   }
 }
 
-@defineType(gql`
+@ObjectType.define(gql`
   type Query {
     getMember(id: Int!): ${Member}
   }

@@ -1,11 +1,12 @@
-import { defineType, gql, getGraphQLType, List } from "../src";
+import { gql, getGraphQLType, List } from "../src";
 import { Field } from "../src/field/Field";
 import { mount } from "../src/field/mount";
 import { GraphQLObjectType, GraphQLSchema, graphql, printSchema } from "graphql";
 import { InputField } from "../src/field/InputField";
+import { ObjectType } from "../src/metadata/ObjectType";
 
 
-@defineType(gql`
+@ObjectType.define(gql`
   type Room {
     name: String!
   }
@@ -34,7 +35,7 @@ class RoomsField extends Field {
   }
 }
 
-@defineType(gql`
+@ObjectType.define(gql`
   type Host {
     name: String!
   }
@@ -46,7 +47,7 @@ class Host {
   rooms: Room[];
 }
 
-@defineType(gql`
+@ObjectType.define(gql`
   type Query {
     host: ${Host}
   }
