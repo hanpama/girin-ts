@@ -4,7 +4,7 @@ import { GraphQLSchema } from "graphql";
 import { getRebels, getEmpire, getFaction, getShip, createShip } from "./starWarsData";
 import { defineType, gql, getGraphQLType } from "girin";
 
-import { Node, Connection, Edge } from "../src";
+import { Node, Connection, Edge } from "../../src";
 
 
 @defineType(gql`
@@ -19,6 +19,9 @@ import { Node, Connection, Edge } from "../src";
   }
 `)
 export class Ship extends Node {
+  // fetch(id: string): Ship {
+  //   return Object.assign(new Ship(),getShip(id));
+  // } 이거 defineNode()의 인자로 요구하자
   name: string;
 }
 
@@ -36,8 +39,9 @@ class ShipEdge extends Edge<Ship> {
     edges: [${ShipEdge}]
   }
 `)
-class ShipConnection extends Connection<ShipEdge> {
+class ShipConnection extends Connection<ShipEdge, any> {
   edges: ShipEdge[];
+
 }
 
 @defineType(gql`

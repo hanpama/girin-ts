@@ -12,13 +12,13 @@ import {
 } from 'graphql';
 
 import { Field, FieldReference } from '../field/Field';
-import { InputTypeMetadataConfig } from '../metadata/InputType';
+import { InputTypeConfig } from '../metadata/InputType';
 import { List, NonNull } from '../type-expression/structure';
-import { ObjectTypeMetadataConfig } from '../metadata/ObjectType';
+import { ObjectTypeConfig } from '../metadata/ObjectType';
 import { completeDirectives, completeValueNode } from './directive';
 import { TypeArg, TypeExpression } from '../type-expression/TypeExpression';
 import { Lazy } from '../types';
-import { InterfaceTypeMetadataConfig } from '../metadata/InterfaceType';
+import { InterfaceTypeConfig } from '../metadata/InterfaceType';
 import { InputField, InputFieldReference } from '../field/InputField';
 
 
@@ -48,9 +48,9 @@ export function gql(strings: TemplateStringsArray, ...typeArgs: Array<TypeExpres
 
 export class ASTParser {
 
-  public readonly objectTypeMetadataConfigs: ObjectTypeMetadataConfig[] = [];
-  public readonly interfaceTypeMetadataConfigs: InterfaceTypeMetadataConfig[] = [];
-  public readonly inputObjectTypeMetadataConfigs: InputTypeMetadataConfig[] = [];
+  public readonly objectTypeMetadataConfigs: ObjectTypeConfig[] = [];
+  public readonly interfaceTypeMetadataConfigs: InterfaceTypeConfig[] = [];
+  public readonly inputObjectTypeMetadataConfigs: InputTypeConfig[] = [];
 
   public readonly fieldMetadataConfigs: FieldReference[] = [];
   public readonly inputFieldMetadataConfigs: InputFieldReference[] = [];

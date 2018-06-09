@@ -23,15 +23,17 @@ class RoomsField extends Field {
   args = [
     { name: 'count', field: new InputField('Int'), props: {} }
   ]
-  resolve(source: string, args: { count: number }) {
-    const rooms: Room[] = [];
-    for(let i = 0; i < args.count; i ++) {
-      const room = new Room();
-      room.name = `My room ${i}`;
-      room.tags = [String(i)];
-      rooms.push(room)
+  buildResolver() {
+    return (source: string, args: { count: number }) => {
+      const rooms: Room[] = [];
+      for(let i = 0; i < args.count; i ++) {
+        const room = new Room();
+        room.name = `My room ${i}`;
+        room.tags = [String(i)];
+        rooms.push(room)
+      }
+      return rooms;
     }
-    return rooms;
   }
 }
 

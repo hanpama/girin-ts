@@ -6,7 +6,7 @@ import { DefinitionClass } from "../types";
 import { ASTParser } from "../sdl/ast";
 
 
-export interface InterfaceTypeMetadataConfig extends DefinitionMetadataConfig {
+export interface InterfaceTypeConfig extends DefinitionMetadataConfig {
   resolveType?: GraphQLTypeResolver<any, any>;
   description?: string;
 }
@@ -14,9 +14,9 @@ export interface InterfaceTypeMetadataConfig extends DefinitionMetadataConfig {
 /**
  * Metadata type for InterfaceType
  */
-export class InterfaceType<T extends InterfaceTypeMetadataConfig = InterfaceTypeMetadataConfig> extends DefinitionMetadata<T> {
+export class InterfaceType<T extends InterfaceTypeConfig = InterfaceTypeConfig> extends DefinitionMetadata<T> {
 
-  static decorate(astParser: ASTParser, storage: MetadataStorage, definitionClass: DefinitionClass) {
+  protected static decorate(astParser: ASTParser, storage: MetadataStorage, definitionClass: DefinitionClass) {
     astParser.interfaceTypeMetadataConfigs.forEach(config => {
       storage.register(new this(config), definitionClass);
     });

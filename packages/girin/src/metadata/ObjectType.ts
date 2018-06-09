@@ -7,7 +7,7 @@ import { DefinitionClass } from "../types";
 import { ASTParser } from "../sdl/ast";
 
 
-export interface ObjectTypeMetadataConfig extends DefinitionMetadataConfig {
+export interface ObjectTypeConfig extends DefinitionMetadataConfig {
   description?: string;
   interfaces?: TypeExpression[];
 }
@@ -15,9 +15,9 @@ export interface ObjectTypeMetadataConfig extends DefinitionMetadataConfig {
 /**
  * Metadata type for ObjectType
  */
-export class ObjectType<TConfig extends ObjectTypeMetadataConfig = ObjectTypeMetadataConfig> extends DefinitionMetadata<TConfig> {
+export class ObjectType<TConfig extends ObjectTypeConfig = ObjectTypeConfig> extends DefinitionMetadata<TConfig> {
 
-  static decorate(astParser: ASTParser, storage: MetadataStorage, definitionClass: DefinitionClass) {
+  protected static decorate(astParser: ASTParser, storage: MetadataStorage, definitionClass: DefinitionClass) {
     astParser.objectTypeMetadataConfigs.forEach(config => {
       storage.register(new this(config), definitionClass);
     });
@@ -60,7 +60,6 @@ export class ObjectType<TConfig extends ObjectTypeMetadataConfig = ObjectTypeMet
 
   public findInterfaces(storage: MetadataStorage): GraphQLInterfaceType[] | undefined {
     const { interfaces } = this.config;
-    // const { storage } = this;
     return interfaces && interfaces.map(i => (
       i.buildTypeInstance(storage) as GraphQLInterfaceType)
     );

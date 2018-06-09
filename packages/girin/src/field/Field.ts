@@ -1,4 +1,4 @@
-import { GraphQLResolveInfo, defaultFieldResolver, GraphQLFieldConfigArgumentMap, GraphQLFieldConfig, GraphQLOutputType } from "graphql";
+import { GraphQLFieldConfigArgumentMap, GraphQLFieldConfig, GraphQLOutputType, GraphQLFieldResolver } from "graphql";
 import { TypeExpression, TypeArg } from "../type-expression/TypeExpression";
 import { MetadataStorage } from "../base/MetadataStorage";
 import { InputFieldReference } from "./InputField";
@@ -33,8 +33,8 @@ export class Field {
   }
 
 
-  public resolve(source: any, args: any, context: any, info: GraphQLResolveInfo): any {
-    return defaultFieldResolver(source, args, context, info);
+  public buildResolver(storage: MetadataStorage): GraphQLFieldResolver<any, any> | undefined  {
+    return undefined;
   }
 
   public buildArgs(storage: MetadataStorage): GraphQLFieldConfigArgumentMap {
@@ -51,7 +51,7 @@ export class Field {
     return {
       type: output.buildTypeInstance(storage) as GraphQLOutputType,
       args: this.buildArgs(storage),
-      resolve: this.resolve.bind(this),
+      resolve: this.buildResolver(storage),
     };
   }
 }

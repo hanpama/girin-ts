@@ -6,14 +6,14 @@ import { DefinitionClass } from "../types";
 import { ASTParser } from "../sdl/ast";
 
 
-export interface InputTypeMetadataConfig extends DefinitionMetadataConfig {}
+export interface InputTypeConfig extends DefinitionMetadataConfig {}
 
 /**
  * Metadata type for InputObjectType
  */
-export class InputType<T extends InputTypeMetadataConfig = InputTypeMetadataConfig> extends DefinitionMetadata<T> {
+export class InputType<T extends InputTypeConfig = InputTypeConfig> extends DefinitionMetadata<T> {
 
-  static decorate(astParser: ASTParser, storage: MetadataStorage, definitionClass: DefinitionClass) {
+  protected static decorate(astParser: ASTParser, storage: MetadataStorage, definitionClass: DefinitionClass) {
     astParser.inputObjectTypeMetadataConfigs.forEach(config => {
       storage.register(new this(config), definitionClass);
     });
