@@ -10,15 +10,6 @@ export interface DefinitionMetadataConfig {
   directives?: any;
 }
 
-
-// export type DefineDecoratorFactory<T extends DefinitionClass = DefinitionClass> = (astParser: ASTParser) => (
-//   (definitionClass: DefinitionClass) => void
-// )
-
-// // export interface DefinitionMetadata {
-// //   define: DefineDecoratorFactory;
-// // }
-
 /**
  * Contain configs required to build named GraphQL types.
  * Guarantee its type instance only created once.

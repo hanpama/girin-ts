@@ -22,28 +22,38 @@ import { InterfaceTypeConfig } from '../metadata/InterfaceType';
 import { InputField, InputFieldReference } from '../field/InputField';
 
 
-export interface TypeSubstitutionMap {
-  [tempName: string]: TypeExpression | TypeArg | Lazy<TypeArg>;
+const SUBSTITUTION_PREFIX = '__GIRIN__SUBS__';
+const TEMP_PLACEHOLDER = '__GIRIN__TEMP__';
+
+export interface SubstitutionMap {
+  [tempName: string]: GQLInterpolatable;
+
 }
+export type GQLInterpolatable = FieldReference | TypeExpression | TypeArg | Lazy<TypeArg>;
 
-export function gql(strings: TemplateStringsArray, ...typeArgs: Array<TypeExpression | TypeArg | Lazy<TypeArg>>) {
-  const result = [];
+export function gql(strings: TemplateStringsArray, ...interpolated: Array<GQLInterpolatable>) {
+  const result = [strings[0]];
+  const subsMap: SubstitutionMap = {};
 
-  const substitution_prefix = '__girin__intermediate__'
-
-  result.push(strings[0]);
-  for (let i = 0; i < strings.length - 1; i++) {
-    result.push(`${substitution_prefix}${i}`);
+  for (let i = 0; i < interpolated.length; i++) {
+    const item = interpolated[i];
+    const name = `${SUBSTITUTION_PREFIX}${i}`;
+    if (item instanceof FieldReference) {
+      subsMap[name] = item;
+      result.push(`${name}: ${TEMP_PLACEHOLDER}`);
+    } else {
+      subsMap[name] = item;
+      result.push(name);
+    }
     result.push(strings[i + 1]);
   }
 
-  const rootNode = parse(result.join('')).definitions[0];
-  const substitutionMap = typeArgs.reduce((results, exp, i) => {
-    const name = `${substitution_prefix}${i}`;
-    results[name] = exp;
-    return results;
-  }, {} as TypeSubstitutionMap);
-  return new ASTParser(rootNode, substitutionMap);
+  const ast = parse(result.join(''));
+  if (ast.definitions.length > 1) {
+    throw new Error('Only one type definition should be passed to gql tag');
+  }
+  const rootNode = ast.definitions[0];
+  return new ASTParser(rootNode, subsMap);
 }
 
 export class ASTParser {
@@ -57,16 +67,16 @@ export class ASTParser {
 
   constructor(
     rootNode: DefinitionNode,
-    substitutionMap: TypeSubstitutionMap,
+    subsMap: SubstitutionMap,
   ) {
     this.rootNode = rootNode;
-    this.substitutionMap = substitutionMap;
+    this.subsMap = subsMap;
 
     this.createMetadataFromAST();
   }
 
   protected rootNode: DefinitionNode;
-  protected substitutionMap: TypeSubstitutionMap;
+  protected subsMap: SubstitutionMap;
 
   protected createMetadataFromAST(): void {
     const { rootNode } = this;
@@ -88,22 +98,22 @@ export class ASTParser {
   protected completeTypeExpression(
     type: NamedTypeNode | ListTypeNode | NonNullTypeNode,
   ): TypeExpression {
-    const { substitutionMap } = this;
+    const { subsMap } = this;
 
     if (type.kind === 'ListType') {
       return List.of(this.completeTypeExpression(type.type));
     } else if (type.kind === 'NonNullType') {
       return NonNull.of(this.completeTypeExpression(type.type));
     } else {
-      const givenExpression = substitutionMap[type.name.value];
+      const sub = subsMap[type.name.value];
 
-      if (!givenExpression) {
+      if (!sub) {
         return new TypeExpression(type.name.value);
       }
-      else if (givenExpression instanceof TypeExpression) {
-        return givenExpression;
+      else if (sub instanceof TypeExpression) {
+        return sub;
       }
-      return new TypeExpression(givenExpression);
+      return new TypeExpression(sub as TypeArg | Lazy<TypeArg>);
     }
   }
 
@@ -157,19 +167,22 @@ export class ASTParser {
   protected appendFieldMetadataConfig(node: FieldDefinitionNode): void {
     const { name, type, description, directives, arguments: args } = node;
 
-    const argumentRefs = args && args.map(argumentNode => (
-      this.createArgumentReference(argumentNode)
-    ));
-    const field = new Field(this.completeTypeExpression(type), argumentRefs);
-
-    this.fieldMetadataConfigs.push({
-      field,
-      name: name.value,
-      props: {
+    const sub = this.subsMap[name.value];
+    let ref: FieldReference;
+    if (sub) {
+      ref = sub as FieldReference;
+    } else {
+      const argumentRefs = args && args.map(argumentNode => (
+        this.createArgumentReference(argumentNode)
+      ));
+      const field = new Field(this.completeTypeExpression(type), argumentRefs);
+      ref = new FieldReference(name.value, field, {
         description: description && description.value,
         directives: directives && completeDirectives(directives),
-      },
-    });
+      });
+    }
+
+    this.fieldMetadataConfigs.push(ref);
   }
 
   protected createArgumentReference(node: InputValueDefinitionNode): InputFieldReference {
@@ -183,7 +196,7 @@ export class ASTParser {
         description: description && description.value,
         directives: directives && completeDirectives(directives),
         defaultValue: defaultValue && completeValueNode(defaultValue),
-      }
+      },
     };
   }
 
@@ -199,7 +212,7 @@ export class ASTParser {
         description: description && description.value,
         directives: node.directives && completeDirectives(node.directives),
         defaultValue: defaultValue && completeValueNode(defaultValue),
-      }
+      },
     });
   }
 }

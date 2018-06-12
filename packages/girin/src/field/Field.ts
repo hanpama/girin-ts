@@ -11,30 +11,36 @@ export interface FieldProps {
   resolve?: Function;
 }
 
-export interface FieldReference {
-  name: string;
-  field: Field;
-  props: FieldProps;
+export class FieldReference {
+  constructor(
+    public name: string,
+    public field: Field,
+    public props: FieldProps,
+  ) { }
 }
 
 export class Field {
 
   protected output: TypeExpression;
-  protected args: InputFieldReference[];
+  protected args: InputFieldReference[] = [];
 
-  constructor(
-    output?: TypeArg | TypeExpression,
-    args?: InputFieldReference[],
-  ) {
+  constructor(output?: TypeArg | TypeExpression, args?: InputFieldReference[]) {
     if (output) {
       this.output = output instanceof TypeExpression ? output : new TypeExpression(output);
     }
-    this.args = args || [];;
+    this.args = args ? this.args.concat(args) : this.args;
   }
 
+  public static of(output?: TypeArg | TypeExpression, args?: InputFieldReference[]) {
+    return new Field(output, args);
+  }
+
+  public mountAs(fieldName: string, props?: FieldProps) {
+    return new FieldReference(fieldName, this, props || {});
+  }
 
   public buildResolver(storage: MetadataStorage): GraphQLFieldResolver<any, any> | undefined  {
-    return undefined;
+    return;
   }
 
   public buildArgs(storage: MetadataStorage): GraphQLFieldConfigArgumentMap {
