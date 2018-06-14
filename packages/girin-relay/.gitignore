@@ -1,9 +1,0 @@
-node_modules/
-.DS_Store
-
-/coverage/
-/index.*
-/decorators/
-/metadata/
-/types/
-/fields/

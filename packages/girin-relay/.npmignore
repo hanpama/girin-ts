@@ -1,9 +1,0 @@
-node_modules/
-.DS_Store
-/coverage/
-
-/src
-/test
-/.gitignore
-/tsconfig.json
-/tsconfig.publish.json
