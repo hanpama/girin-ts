@@ -2,8 +2,8 @@
 
 exports[`Fields should create and execute schema as expected 1`] = `
 "type Host {
-  rooms(count: Int): [Room]
   name: String!
+  rooms(count: Int): [Room]
 }
 
 type Query {
@@ -11,8 +11,8 @@ type Query {
 }
 
 type Room {
-  tags: [String]
   name: String!
+  tags: [String]
 }
 "
 `;

@@ -19,21 +19,22 @@ export class FieldReference {
   ) { }
 }
 
-export class Field {
+export interface FieldBuilder {
+  output: TypeArg | TypeExpression;
+  args: InputFieldReference[];
+  buildResolver?(storage: MetadataStorage): GraphQLFieldResolver<any, any> | undefined;
+  buildArgs?(storage: MetadataStorage): GraphQLFieldConfigArgumentMap;
+  buildConfig?(storage: MetadataStorage): GraphQLFieldConfig<any, any>
+}
 
-  protected output: TypeExpression;
-  protected args: InputFieldReference[] = [];
+export class Field implements FieldBuilder {
 
-  constructor(output?: TypeArg | TypeExpression, args?: InputFieldReference[]) {
-    if (output) {
-      this.output = output instanceof TypeExpression ? output : new TypeExpression(output);
-    }
-    this.args = args ? this.args.concat(args) : this.args;
+  constructor(builder?: FieldBuilder) {
+    if (builder) { Object.assign(this, builder); }
   }
 
-  public static of(output?: TypeArg | TypeExpression, args?: InputFieldReference[]) {
-    return new Field(output, args);
-  }
+  public output: TypeExpression;
+  public args: InputFieldReference[];
 
   public mountAs(fieldName: string, props?: FieldProps) {
     return new FieldReference(fieldName, this, props || {});

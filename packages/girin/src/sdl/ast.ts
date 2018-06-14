@@ -175,7 +175,10 @@ export class ASTParser {
       const argumentRefs = args && args.map(argumentNode => (
         this.createArgumentReference(argumentNode)
       ));
-      const field = new Field(this.completeTypeExpression(type), argumentRefs);
+      const field = new Field({
+        output: this.completeTypeExpression(type),
+        args: argumentRefs || [],
+      });
       ref = new FieldReference(name.value, field, {
         description: description && description.value,
         directives: directives && completeDirectives(directives),

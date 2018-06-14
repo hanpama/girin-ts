@@ -57,7 +57,7 @@ interface Character {
   secretBackstory: String
 }
 `)
-abstract class Character {
+class Character {
   id: string;
   name: string;
   friends: any;

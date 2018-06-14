@@ -4,3 +4,4 @@ export * from './metadata';
 export * from './sdl';
 export * from './getGraphQLType';
 export * from './field';
+export * from './type-expression';
