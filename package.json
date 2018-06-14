@@ -8,6 +8,8 @@
     "docs": "docsify serve docs"
   },
   "devDependencies": {
+    "@types/graphql-relay": "^0.4.5",
+    "graphql-relay": "^0.5.5",
     "@types/graphql": "^0.13.1",
     "@types/jest": "^23.0.0",
     "codecov": "^3.0.2",

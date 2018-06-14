@@ -1,7 +1,9 @@
 import { GraphQLEnumType, GraphQLSchema } from "graphql";
 
 import { getFriends, getHero, getHuman, getDroid, EpisodeValue, CharacterSource, HumanSource, DroidSource } from "./starWarsData";
-import { defineType, gql, getGraphQLType } from '../../src';
+import { gql, getGraphQLType } from '../../src';
+import { InterfaceType } from "../../src/metadata/InterfaceType";
+import { ObjectType } from "../../src/metadata/ObjectType";
 
 
 const episodeEnum = new GraphQLEnumType({
@@ -24,7 +26,7 @@ const episodeEnum = new GraphQLEnumType({
 });
 
 
-@defineType(gql`
+@InterfaceType.define(gql`
 """
 A character in the Star Wars Trilogy
 """
@@ -55,7 +57,7 @@ interface Character {
   secretBackstory: String
 }
 `)
-abstract class Character {
+class Character {
   id: string;
   name: string;
   friends: any;
@@ -77,7 +79,7 @@ abstract class Character {
 }
 
 
-@defineType(gql`
+@ObjectType.define(gql`
   """
   A humanoid creature in the Star Wars universe.
   """
@@ -106,7 +108,7 @@ class Human extends Character {
 }
 
 
-@defineType(gql`
+@ObjectType.define(gql`
   """
   A mechanical creature in the Star Wars universe.
   """
@@ -136,7 +138,7 @@ class Droid extends Character {
 }
 
 
-@defineType(gql`
+@ObjectType.define(gql`
   type Query {
     hero(
       """If omitted, returns the hero of the whole saga. If provided, returns the hero of that particular episode."""

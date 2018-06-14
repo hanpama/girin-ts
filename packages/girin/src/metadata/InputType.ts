@@ -3,14 +3,24 @@ import { GraphQLInputObjectType, GraphQLInputFieldConfigMap, GraphQLInputFieldCo
 import { DefinitionMetadata, DefinitionMetadataConfig } from "../base/DefinitionMetadata";
 import { MetadataStorage, InputFieldReferenceEntry } from "../base/MetadataStorage";
 import { DefinitionClass } from "../types";
+import { ASTParser } from "../sdl/ast";
 
 
-export interface InputTypeMetadataConfig extends DefinitionMetadataConfig {}
+export interface InputTypeConfig extends DefinitionMetadataConfig {}
 
 /**
  * Metadata type for InputObjectType
  */
-export class InputTypeMetadata<T extends InputTypeMetadataConfig = InputTypeMetadataConfig> extends DefinitionMetadata<T> {
+export class InputType<T extends InputTypeConfig = InputTypeConfig> extends DefinitionMetadata<T> {
+
+  protected static decorate(astParser: ASTParser, storage: MetadataStorage, definitionClass: DefinitionClass) {
+    astParser.inputObjectTypeMetadataConfigs.forEach(config => {
+      storage.register(new this(config), definitionClass);
+    });
+    astParser.inputFieldMetadataConfigs.forEach(config => {
+      storage.registerInputFieldReference(config, definitionClass);
+    });
+  }
 
   public buildInputFieldConfig(storage: MetadataStorage, definitionClass: DefinitionClass, entry: InputFieldReferenceEntry): GraphQLInputFieldConfig {
     return Object.assign({}, entry.reference.field.buildConfig(storage), entry.reference.props);

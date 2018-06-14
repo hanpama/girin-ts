@@ -25,7 +25,7 @@ export interface InputFieldReferenceEntry {
  * Provide methods to query metadata with its associated class or graphql type name.
  */
 export class MetadataStorage {
-  public readonly definitionMetadata: Array<DefinitionMetadataEntry<any>> = [];
+  public readonly definitionMetadata: Array<DefinitionMetadataEntry<DefinitionMetadata>> = [];
   public readonly memoizedTypeInstanceMap: Map<DefinitionClass, GraphQLNamedType> = new Map();
   public readonly fieldReferences: Array<FieldReferenceEntry> = [];
   public readonly inputFieldReferences: Array<InputFieldReferenceEntry> = [];
@@ -50,8 +50,6 @@ export class MetadataStorage {
   registerInputFieldReference(reference: InputFieldReference, definitionClass: DefinitionClass) {
     this.inputFieldReferences.push({ reference, definitionClass });
   }
-
-  // registerInputFieldReference()
 
   /**
    * Get a [[DefinitionMetadata]] object which is instance of the `metadataClass` and associated to `definitionClass`
@@ -79,10 +77,14 @@ export class MetadataStorage {
   }
 
   queryFieldReferences(definitionClass: Function): FieldReferenceEntry[] {
-    return this.fieldReferences.filter(entry => isSubClassOf(definitionClass, entry.definitionClass));
+    return this.fieldReferences.filter(entry => (
+      definitionClass === entry.definitionClass || isSubClassOf(definitionClass, entry.definitionClass)
+    ));
   }
 
   queryInputFieldReference(definitionClass: Function): InputFieldReferenceEntry[] {
-    return this.inputFieldReferences.filter(entry => isSubClassOf(definitionClass, entry.definitionClass));
+    return this.inputFieldReferences.filter(entry => (
+      definitionClass === entry.definitionClass || isSubClassOf(definitionClass, entry.definitionClass)
+    ));
   }
 }

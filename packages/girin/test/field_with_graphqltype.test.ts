@@ -7,10 +7,11 @@ import {
   GraphQLEnumType
 } from "graphql";
 
-import { defineType, gql, getGraphQLType } from '../src';
+import { gql, getGraphQLType } from '../src';
+import { ObjectType } from "../src/metadata/ObjectType";
 
 
-@defineType(gql`
+@ObjectType.define(gql`
   type ItemInfo {
     description: String
   }
@@ -42,7 +43,7 @@ const bazEnum = new GraphQLEnumType({
   values: { A: {}, B: {}, C: {}, }
 });
 
-@defineType(gql`
+@ObjectType.define(gql`
   type Query {
     item: ${itemType}
     nonNullItem: ${itemType}!

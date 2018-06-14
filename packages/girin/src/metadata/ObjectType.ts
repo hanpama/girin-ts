@@ -4,9 +4,10 @@ import { DefinitionMetadata, DefinitionMetadataConfig } from "../base/Definition
 import { MetadataStorage, FieldReferenceEntry } from "../base/MetadataStorage";
 import { TypeExpression } from "../type-expression/TypeExpression";
 import { DefinitionClass } from "../types";
+import { ASTParser } from "../sdl/ast";
 
 
-export interface ObjectTypeMetadataConfig extends DefinitionMetadataConfig {
+export interface ObjectTypeConfig extends DefinitionMetadataConfig {
   description?: string;
   interfaces?: TypeExpression[];
 }
@@ -14,7 +15,16 @@ export interface ObjectTypeMetadataConfig extends DefinitionMetadataConfig {
 /**
  * Metadata type for ObjectType
  */
-export class ObjectTypeMetadata<TConfig extends ObjectTypeMetadataConfig = ObjectTypeMetadataConfig> extends DefinitionMetadata<TConfig> {
+export class ObjectType<TConfig extends ObjectTypeConfig = ObjectTypeConfig> extends DefinitionMetadata<TConfig> {
+
+  protected static decorate(astParser: ASTParser, storage: MetadataStorage, definitionClass: DefinitionClass) {
+    astParser.objectTypeMetadataConfigs.forEach(config => {
+      storage.register(new this(config), definitionClass);
+    });
+    astParser.fieldMetadataConfigs.forEach(config => {
+      storage.registerFieldReference(config, definitionClass);
+    });
+  }
 
   public buildFieldConfig(storage: MetadataStorage, definitionClass: DefinitionClass, entry: FieldReferenceEntry): GraphQLFieldConfig<any, any> {
     const { name } = entry.reference;
@@ -41,7 +51,6 @@ export class ObjectTypeMetadata<TConfig extends ObjectTypeMetadataConfig = Objec
   public buildTypeInstance(storage: MetadataStorage, definitionClass: DefinitionClass): GraphQLObjectType {
     const name = this.typeName;
     const fields = this.buildFieldConfigMap.bind(this, storage, definitionClass);
-    // const isTypeOf = this.isTypeOf.bind(this);
     const interfaces = this.findInterfaces(storage);
     const description = this.description;
     const isTypeOf = this.buildIsTypeOf(storage, definitionClass);
@@ -51,7 +60,6 @@ export class ObjectTypeMetadata<TConfig extends ObjectTypeMetadataConfig = Objec
 
   public findInterfaces(storage: MetadataStorage): GraphQLInterfaceType[] | undefined {
     const { interfaces } = this.config;
-    // const { storage } = this;
     return interfaces && interfaces.map(i => (
       i.buildTypeInstance(storage) as GraphQLInterfaceType)
     );

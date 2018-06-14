@@ -30,10 +30,6 @@
   "peerDependencies": {
     "graphql-relay": "^0.5.0"
   },
-  "devDependencies": {
-    "@types/graphql-relay": "^0.4.3",
-    "graphql-relay": "^0.5.5"
-  },
   "jest": {
     "transform": {
       "^.+\\.tsx?$": "ts-jest"

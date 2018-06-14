@@ -1,19 +1,20 @@
-import { defineType, gql, getGraphQLType, List } from "../src";
+import { gql, getGraphQLType, List, StringScalar } from "../src";
 import { Field } from "../src/field/Field";
-import { mount } from "../src/field/mount";
 import { GraphQLObjectType, GraphQLSchema, graphql, printSchema } from "graphql";
 import { InputField } from "../src/field/InputField";
+import { ObjectType } from "../src/metadata/ObjectType";
 
 
-@defineType(gql`
+const tagListField = new Field({ output: List.of(StringScalar), args: [] });
+
+@ObjectType.define(gql`
   type Room {
     name: String!
+    ${tagListField.mountAs('tags')}
   }
 `)
 class Room {
   name: string;
-
-  @mount(new Field(List.of('String')))
   tags: string[];
 }
 
@@ -22,31 +23,32 @@ class RoomsField extends Field {
   args = [
     { name: 'count', field: new InputField('Int'), props: {} }
   ]
-  resolve(source: string, args: { count: number }) {
-    const rooms: Room[] = [];
-    for(let i = 0; i < args.count; i ++) {
-      const room = new Room();
-      room.name = `My room ${i}`;
-      room.tags = [String(i)];
-      rooms.push(room)
+  buildResolver() {
+    return (source: string, args: { count: number }) => {
+      const rooms: Room[] = [];
+      for(let i = 0; i < args.count; i ++) {
+        const room = new Room();
+        room.name = `My room ${i}`;
+        room.tags = [String(i)];
+        rooms.push(room)
+      }
+      return rooms;
     }
-    return rooms;
   }
 }
 
-@defineType(gql`
+@ObjectType.define(gql`
   type Host {
     name: String!
+    ${(new RoomsField()).mountAs('rooms')}
   }
 `)
 class Host {
   name: string;
-
-  @mount(new RoomsField())
   rooms: Room[];
 }
 
-@defineType(gql`
+@ObjectType.define(gql`
   type Query {
     host: ${Host}
   }

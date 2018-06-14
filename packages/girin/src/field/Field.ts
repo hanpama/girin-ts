@@ -1,4 +1,4 @@
-import { GraphQLResolveInfo, defaultFieldResolver, GraphQLFieldConfigArgumentMap, GraphQLFieldConfig, GraphQLOutputType } from "graphql";
+import { GraphQLFieldConfigArgumentMap, GraphQLFieldConfig, GraphQLOutputType, GraphQLFieldResolver } from "graphql";
 import { TypeExpression, TypeArg } from "../type-expression/TypeExpression";
 import { MetadataStorage } from "../base/MetadataStorage";
 import { InputFieldReference } from "./InputField";
@@ -11,30 +11,37 @@ export interface FieldProps {
   resolve?: Function;
 }
 
-export interface FieldReference {
-  name: string;
-  field: Field;
-  props: FieldProps;
+export class FieldReference {
+  constructor(
+    public name: string,
+    public field: Field,
+    public props: FieldProps,
+  ) { }
 }
 
-export class Field {
+export interface FieldBuilder {
+  output: TypeArg | TypeExpression;
+  args: InputFieldReference[];
+  buildResolver?(storage: MetadataStorage): GraphQLFieldResolver<any, any> | undefined;
+  buildArgs?(storage: MetadataStorage): GraphQLFieldConfigArgumentMap;
+  buildConfig?(storage: MetadataStorage): GraphQLFieldConfig<any, any>
+}
 
-  protected output: TypeExpression;
-  protected args: InputFieldReference[];
+export class Field implements FieldBuilder {
 
-  constructor(
-    output?: TypeArg | TypeExpression,
-    args?: InputFieldReference[],
-  ) {
-    if (output) {
-      this.output = output instanceof TypeExpression ? output : new TypeExpression(output);
-    }
-    this.args = args || [];;
+  constructor(builder?: FieldBuilder) {
+    if (builder) { Object.assign(this, builder); }
   }
 
+  public output: TypeExpression;
+  public args: InputFieldReference[];
 
-  public resolve(source: any, args: any, context: any, info: GraphQLResolveInfo): any {
-    return defaultFieldResolver(source, args, context, info);
+  public mountAs(fieldName: string, props?: FieldProps) {
+    return new FieldReference(fieldName, this, props || {});
+  }
+
+  public buildResolver(storage: MetadataStorage): GraphQLFieldResolver<any, any> | undefined  {
+    return;
   }
 
   public buildArgs(storage: MetadataStorage): GraphQLFieldConfigArgumentMap {
@@ -51,7 +58,7 @@ export class Field {
     return {
       type: output.buildTypeInstance(storage) as GraphQLOutputType,
       args: this.buildArgs(storage),
-      resolve: this.resolve.bind(this),
+      resolve: this.buildResolver(storage),
     };
   }
 }
