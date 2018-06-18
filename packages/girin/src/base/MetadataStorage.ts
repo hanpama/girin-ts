@@ -1,11 +1,11 @@
 import { isSubClassOf, DefinitionClass } from '../types';
-import { DefinitionMetadata } from './DefinitionMetadata';
+import { Definition } from './Definition';
 import { GraphQLNamedType } from 'graphql';
 import { FieldReference } from '../field/Field';
 import { InputFieldReference } from '../field/InputField';
 
 
-export interface DefinitionMetadataEntry<T extends DefinitionMetadata = DefinitionMetadata> {
+export interface DefinitionEntry<T extends Definition = Definition> {
   definitionClass: DefinitionClass;
   metadata: T;
 }
@@ -21,11 +21,11 @@ export interface InputFieldReferenceEntry {
 }
 
 /**
- * Keep all [[DefinitionMetadata]] and [[GenericMetadata]].
+ * Keep all [[Definition]] and [[GenericMetadata]].
  * Provide methods to query metadata with its associated class or graphql type name.
  */
 export class MetadataStorage {
-  public readonly definitionMetadata: Array<DefinitionMetadataEntry<DefinitionMetadata>> = [];
+  public readonly definitionMetadata: Array<DefinitionEntry<Definition>> = [];
   public readonly memoizedTypeInstanceMap: Map<DefinitionClass, GraphQLNamedType> = new Map();
   public readonly fieldReferences: Array<FieldReferenceEntry> = [];
   public readonly inputFieldReferences: Array<InputFieldReferenceEntry> = [];
@@ -34,8 +34,8 @@ export class MetadataStorage {
    * Add a new [[Metadata]] object to storage.
    * @param metadata A metadata object to register
    */
-  register(metadata: DefinitionMetadata<any>, definitionClass: DefinitionClass) {
-    if (metadata instanceof DefinitionMetadata) {
+  register(metadata: Definition<any>, definitionClass: DefinitionClass) {
+    if (metadata instanceof Definition) {
       this.definitionMetadata.push({ definitionClass, metadata });
 
     } else {
@@ -52,28 +52,28 @@ export class MetadataStorage {
   }
 
   /**
-   * Get a [[DefinitionMetadata]] object which is instance of the `metadataClass` and associated to `definitionClass`
-   * @param metadataClass A [[DefinitionMetadata]] subclass to query
+   * Get a [[Definition]] object which is instance of the `metadataClass` and associated to `definitionClass`
+   * @param metadataClass A [[Definition]] subclass to query
    * @param definitionClass A class associated with metadata to query
    */
-  getDefinitionMetadata<T extends DefinitionMetadata>(metadataClass: { new (...args: any[]): T; }, definitionClass: Function) {
+  getDefinition<T extends Definition>(metadataClass: { new (...args: any[]): T; }, definitionClass: Function) {
     const entry = this.definitionMetadata.find(entry => entry.definitionClass === definitionClass);
     if (!entry) {
       throw new Error(`Cannot get ${metadataClass.name} of ${definitionClass.name} from MetadataStorage`);
     }
-    return entry as DefinitionMetadataEntry<T>;
+    return entry as DefinitionEntry<T>;
   }
 
   /**
-   * Get a [[DefinitionMetadata]] object by the name of the GraphQLType that the metadata will generate.
+   * Get a [[Definition]] object by the name of the GraphQLType that the metadata will generate.
    * @param name The name of a GraphQLType which will be built from metadata to query
    */
-  getDefinitionMetadataByName(name: string) {
+  getDefinitionByName(name: string) {
     const entry = this.definitionMetadata.find(entry => entry.metadata.typeName === name);
     if (!entry) {
       throw new Error(`Cannot find metadata with given name: ${name}`);
     }
-    return entry as DefinitionMetadataEntry<any>;
+    return entry as DefinitionEntry<any>;
   }
 
   queryFieldReferences(definitionClass: Function): FieldReferenceEntry[] {

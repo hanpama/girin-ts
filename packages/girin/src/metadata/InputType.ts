@@ -1,17 +1,17 @@
 import { GraphQLInputObjectType, GraphQLInputFieldConfigMap, GraphQLInputFieldConfig } from "graphql";
 
-import { DefinitionMetadata, DefinitionMetadataConfig } from "../base/DefinitionMetadata";
+import { Definition, DefinitionConfig } from "../base/Definition";
 import { MetadataStorage, InputFieldReferenceEntry } from "../base/MetadataStorage";
 import { DefinitionClass } from "../types";
 import { ASTParser } from "../sdl/ast";
 
 
-export interface InputTypeConfig extends DefinitionMetadataConfig {}
+export interface InputTypeConfig extends DefinitionConfig {}
 
 /**
  * Metadata type for InputObjectType
  */
-export class InputType<T extends InputTypeConfig = InputTypeConfig> extends DefinitionMetadata<T> {
+export class InputType<T extends InputTypeConfig = InputTypeConfig> extends Definition<T> {
 
   protected static decorate(astParser: ASTParser, storage: MetadataStorage, definitionClass: DefinitionClass) {
     astParser.inputObjectTypeMetadataConfigs.forEach(config => {

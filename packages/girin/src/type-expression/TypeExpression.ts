@@ -1,7 +1,7 @@
 import { GraphQLType, isType } from "graphql";
-import { MetadataStorage, DefinitionMetadataEntry } from "../base/MetadataStorage";
+import { MetadataStorage, DefinitionEntry } from "../base/MetadataStorage";
 import { isLazy, Lazy } from "../types";
-import { DefinitionMetadata } from "../base/DefinitionMetadata";
+import { Definition } from "../base/Definition";
 import { formatObjectInfo } from "../utilities/formatObjectInfo";
 
 
@@ -24,15 +24,15 @@ export class TypeExpression {
 
   public typeArg: TypeArg | Lazy<TypeArg>;
 
-  public getDefinitionMetadataEntry(storage: MetadataStorage): DefinitionMetadataEntry {
+  public getDefinitionEntry(storage: MetadataStorage): DefinitionEntry {
     const completeTypeArg = this.getCompleteTypeArg();
 
     if (completeTypeArg instanceof Function) {
-      return storage.getDefinitionMetadata(DefinitionMetadata, completeTypeArg);
+      return storage.getDefinition(Definition, completeTypeArg);
     } else if (typeof completeTypeArg === 'string'){
-      return storage.getDefinitionMetadataByName(completeTypeArg);
+      return storage.getDefinitionByName(completeTypeArg);
     } else {
-      throw new Error(`Cannot find any DefinitionMetadata with TypeExpression of ${formatObjectInfo(completeTypeArg)}`);
+      throw new Error(`Cannot find any Definition with TypeExpression of ${formatObjectInfo(completeTypeArg)}`);
     }
   }
 
@@ -42,11 +42,11 @@ export class TypeExpression {
     if (isType(completeTypeArg)) {
       return completeTypeArg;
     }
-    const entry = this.getDefinitionMetadataEntry(storage);
+    const entry = this.getDefinitionEntry(storage);
 
     let typeInstance = storage.memoizedTypeInstanceMap.get(entry.definitionClass);
     if (!typeInstance) {
-      const typeMetadata = storage.getDefinitionMetadata(DefinitionMetadata, entry.definitionClass);
+      const typeMetadata = storage.getDefinition(Definition, entry.definitionClass);
       if (!typeMetadata) {
         throw new Error(`Given class ${entry.definitionClass.name} has no corresponding metadata`);
       }

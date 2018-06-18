@@ -4,7 +4,7 @@ import { DefinitionClass } from "../types";
 import { ASTParser } from "../sdl/ast";
 
 
-export interface DefinitionMetadataConfig {
+export interface DefinitionConfig {
   typeName?: string;
   description?: string;
   directives?: any;
@@ -14,7 +14,7 @@ export interface DefinitionMetadataConfig {
  * Contain configs required to build named GraphQL types.
  * Guarantee its type instance only created once.
  */
-export class DefinitionMetadata<TConfig extends DefinitionMetadataConfig = DefinitionMetadataConfig> {
+export class Definition<TConfig extends DefinitionConfig = DefinitionConfig> {
 
   public static define(astParser: ASTParser, storage?: MetadataStorage) {
     const targetStorage: MetadataStorage = storage || require('../globalMetadataStorage').globalMetadataStorage;

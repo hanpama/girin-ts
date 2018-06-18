@@ -1,12 +1,12 @@
 import { GraphQLFieldConfigMap, GraphQLTypeResolver, GraphQLInterfaceType, GraphQLFieldConfig } from "graphql";
 
-import { DefinitionMetadata, DefinitionMetadataConfig } from "../base/DefinitionMetadata";
+import { Definition, DefinitionConfig } from "../base/Definition";
 import { MetadataStorage, FieldReferenceEntry } from "../base/MetadataStorage";
 import { DefinitionClass } from "../types";
 import { ASTParser } from "../sdl/ast";
 
 
-export interface InterfaceTypeConfig extends DefinitionMetadataConfig {
+export interface InterfaceTypeConfig extends DefinitionConfig {
   resolveType?: GraphQLTypeResolver<any, any>;
   description?: string;
 }
@@ -14,7 +14,7 @@ export interface InterfaceTypeConfig extends DefinitionMetadataConfig {
 /**
  * Metadata type for InterfaceType
  */
-export class InterfaceType<T extends InterfaceTypeConfig = InterfaceTypeConfig> extends DefinitionMetadata<T> {
+export class InterfaceType<T extends InterfaceTypeConfig = InterfaceTypeConfig> extends Definition<T> {
 
   protected static decorate(astParser: ASTParser, storage: MetadataStorage, definitionClass: DefinitionClass) {
     astParser.interfaceTypeMetadataConfigs.forEach(config => {

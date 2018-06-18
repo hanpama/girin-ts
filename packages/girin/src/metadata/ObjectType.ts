@@ -1,13 +1,13 @@
 import { GraphQLObjectType, GraphQLFieldConfigMap, GraphQLInterfaceType, GraphQLFieldConfig } from "graphql";
 
-import { DefinitionMetadata, DefinitionMetadataConfig } from "../base/DefinitionMetadata";
+import { Definition, DefinitionConfig } from "../base/Definition";
 import { MetadataStorage, FieldReferenceEntry } from "../base/MetadataStorage";
 import { TypeExpression } from "../type-expression/TypeExpression";
 import { DefinitionClass } from "../types";
 import { ASTParser } from "../sdl/ast";
 
 
-export interface ObjectTypeConfig extends DefinitionMetadataConfig {
+export interface ObjectTypeConfig extends DefinitionConfig {
   description?: string;
   interfaces?: TypeExpression[];
 }
@@ -15,7 +15,7 @@ export interface ObjectTypeConfig extends DefinitionMetadataConfig {
 /**
  * Metadata type for ObjectType
  */
-export class ObjectType<TConfig extends ObjectTypeConfig = ObjectTypeConfig> extends DefinitionMetadata<TConfig> {
+export class ObjectType<TConfig extends ObjectTypeConfig = ObjectTypeConfig> extends Definition<TConfig> {
 
   protected static decorate(astParser: ASTParser, storage: MetadataStorage, definitionClass: DefinitionClass) {
     astParser.objectTypeMetadataConfigs.forEach(config => {

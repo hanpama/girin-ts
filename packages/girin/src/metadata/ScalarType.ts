@@ -1,16 +1,16 @@
 import { GraphQLScalarType } from "graphql";
 
-import { DefinitionMetadata, DefinitionMetadataConfig } from "../base/DefinitionMetadata";
+import { Definition, DefinitionConfig } from "../base/Definition";
 
 
-export interface ScalarTypeConfig extends DefinitionMetadataConfig {
+export interface ScalarTypeConfig extends DefinitionConfig {
   typeInstance: GraphQLScalarType;
 }
 
 /**
  * Metadata type for ScalarType
  */
-export class ScalarType<T extends ScalarTypeConfig = ScalarTypeConfig> extends DefinitionMetadata<T> {
+export class ScalarType<T extends ScalarTypeConfig = ScalarTypeConfig> extends Definition<T> {
   public get typeName(): string {
     return this.config.typeInstance.name;
   }

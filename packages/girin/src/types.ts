@@ -1,4 +1,4 @@
-export interface DefinitionClass<T = any> extends ConcreteClass<T> {
+export interface DefinitionClass extends Function {
   typeName?: string;
   description?: string;
 }
