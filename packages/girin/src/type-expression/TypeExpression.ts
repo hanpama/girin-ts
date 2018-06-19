@@ -1,6 +1,6 @@
 import { GraphQLType, isType } from "graphql";
 import { MetadataStorage, DefinitionEntry } from "../base/MetadataStorage";
-import { isLazy, Lazy } from "../types";
+import { isLazy, Lazy, DefinitionClass } from "../types";
 import { Definition } from "../base/Definition";
 import { formatObjectInfo } from "../utilities/formatObjectInfo";
 
@@ -17,15 +17,19 @@ export class TypeExpression {
     this.typeArg = typeArg;
   }
 
-  private getCompleteTypeArg(): TypeArg {
+  private getCompleteTypeArg(definitionClass?: DefinitionClass): TypeArg {
     const { typeArg } = this;
-    return isLazy(typeArg) ? typeArg() : typeArg;
+    if (isLazy(typeArg)) {
+      return typeArg(definitionClass);
+    } else {
+      return typeArg;
+    }
   }
 
   public typeArg: TypeArg | Lazy<TypeArg>;
 
-  public getDefinitionEntry(storage: MetadataStorage): DefinitionEntry {
-    const completeTypeArg = this.getCompleteTypeArg();
+  public getDefinitionEntry(storage: MetadataStorage, definitionClass?: DefinitionClass): DefinitionEntry {
+    const completeTypeArg = this.getCompleteTypeArg(definitionClass);
 
     if (completeTypeArg instanceof Function) {
       return storage.getDefinition(Definition, completeTypeArg);
@@ -36,13 +40,13 @@ export class TypeExpression {
     }
   }
 
-  public buildTypeInstance(storage: MetadataStorage): GraphQLType {
+  public buildTypeInstance(storage: MetadataStorage, definitionClass?: DefinitionClass): GraphQLType {
 
-    const completeTypeArg = this.getCompleteTypeArg();
+    const completeTypeArg = this.getCompleteTypeArg(definitionClass);
     if (isType(completeTypeArg)) {
       return completeTypeArg;
     }
-    const entry = this.getDefinitionEntry(storage);
+    const entry = this.getDefinitionEntry(storage, definitionClass);
 
     let typeInstance = storage.memoizedTypeInstanceMap.get(entry.definitionClass);
     if (!typeInstance) {

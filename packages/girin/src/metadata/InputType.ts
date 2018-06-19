@@ -23,7 +23,7 @@ export class InputType<T extends InputTypeConfig = InputTypeConfig> extends Defi
   }
 
   public buildInputFieldConfig(storage: MetadataStorage, definitionClass: DefinitionClass, entry: InputFieldReferenceEntry): GraphQLInputFieldConfig {
-    return Object.assign({}, entry.reference.field.buildConfig(storage), entry.reference.props);
+    return Object.assign({}, entry.reference.field.buildConfig(storage, definitionClass), entry.reference.props);
   }
 
   public buildInputFieldConfigMap(storage: MetadataStorage, definitionClass: DefinitionClass): GraphQLInputFieldConfigMap {

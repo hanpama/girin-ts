@@ -16,13 +16,15 @@ export interface DefinitionConfig {
  */
 export class Definition<TConfig extends DefinitionConfig = DefinitionConfig> {
 
-  public static define(astParser: ASTParser, storage?: MetadataStorage) {
+  public static define(astParser?: ASTParser, storage?: MetadataStorage) {
     const targetStorage: MetadataStorage = storage || require('../globalMetadataStorage').globalMetadataStorage;
     return (definitionClass: DefinitionClass) => this.decorate(astParser, targetStorage, definitionClass);
   }
 
-  protected static decorate(astParser: ASTParser, storage: MetadataStorage, definitionClass: DefinitionClass) {
-    throw new Error('Not implemented');
+  protected static decorate(astParser: ASTParser | undefined, storage: MetadataStorage, definitionClass: DefinitionClass) {
+    astParser && astParser.fieldMetadataConfigs.forEach(config => {
+      storage.registerFieldReference(config, definitionClass);
+    });
   }
 
   // public readonly definitionClass: DefinitionClass;

@@ -17,18 +17,22 @@ export interface ObjectTypeConfig extends DefinitionConfig {
  */
 export class ObjectType<TConfig extends ObjectTypeConfig = ObjectTypeConfig> extends Definition<TConfig> {
 
-  protected static decorate(astParser: ASTParser, storage: MetadataStorage, definitionClass: DefinitionClass) {
-    astParser.objectTypeMetadataConfigs.forEach(config => {
-      storage.register(new this(config), definitionClass);
-    });
-    astParser.fieldMetadataConfigs.forEach(config => {
-      storage.registerFieldReference(config, definitionClass);
-    });
+  protected static decorate(astParser: ASTParser | undefined, storage: MetadataStorage, definitionClass: DefinitionClass) {
+    if (astParser) {
+      astParser.objectTypeMetadataConfigs.forEach(config => {
+        storage.register(new this(config), definitionClass);
+      });
+      astParser.fieldMetadataConfigs.forEach(config => {
+        storage.registerFieldReference(config, definitionClass);
+      });
+    } else {
+      storage.register(new this({ typeName: definitionClass.name }), definitionClass);
+    }
   }
 
   public buildFieldConfig(storage: MetadataStorage, definitionClass: DefinitionClass, entry: FieldReferenceEntry): GraphQLFieldConfig<any, any> {
     const { name } = entry.reference;
-    const config = Object.assign({}, entry.reference.field.buildConfig(storage), entry.reference.props);
+    const config = Object.assign({}, entry.reference.field.buildConfig(storage, definitionClass), entry.reference.props);
     if ((definitionClass as any)[name] instanceof Function) {
       config.resolve = (definitionClass as any)[name];
     }
@@ -49,19 +53,19 @@ export class ObjectType<TConfig extends ObjectTypeConfig = ObjectTypeConfig> ext
    * Build GraphQLObjectType instance from metadata.
    */
   public buildTypeInstance(storage: MetadataStorage, definitionClass: DefinitionClass): GraphQLObjectType {
-    const name = this.typeName;
+    const name = this.typeName || definitionClass.constructor.name;
     const fields = this.buildFieldConfigMap.bind(this, storage, definitionClass);
-    const interfaces = this.findInterfaces(storage);
+    const interfaces = this.findInterfaces(storage, definitionClass);
     const description = this.description;
     const isTypeOf = this.buildIsTypeOf(storage, definitionClass);
     return new GraphQLObjectType({ name, fields, interfaces, description, isTypeOf });
   }
 
 
-  public findInterfaces(storage: MetadataStorage): GraphQLInterfaceType[] | undefined {
+  public findInterfaces(storage: MetadataStorage, definitionClass: DefinitionClass): GraphQLInterfaceType[] | undefined {
     const { interfaces } = this.config;
     return interfaces && interfaces.map(i => (
-      i.buildTypeInstance(storage) as GraphQLInterfaceType)
+      i.buildTypeInstance(storage, definitionClass) as GraphQLInterfaceType)
     );
   }
 

@@ -29,7 +29,6 @@
     "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0"
   },
   "jest": {
-    "mapCoverage": true,
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },

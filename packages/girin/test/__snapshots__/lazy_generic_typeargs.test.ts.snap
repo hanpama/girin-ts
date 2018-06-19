@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Lazy-generic TypeArgs should generate schema as expected 1`] = `
+"type Author {
+  name: String!
+}
+
+type AuthorEdge {
+  node: Author
+}
+
+type Post {
+  title: String!
+}
+
+type PostEdge {
+  node: Post
+}
+
+type Query {
+  postEdge: PostEdge
+  authorEdge: AuthorEdge
+}
+"
+`;

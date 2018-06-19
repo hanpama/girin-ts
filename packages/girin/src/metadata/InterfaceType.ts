@@ -27,7 +27,7 @@ export class InterfaceType<T extends InterfaceTypeConfig = InterfaceTypeConfig> 
 
   public buildFieldConfig(storage: MetadataStorage, definitionClass: DefinitionClass, entry: FieldReferenceEntry): GraphQLFieldConfig<any, any> {
     const { name } = entry.reference;
-    const config = Object.assign({}, entry.reference.field.buildConfig(storage), entry.reference.props);
+    const config = Object.assign({}, entry.reference.field.buildConfig(storage, definitionClass), entry.reference.props);
     if ((definitionClass as any)[name] instanceof Function) {
       config.resolve = (definitionClass as any)[name];
     }

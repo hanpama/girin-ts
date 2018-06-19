@@ -1,6 +1,7 @@
 import { GraphQLInputFieldConfig, GraphQLInputType } from "graphql";
 import { TypeExpression, TypeArg } from "../type-expression/TypeExpression";
 import { MetadataStorage } from "../base/MetadataStorage";
+import { DefinitionClass } from "../types";
 
 
 export interface InputFieldProps {
@@ -25,10 +26,10 @@ export class InputField {
     }
   }
 
-  public buildConfig(storage: MetadataStorage): GraphQLInputFieldConfig {
+  public buildConfig(storage: MetadataStorage, definitionClass: DefinitionClass): GraphQLInputFieldConfig {
     const { input } = this;
     return {
-      type: input.buildTypeInstance(storage) as GraphQLInputType,
+      type: input.buildTypeInstance(storage, definitionClass) as GraphQLInputType,
     };
   }
 }

@@ -2,6 +2,7 @@ import { GraphQLFieldConfigArgumentMap, GraphQLFieldConfig, GraphQLOutputType, G
 import { TypeExpression, TypeArg } from "../type-expression/TypeExpression";
 import { MetadataStorage } from "../base/MetadataStorage";
 import { InputFieldReference } from "./InputField";
+import { DefinitionClass } from "../types";
 
 
 export interface FieldProps {
@@ -23,8 +24,8 @@ export interface FieldBuilder {
   output: TypeArg | TypeExpression;
   args: InputFieldReference[];
   buildResolver?(storage: MetadataStorage): GraphQLFieldResolver<any, any> | undefined;
-  buildArgs?(storage: MetadataStorage): GraphQLFieldConfigArgumentMap;
-  buildConfig?(storage: MetadataStorage): GraphQLFieldConfig<any, any>
+  buildArgs?(storage: MetadataStorage, definitionClass: DefinitionClass): GraphQLFieldConfigArgumentMap;
+  buildConfig?(storage: MetadataStorage, definitionClass: DefinitionClass): GraphQLFieldConfig<any, any>
 }
 
 export class Field implements FieldBuilder {
@@ -44,20 +45,20 @@ export class Field implements FieldBuilder {
     return;
   }
 
-  public buildArgs(storage: MetadataStorage): GraphQLFieldConfigArgumentMap {
+  public buildArgs(storage: MetadataStorage, definitionClass: DefinitionClass): GraphQLFieldConfigArgumentMap {
     const { args } = this;
     return args.reduce((args, ref) => {
-      args[ref.name] = Object.assign(ref.field.buildConfig(storage), ref.props);
+      args[ref.name] = Object.assign(ref.field.buildConfig(storage, definitionClass), ref.props);
       return args;
     }, {} as GraphQLFieldConfigArgumentMap);
   }
 
-  public buildConfig(storage: MetadataStorage): GraphQLFieldConfig<any, any> {
+  public buildConfig(storage: MetadataStorage, definitionClass: DefinitionClass): GraphQLFieldConfig<any, any> {
     const { output } = this;
 
     return {
-      type: output.buildTypeInstance(storage) as GraphQLOutputType,
-      args: this.buildArgs(storage),
+      type: output.buildTypeInstance(storage, definitionClass) as GraphQLOutputType,
+      args: this.buildArgs(storage, definitionClass),
       resolve: this.buildResolver(storage),
     };
   }
