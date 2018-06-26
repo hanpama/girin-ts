@@ -11,7 +11,7 @@ import {
   ObjectTypeDefinitionNode,
 } from 'graphql';
 
-import { Field, FieldReference } from '../field/Field';
+import { Field, FieldMount } from '../field/Field';
 import { InputTypeConfig } from '../metadata/InputType';
 import { List, NonNull } from '../type-expression/structure';
 import { ObjectTypeConfig } from '../metadata/ObjectType';
@@ -19,7 +19,7 @@ import { completeDirectives, completeValueNode } from './directive';
 import { TypeArg, TypeExpression } from '../type-expression/TypeExpression';
 import { Lazy } from '../types';
 import { InterfaceTypeConfig } from '../metadata/InterfaceType';
-import { InputField, InputFieldReference } from '../field/InputField';
+import { InputField } from '../field/InputField';
 
 
 const SUBSTITUTION_PREFIX = '__GIRIN__SUBS__';
@@ -29,7 +29,11 @@ export interface SubstitutionMap {
   [tempName: string]: GQLInterpolatable;
 
 }
-export type GQLInterpolatable = FieldReference | TypeExpression | TypeArg | Lazy<TypeArg>;
+export type GQLInterpolatable =
+  | FieldMount | Array<FieldMount>
+  | TypeArg | TypeExpression
+  | Lazy<TypeArg> | Lazy<TypeExpression>;
+
 
 export function gql(strings: TemplateStringsArray, ...interpolated: Array<GQLInterpolatable>) {
   const result = [strings[0]];
@@ -38,7 +42,7 @@ export function gql(strings: TemplateStringsArray, ...interpolated: Array<GQLInt
   for (let i = 0; i < interpolated.length; i++) {
     const item = interpolated[i];
     const name = `${SUBSTITUTION_PREFIX}${i}`;
-    if (item instanceof FieldReference) {
+    if (item instanceof FieldMount) {
       subsMap[name] = item;
       result.push(`${name}: ${TEMP_PLACEHOLDER}`);
     } else {
@@ -62,8 +66,8 @@ export class ASTParser {
   public readonly interfaceTypeMetadataConfigs: InterfaceTypeConfig[] = [];
   public readonly inputObjectTypeMetadataConfigs: InputTypeConfig[] = [];
 
-  public readonly fieldMetadataConfigs: FieldReference[] = [];
-  public readonly inputFieldMetadataConfigs: InputFieldReference[] = [];
+  public readonly fieldMetadataConfigs: FieldMount[] = [];
+  public readonly inputFieldMetadataConfigs: InputField[] = [];
 
   constructor(
     rootNode: DefinitionNode,
@@ -168,54 +172,41 @@ export class ASTParser {
     const { name, type, description, directives, arguments: args } = node;
 
     const sub = this.subsMap[name.value];
-    let ref: FieldReference;
+    let mount: FieldMount;
     if (sub) {
-      ref = sub as FieldReference;
+      mount = sub as FieldMount;
     } else {
       const argumentRefs = args && args.map(argumentNode => (
-        this.createArgumentReference(argumentNode)
+        this.createInputField(argumentNode)
       ));
+
       const field = new Field({
-        output: this.completeTypeExpression(type),
+        defaultName: name.value,
+        type: this.completeTypeExpression(type),
         args: argumentRefs || [],
-      });
-      ref = new FieldReference(name.value, field, {
         description: description && description.value,
         directives: directives && completeDirectives(directives),
       });
+
+      mount = new FieldMount({ mountName: name.value, field });
     }
 
-    this.fieldMetadataConfigs.push(ref);
+    this.fieldMetadataConfigs.push(mount);
   }
 
-  protected createArgumentReference(node: InputValueDefinitionNode): InputFieldReference {
+  protected createInputField(node: InputValueDefinitionNode): InputField {
     const { name, type, description, defaultValue, directives } = node;
 
-    const field = new InputField(this.completeTypeExpression(type));
-    return {
-      field,
-      name: name.value,
-      props: {
-        description: description && description.value,
-        directives: directives && completeDirectives(directives),
-        defaultValue: defaultValue && completeValueNode(defaultValue),
-      },
-    };
+    return new InputField({
+      defaultName: name.value,
+      type: this.completeTypeExpression(type),
+      directives: directives && completeDirectives(directives),
+      defaultValue: defaultValue && completeValueNode(defaultValue),
+      description: description && description.value,
+    });
   }
 
   protected appendInputFieldMetadataConfig(node: InputValueDefinitionNode): void {
-    const { name, type, description, defaultValue } = node;
-
-    const field = new InputField(this.completeTypeExpression(type));
-
-    this.inputFieldMetadataConfigs.push({
-      field,
-      name: name.value,
-      props: {
-        description: description && description.value,
-        directives: node.directives && completeDirectives(node.directives),
-        defaultValue: defaultValue && completeValueNode(defaultValue),
-      },
-    });
+    this.inputFieldMetadataConfigs.push(this.createInputField(node));
   }
 }

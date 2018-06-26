@@ -1,6 +1,6 @@
 import { GraphQLType, isType } from "graphql";
 import { MetadataStorage, DefinitionEntry } from "../base/MetadataStorage";
-import { isLazy, Lazy, DefinitionClass } from "../types";
+import { isLazy, Lazy } from "../types";
 import { Definition } from "../base/Definition";
 import { formatObjectInfo } from "../utilities/formatObjectInfo";
 
@@ -11,51 +11,61 @@ export type TypeArg = GraphQLType | string | Function;
  * Contain an argument which can be resolved to GraphQLType instance.
  */
 export class TypeExpression {
-  protected options: TypeArg | Lazy<TypeArg>;
 
-  constructor(typeArg: TypeArg | Lazy<TypeArg>) {
-    this.typeArg = typeArg;
+  constructor(typeOption: TypeArg | Lazy<TypeArg> | TypeExpression | Lazy<TypeExpression>) {
+    this.typeArg = typeOption;
   }
 
-  private getCompleteTypeArg(definitionClass?: DefinitionClass): TypeArg {
+  public resolve(targetClass?: Function): TypeExpression {
     const { typeArg } = this;
     if (isLazy(typeArg)) {
-      return typeArg(definitionClass);
-    } else {
-      return typeArg;
-    }
-  }
-
-  public typeArg: TypeArg | Lazy<TypeArg>;
-
-  public getDefinitionEntry(storage: MetadataStorage, definitionClass?: DefinitionClass): DefinitionEntry {
-    const completeTypeArg = this.getCompleteTypeArg(definitionClass);
-
-    if (completeTypeArg instanceof Function) {
-      return storage.getDefinition(Definition, completeTypeArg);
-    } else if (typeof completeTypeArg === 'string'){
-      return storage.getDefinitionByName(completeTypeArg);
-    } else {
-      throw new Error(`Cannot find any Definition with TypeExpression of ${formatObjectInfo(completeTypeArg)}`);
-    }
-  }
-
-  public buildTypeInstance(storage: MetadataStorage, definitionClass?: DefinitionClass): GraphQLType {
-
-    const completeTypeArg = this.getCompleteTypeArg(definitionClass);
-    if (isType(completeTypeArg)) {
-      return completeTypeArg;
-    }
-    const entry = this.getDefinitionEntry(storage, definitionClass);
-
-    let typeInstance = storage.memoizedTypeInstanceMap.get(entry.definitionClass);
-    if (!typeInstance) {
-      const typeMetadata = storage.getDefinition(Definition, entry.definitionClass);
-      if (!typeMetadata) {
-        throw new Error(`Given class ${entry.definitionClass.name} has no corresponding metadata`);
+      const resolved = typeArg(targetClass);
+      if (resolved instanceof TypeExpression) {
+        return resolved.resolve(targetClass);
       }
-      typeInstance = typeMetadata.metadata.buildTypeInstance(storage, entry.definitionClass);
-      storage.memoizedTypeInstanceMap.set(entry.definitionClass, typeInstance);
+      return new TypeExpression(resolved);
+    } else {
+      if (typeArg instanceof TypeExpression) {
+        return typeArg.resolve(targetClass);
+      } else {
+        return this;
+      }
+    }
+  }
+
+  public typeArg: TypeArg | Lazy<TypeArg> | TypeExpression | Lazy<TypeExpression>;
+
+  protected getDefinitionEntry(storage: MetadataStorage): DefinitionEntry {
+    if (this.typeArg instanceof Function) {
+      return storage.getDefinition(Definition, this.typeArg);
+    } else if (typeof this.typeArg === 'string'){
+      return storage.getDefinitionByName(this.typeArg);
+    } else {
+      throw new Error(`Cannot find any Definition with TypeExpression of ${formatObjectInfo(this.typeArg)}`);
+    }
+  }
+
+  public buildTypeInstance(storage: MetadataStorage, targetClass?: Function): GraphQLType {
+
+    const resolvedTypeExpression = this.resolve(targetClass);
+    if (this !== resolvedTypeExpression) {
+      return resolvedTypeExpression.buildTypeInstance(storage, targetClass);
+    }
+
+    if (isType(resolvedTypeExpression.typeArg)) {
+      return resolvedTypeExpression.typeArg;
+    }
+
+    const entry = resolvedTypeExpression.getDefinitionEntry(storage);
+
+    let typeInstance = storage.memoizedTypeInstanceMap.get(entry.key);
+    if (!typeInstance) {
+      const typeMetadata = storage.getDefinition(Definition, entry.key);
+      if (!typeMetadata) {
+        throw new Error(`Given class ${entry.key.name} has no corresponding metadata`);
+      }
+      typeInstance = typeMetadata.metadata.buildTypeInstance(storage, entry.key);
+      storage.memoizedTypeInstanceMap.set(entry.key, typeInstance);
     }
     return typeInstance;
   }

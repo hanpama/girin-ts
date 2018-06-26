@@ -18,15 +18,15 @@ export abstract class Structure extends TypeExpression {
 }
 
 export class List extends Structure {
-  public buildTypeInstance(storage: MetadataStorage): GraphQLType {
-    const innerTypeInstance = super.buildTypeInstance(storage);
+  public buildTypeInstance(storage: MetadataStorage, targetClass?: Function): GraphQLType {
+    const innerTypeInstance = super.buildTypeInstance(storage, targetClass);
     return new GraphQLList(innerTypeInstance);
   }
 }
 
 export class NonNull extends Structure {
-  public buildTypeInstance(storage: MetadataStorage): GraphQLType {
-    const innerTypeInstance = this.innerType.buildTypeInstance(storage);
+  public buildTypeInstance(storage: MetadataStorage, targetClass?: Function): GraphQLType {
+    const innerTypeInstance = this.innerType.buildTypeInstance(storage, targetClass);
     return new GraphQLNonNull(innerTypeInstance);
   }
 }

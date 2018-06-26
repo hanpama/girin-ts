@@ -1,7 +1,6 @@
 import { GraphQLSchema, printSchema } from "graphql";
 
-import { ObjectType, Definition, gql, getGraphQLType } from "../src";
-import { DefinitionClass } from "../src/types";
+import { ObjectType, Definition, gql, getGraphQLType, List } from "../src";
 
 
 @Definition.define(gql`
@@ -10,7 +9,7 @@ import { DefinitionClass } from "../src/types";
   }
 `)
 abstract class Edge<TNode> {
-  static nodeType: DefinitionClass;
+  static nodeType: Function;
   node: TNode;
 }
 
@@ -46,6 +45,8 @@ class AuthorEdge extends Edge<Author> {
   type Query {
     postEdge: ${PostEdge}
     authorEdge: ${AuthorEdge}
+    postEdges: ${List.of(PostEdge)}
+    authorEdges: ${List.of(AuthorEdge)}
   }
 `)
 class Query {

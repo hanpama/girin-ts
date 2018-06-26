@@ -1,35 +1,24 @@
-import { GraphQLInputFieldConfig, GraphQLInputType } from "graphql";
-import { TypeExpression, TypeArg } from "../type-expression/TypeExpression";
-import { MetadataStorage } from "../base/MetadataStorage";
-import { DefinitionClass } from "../types";
+import { GraphQLInputType } from "graphql";
+import { TypeExpression, MetadataStorage } from "..";
 
 
-export interface InputFieldProps {
+export interface InputFieldConfig {
+  type: TypeExpression;
+  defaultName: string;
   defaultValue?: any;
   description?: string;
   directives?: any;
 }
 
-export interface InputFieldReference {
-  name: string;
-  field: InputField;
-  props: InputFieldProps;
-}
+export class InputField<TConfig extends InputFieldConfig = InputFieldConfig> {
+  constructor(protected config: TConfig) { }
 
-export class InputField {
+  public get defaultName() { return this.config.defaultName; }
+  public get defaultValue() { return this.config.defaultValue; }
+  public get description() { return this.config.description; }
+  public get directives() { return this.config.directives; }
 
-  protected input: TypeExpression;
-
-  constructor(input?: TypeArg | TypeExpression) {
-    if (input) {
-      this.input = input instanceof TypeExpression ? input : new TypeExpression(input);
-    }
-  }
-
-  public buildConfig(storage: MetadataStorage, definitionClass: DefinitionClass): GraphQLInputFieldConfig {
-    const { input } = this;
-    return {
-      type: input.buildTypeInstance(storage, definitionClass) as GraphQLInputType,
-    };
+  public buildType(storage: MetadataStorage, targetClass?: Function): GraphQLInputType {
+    return this.config.type.buildTypeInstance(storage, targetClass) as GraphQLInputType;
   }
 }

@@ -2,6 +2,7 @@ import { graphql, GraphQLSchema, printSchema } from 'graphql';
 
 import { gql, getGraphQLType } from '../src';
 import { ObjectType } from '../src/metadata/ObjectType';
+import { Component, source } from '../src/component';
 
 
 interface TestSource {
@@ -18,11 +19,7 @@ interface TestSource {
     fieldWithDefaultResolver: String
   }
 `)
-class Test {
-  constructor(public source: TestSource) {
-    this.fieldWithDefaultResolver = source.fieldWithDefaultResolver;
-  }
-
+class Test extends Component<TestSource> {
   public resolverGotDefinitionInstance() {
     return this instanceof Test;
   }
@@ -32,7 +29,9 @@ class Test {
   public bigGreeting(arg: { name: string, greeting: string }) {
     return this.greeting(arg) + '!';
   }
-  public fieldWithDefaultResolver?: string;
+
+  @source() fieldWithDefaultResolver?: string;
+
 }
 
 @ObjectType.define(gql`
@@ -42,7 +41,7 @@ class Test {
     testPassingSource: ${Test}
   }
 `)
-class Query {
+class Query extends Component {
   public static test() {
     return new Test({});
   }

@@ -20,6 +20,8 @@ type PostEdge {
 type Query {
   postEdge: PostEdge
   authorEdge: AuthorEdge
+  postEdges: [PostEdge]
+  authorEdges: [AuthorEdge]
 }
 "
 `;

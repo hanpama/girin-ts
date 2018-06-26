@@ -21,7 +21,7 @@ class Member {
 
 @ObjectType.define(gql`
   type Query {
-    getMember: ${Member}!
+    getMember: ${Member}! @resolver
   }
 `)
 class Query {

@@ -1,8 +1,3 @@
-export interface DefinitionClass extends Function {
-  typeName?: string;
-  description?: string;
-}
-
 export type ResolvedValue<T> = T | Promise<T>;
 export type ResolvedList<T> = T[] | Promise<T[]> | Promise<T>[];
 
@@ -16,12 +11,12 @@ export function isSubClassOf(cls: Function, superClass: Function) {
   return cls.prototype instanceof superClass;
 }
 
-export interface ConcreteClass<T> {
+export interface ConcreteClass<T = any> {
   new(...args: any[]): T
 }
 
 export type TypedClassDecorator<T extends Function> = (cls: T) => T | void;
 
-export function isPromise<T>(value: T | Promise<T>): value is Promise<T> {
+export function isPromise<T = any>(value: T | Promise<T>): value is Promise<T> {
   return Boolean(value && typeof (value as Promise<T>).then === 'function');
 }

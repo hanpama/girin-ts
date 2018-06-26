@@ -1,65 +1,46 @@
-import { GraphQLFieldConfigArgumentMap, GraphQLFieldConfig, GraphQLOutputType, GraphQLFieldResolver } from "graphql";
-import { TypeExpression, TypeArg } from "../type-expression/TypeExpression";
+import { GraphQLFieldConfigArgumentMap, GraphQLOutputType, GraphQLFieldResolver } from "graphql";
+import { TypeExpression } from "../type-expression/TypeExpression";
 import { MetadataStorage } from "../base/MetadataStorage";
-import { InputFieldReference } from "./InputField";
-import { DefinitionClass } from "../types";
+import { InputField } from "./InputField";
 
 
-export interface FieldProps {
+export interface FieldConfig {
+  defaultName: string;
+  type: TypeExpression;
+  args: InputField[];
   description?: string;
   deprecationReason?: string;
   directives?: any;
-  resolve?: Function;
 }
 
-export class FieldReference {
-  constructor(
-    public name: string,
-    public field: Field,
-    public props: FieldProps,
-  ) { }
-}
+export class Field<TConfig extends FieldConfig = FieldConfig> {
+  constructor(protected config: TConfig) { }
 
-export interface FieldBuilder {
-  output: TypeArg | TypeExpression;
-  args: InputFieldReference[];
-  buildResolver?(storage: MetadataStorage): GraphQLFieldResolver<any, any> | undefined;
-  buildArgs?(storage: MetadataStorage, definitionClass: DefinitionClass): GraphQLFieldConfigArgumentMap;
-  buildConfig?(storage: MetadataStorage, definitionClass: DefinitionClass): GraphQLFieldConfig<any, any>
-}
+  public get defaultName() { return this.config.defaultName; };
+  public get description() { return this.config.description; };
+  public get deprecationReason() { return this.config.deprecationReason; };
 
-export class Field implements FieldBuilder {
-
-  constructor(builder?: FieldBuilder) {
-    if (builder) { Object.assign(this, builder); }
-  }
-
-  public output: TypeExpression;
-  public args: InputFieldReference[];
-
-  public mountAs(fieldName: string, props?: FieldProps) {
-    return new FieldReference(fieldName, this, props || {});
-  }
-
-  public buildResolver(storage: MetadataStorage): GraphQLFieldResolver<any, any> | undefined  {
-    return;
-  }
-
-  public buildArgs(storage: MetadataStorage, definitionClass: DefinitionClass): GraphQLFieldConfigArgumentMap {
-    const { args } = this;
+  public buildArgs(storage: MetadataStorage, targetClass?: Function): GraphQLFieldConfigArgumentMap {
+    const { args } = this.config;
     return args.reduce((args, ref) => {
-      args[ref.name] = Object.assign(ref.field.buildConfig(storage, definitionClass), ref.props);
+      args[ref.defaultName] = {
+        type: ref.buildType(storage, targetClass),
+        defaultValue: ref.defaultValue,
+        description: ref.description,
+      };
       return args;
     }, {} as GraphQLFieldConfigArgumentMap);
   }
 
-  public buildConfig(storage: MetadataStorage, definitionClass: DefinitionClass): GraphQLFieldConfig<any, any> {
-    const { output } = this;
-
-    return {
-      type: output.buildTypeInstance(storage, definitionClass) as GraphQLOutputType,
-      args: this.buildArgs(storage, definitionClass),
-      resolve: this.buildResolver(storage),
-    };
+  public buildType(storage: MetadataStorage, targetClass?: Function): GraphQLOutputType {
+    return this.config.type.buildTypeInstance(storage, targetClass) as GraphQLOutputType;
   }
+}
+
+export class FieldMount {
+  public field: Field;
+  public mountName: string;
+  public resolver?: GraphQLFieldResolver<any, any>;
+
+  constructor(values: FieldMount) { Object.assign(this, values); }
 }

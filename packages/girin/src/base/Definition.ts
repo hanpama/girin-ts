@@ -1,7 +1,7 @@
 import { GraphQLNamedType } from "graphql";
 import { MetadataStorage } from "./MetadataStorage";
-import { DefinitionClass } from "../types";
 import { ASTParser } from "../sdl/ast";
+import { getGlobalMetadataStorage } from "../global";
 
 
 export interface DefinitionConfig {
@@ -17,17 +17,30 @@ export interface DefinitionConfig {
 export class Definition<TConfig extends DefinitionConfig = DefinitionConfig> {
 
   public static define(astParser?: ASTParser, storage?: MetadataStorage) {
-    const targetStorage: MetadataStorage = storage || require('../globalMetadataStorage').globalMetadataStorage;
-    return (definitionClass: DefinitionClass) => this.decorate(astParser, targetStorage, definitionClass);
+    const targetStorage: MetadataStorage = storage || getGlobalMetadataStorage();
+    return (linkedClass: Function) => this.decorate(astParser, targetStorage, linkedClass);
   }
 
-  protected static decorate(astParser: ASTParser | undefined, storage: MetadataStorage, definitionClass: DefinitionClass) {
+  protected static decorate(astParser: ASTParser | undefined, storage: MetadataStorage, linkedClass: Function) {
     astParser && astParser.fieldMetadataConfigs.forEach(config => {
-      storage.registerFieldReference(config, definitionClass);
+      const maybeStaticResolver = (linkedClass as any)[config.field.defaultName];
+      const resolver = config.resolver || (maybeStaticResolver instanceof Function ? maybeStaticResolver : undefined);
+
+      storage.registerFieldReference({
+        ...config,
+        container: linkedClass,
+        resolver,
+      });
     });
+
+    astParser && astParser.inputFieldMetadataConfigs.forEach(config => {
+      storage.registerInputFieldReference({
+        container: linkedClass,
+        field: config,
+      })
+    })
   }
 
-  // public readonly definitionClass: DefinitionClass;
   protected readonly config: TConfig
 
   public constructor(config: TConfig) {
@@ -47,7 +60,7 @@ export class Definition<TConfig extends DefinitionConfig = DefinitionConfig> {
   /**
    * Build GraphQLType instance from metadata.
    */
-  public buildTypeInstance(storage: MetadataStorage, definitionClass: DefinitionClass): GraphQLNamedType {
+  public buildTypeInstance(storage: MetadataStorage, targetClass: Function): GraphQLNamedType {
     throw new Error(`Should implement typeInstance getter in ${this.constructor.name}`);
   };
 }

@@ -1,32 +1,44 @@
-import { isSubClassOf, DefinitionClass } from '../types';
+import { isSubClassOf } from '../types';
 import { Definition } from './Definition';
-import { GraphQLNamedType } from 'graphql';
-import { FieldReference } from '../field/Field';
-import { InputFieldReference } from '../field/InputField';
+import { Field } from '../field';
+import { InputField } from '../field/InputField';
+import { GraphQLNamedType, GraphQLFieldResolver } from 'graphql';
 
 
-export interface DefinitionEntry<T extends Definition = Definition> {
-  definitionClass: DefinitionClass;
-  metadata: T;
+export class DefinitionEntry<T extends Definition = Definition> {
+  constructor(
+    public key: Function,
+    public metadata: T,
+  ) { };
 }
 
-export interface FieldReferenceEntry {
-  definitionClass: DefinitionClass;
-  reference: FieldReference
+export class FieldReferenceEntry {
+  public mountName: string;
+  public container: Function;
+  public field: Field;
+  public resolver?: GraphQLFieldResolver<any, any>;
+
+  constructor(values: FieldReferenceEntry) {
+    Object.assign(this, values);
+  }
 }
 
-export interface InputFieldReferenceEntry {
-  definitionClass: DefinitionClass;
-  reference: InputFieldReference;
+export class InputFieldReferenceEntry {
+  public container: Function;
+  public field: InputField;
+
+  constructor(values: InputFieldReferenceEntry) {
+    Object.assign(this, values);
+  }
 }
 
 /**
- * Keep all [[Definition]] and [[GenericMetadata]].
+ * Keep all [[Definition]] and references.
  * Provide methods to query metadata with its associated class or graphql type name.
  */
 export class MetadataStorage {
   public readonly definitionMetadata: Array<DefinitionEntry<Definition>> = [];
-  public readonly memoizedTypeInstanceMap: Map<DefinitionClass, GraphQLNamedType> = new Map();
+  public readonly memoizedTypeInstanceMap: Map<Function, GraphQLNamedType> = new Map();
   public readonly fieldReferences: Array<FieldReferenceEntry> = [];
   public readonly inputFieldReferences: Array<InputFieldReferenceEntry> = [];
 
@@ -34,32 +46,32 @@ export class MetadataStorage {
    * Add a new [[Metadata]] object to storage.
    * @param metadata A metadata object to register
    */
-  register(metadata: Definition<any>, definitionClass: DefinitionClass) {
+  register(metadata: Definition<any>, key: Function) {
     if (metadata instanceof Definition) {
-      this.definitionMetadata.push({ definitionClass, metadata });
+      this.definitionMetadata.push(new DefinitionEntry(key, metadata));
 
     } else {
       throw new Error(`Cannot register to stroage: ${metadata}`);
     }
   }
 
-  registerFieldReference(reference: FieldReference, definitionClass: DefinitionClass) {
-    this.fieldReferences.push({ reference, definitionClass });
+  registerFieldReference(args: FieldReferenceEntry) {
+    this.fieldReferences.push(new FieldReferenceEntry(args));
   }
 
-  registerInputFieldReference(reference: InputFieldReference, definitionClass: DefinitionClass) {
-    this.inputFieldReferences.push({ reference, definitionClass });
+  registerInputFieldReference(args: InputFieldReferenceEntry) {
+    this.inputFieldReferences.push(new InputFieldReferenceEntry(args));
   }
 
   /**
-   * Get a [[Definition]] object which is instance of the `metadataClass` and associated to `definitionClass`
+   * Get a [[Definition]] object which is instance of the `metadataClass` and associated to `componentClass`
    * @param metadataClass A [[Definition]] subclass to query
-   * @param definitionClass A class associated with metadata to query
+   * @param componentClass A class associated with metadata to query
    */
-  getDefinition<T extends Definition>(metadataClass: { new (...args: any[]): T; }, definitionClass: Function) {
-    const entry = this.definitionMetadata.find(entry => entry.definitionClass === definitionClass);
+  getDefinition<T extends Definition>(metadataClass: { new (...args: any[]): T; }, componentClass: Function) {
+    const entry = this.definitionMetadata.find(entry => entry.key === componentClass);
     if (!entry) {
-      throw new Error(`Cannot get ${metadataClass.name} of ${definitionClass.name} from MetadataStorage`);
+      throw new Error(`Cannot get ${metadataClass.name} of ${componentClass.name} from MetadataStorage`);
     }
     return entry as DefinitionEntry<T>;
   }
@@ -76,15 +88,23 @@ export class MetadataStorage {
     return entry as DefinitionEntry<any>;
   }
 
-  queryFieldReferences(definitionClass: Function): FieldReferenceEntry[] {
+  getFieldReference(resolver: Function): FieldReferenceEntry {
+    const entry = this.fieldReferences.find(entry => entry.resolver === resolver);
+    if (!entry) {
+      throw new Error(`Cannot find metadata with given function: ${resolver}`);
+    }
+    return entry;
+  }
+
+  queryFieldReferences(componentClass: Function): FieldReferenceEntry[] {
     return this.fieldReferences.filter(entry => (
-      definitionClass === entry.definitionClass || isSubClassOf(definitionClass, entry.definitionClass)
+      componentClass === entry.container || isSubClassOf(componentClass, entry.container)
     ));
   }
 
-  queryInputFieldReference(definitionClass: Function): InputFieldReferenceEntry[] {
+  queryInputFieldReference(componentClass: Function): InputFieldReferenceEntry[] {
     return this.inputFieldReferences.filter(entry => (
-      definitionClass === entry.definitionClass || isSubClassOf(definitionClass, entry.definitionClass)
+      componentClass === entry.container || isSubClassOf(componentClass, entry.container)
     ));
   }
 }

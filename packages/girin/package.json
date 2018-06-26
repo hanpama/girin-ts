@@ -9,7 +9,8 @@
   "scripts": {
     "prepublish": "npm run build",
     "build": "../../node_modules/.bin/tsc -p tsconfig.publish.json",
-    "test": "../../node_modules/.bin/tsc && ../../node_modules/.bin/jest",
+    "test": "../../node_modules/.bin/tsc && npm run testonly",
+    "testonly": "../../node_modules/.bin/jest",
     "coverage": "../../node_modules/.bin/jest --coverage",
     "typedoc": "../../node_modules/.bin/typedoc --out ../../docs/girin --exclude node_modules --target es5 --module commonjs src/index.ts --json typedoc.json"
   },

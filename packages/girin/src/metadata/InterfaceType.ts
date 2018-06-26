@@ -2,7 +2,6 @@ import { GraphQLFieldConfigMap, GraphQLTypeResolver, GraphQLInterfaceType, Graph
 
 import { Definition, DefinitionConfig } from "../base/Definition";
 import { MetadataStorage, FieldReferenceEntry } from "../base/MetadataStorage";
-import { DefinitionClass } from "../types";
 import { ASTParser } from "../sdl/ast";
 
 
@@ -16,37 +15,41 @@ export interface InterfaceTypeConfig extends DefinitionConfig {
  */
 export class InterfaceType<T extends InterfaceTypeConfig = InterfaceTypeConfig> extends Definition<T> {
 
-  protected static decorate(astParser: ASTParser, storage: MetadataStorage, definitionClass: DefinitionClass) {
+  protected static decorate(astParser: ASTParser, storage: MetadataStorage, linkedClass: Function) {
+    super.decorate(astParser, storage, linkedClass);
+
     astParser.interfaceTypeMetadataConfigs.forEach(config => {
-      storage.register(new this(config), definitionClass);
-    });
-    astParser.fieldMetadataConfigs.forEach(config => {
-      storage.registerFieldReference(config, definitionClass);
+      storage.register(new this(config), linkedClass);
     });
   }
 
-  public buildFieldConfig(storage: MetadataStorage, definitionClass: DefinitionClass, entry: FieldReferenceEntry): GraphQLFieldConfig<any, any> {
-    const { name } = entry.reference;
-    const config = Object.assign({}, entry.reference.field.buildConfig(storage, definitionClass), entry.reference.props);
-    if ((definitionClass as any)[name] instanceof Function) {
-      config.resolve = (definitionClass as any)[name];
-    }
-    return config;
+  public buildFieldConfig(storage: MetadataStorage, targetClass: Function, entry: FieldReferenceEntry): GraphQLFieldConfig<any, any> {
+    const { description, deprecationReason } = entry.field;
+
+    return {
+      type: entry.field.buildType(storage, targetClass),
+      args: entry.field.buildArgs(storage, targetClass),
+      description,
+      deprecationReason,
+      resolve: entry.resolver,
+    };
   }
 
-  public buildFieldConfigMap(storage: MetadataStorage, definitionClass: DefinitionClass): GraphQLFieldConfigMap<any, any> {
-    const refs = storage.queryFieldReferences(definitionClass);
+  public buildFieldConfigMap(storage: MetadataStorage, targetClass: Function): GraphQLFieldConfigMap<any, any> {
+    const refs = storage.queryFieldReferences(targetClass);
     return (
       refs.reduce((results, entry) => {
-        results[entry.reference.name] = this.buildFieldConfig(storage, definitionClass, entry);
+        const name = entry.mountName || entry.field.defaultName;
+
+        results[name] = this.buildFieldConfig(storage, targetClass, entry);
         return results;
       }, {} as GraphQLFieldConfigMap<any, any>)
     );
   }
 
-  public buildTypeInstance(storage: MetadataStorage, definitionClass: DefinitionClass): GraphQLInterfaceType {
+  public buildTypeInstance(storage: MetadataStorage, targetClass: Function): GraphQLInterfaceType {
     const name = this.typeName;
-    const fields = this.buildFieldConfigMap.bind(this, storage, definitionClass);
+    const fields = this.buildFieldConfigMap.bind(this, storage, targetClass);
 
     const description = this.description;
     return new GraphQLInterfaceType({ name, fields, description });
