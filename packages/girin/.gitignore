@@ -6,7 +6,7 @@ node_modules/
 /decorators/
 /base/
 /builtins/
-/component/
+/reducer/
 /connection/
 /field/
 /metadata/
