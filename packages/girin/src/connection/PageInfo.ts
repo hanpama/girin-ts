@@ -1,4 +1,4 @@
-import { gql, ObjectType, Component, source } from "..";
+import { gql, ObjectType, Reducer, source } from "..";
 
 
 export interface PageInfoSource {
@@ -26,7 +26,7 @@ export interface PageInfoSource {
     endCursor: String
   }
 `)
-export class PageInfo extends Component<PageInfoSource> {
+export class PageInfo extends Reducer<PageInfoSource> {
   @source() hasNextPage: boolean;
   @source() hasPreviousPage: boolean;
   @source() startCursor?: string | null;

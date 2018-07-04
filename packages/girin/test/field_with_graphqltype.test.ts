@@ -106,5 +106,5 @@ describe('field with GraphQLType', () => {
       }
     `});
     expect(result.errors[0].message).toEqual("Expected a value of type \"Baz\" but received: D");
-  })
+  });
 });

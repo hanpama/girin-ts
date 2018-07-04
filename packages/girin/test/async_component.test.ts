@@ -1,4 +1,4 @@
-import { Component, async, source } from "../src/component";
+import { Reducer, async, source } from "../src";
 
 
 let fetchCount = 0;
@@ -9,25 +9,19 @@ interface PostSource {
   description?: string;
 }
 
-class Post extends Component<PostSource> {
-  async $fetch() {
-    const id = this.$source.id;
-    fetchCount += 1;
+class Post extends Reducer<PostSource> {
+  @source() id: number;
 
+  async $fetch() {
+    fetchCount += 1;
     return {
-      title: `Post ${id}`,
-      description: `Awesome post for topic ${id}`,
+      title: `Post ${this.id}`,
+      description: `Awesome post for topic ${this.id}`,
     };
   }
 
-  @source()
-  id: number;
-
-  @async()
-  title: Promise<string>;
-
-  @async()
-  description: Promise<string>;
+  @async() title: Promise<string>;
+  @async() description: Promise<string>;
 
   tiscription() {
     return Promise

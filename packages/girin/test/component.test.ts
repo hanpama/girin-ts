@@ -1,4 +1,4 @@
-import { Component, source } from "../src/component";
+import { Reducer, source } from "../src";
 
 
 interface AuthorSource {
@@ -6,11 +6,10 @@ interface AuthorSource {
   description: string;
 }
 
-class Author extends Component<AuthorSource> {
+class Author extends Reducer<AuthorSource> {
   @source() name: string;
   @source() description: string;
 }
-
 
 describe('Reducer', () => {
   describe('source decorator', () => {

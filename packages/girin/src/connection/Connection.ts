@@ -1,7 +1,7 @@
 import { GraphQLResolveInfo } from "graphql";
 
 import { PageInfo, Edge } from '.';
-import { gql, Definition, List, ObjectType, Component } from "..";
+import { gql, Definition, List, ObjectType, Reducer } from "..";
 import { ConcreteClass } from "../types";
 
 
@@ -18,18 +18,18 @@ export interface ConnectionArguments {
     Information to aid in pagination.
     """
     pageInfo: ${PageInfo}
-    edges: ${cls => cls.getOrCreatedEdgesType()}
+    edges: ${cls => cls.getOrCreateEdgesType()}
   }
 `)
 export abstract class Connection<
   TSource,
   TArgs extends ConnectionArguments = ConnectionArguments,
   TContext = {}
-> extends Component<TSource, TArgs, TContext> {
+> extends Reducer<TSource, TContext> {
   static edgeType?: ConcreteClass<Edge<any>>;
   static nodeType?: any;
 
-  protected static getOrCreatedEdgesType() {
+  protected static getOrCreateEdgesType() {
     const { edgeType, nodeType } = this;
     if (edgeType) {
       return List.of(edgeType);
@@ -51,7 +51,7 @@ export abstract class Connection<
     protected context?: TContext,
     protected info?: GraphQLResolveInfo,
   ) {
-    super(source, args, context, info);
+    super(source, context, info);
     if (args) {
       if (typeof args.first === 'number' && args.first < 0) {
         throw new Error('Argument "first" must be a non-negative integer');

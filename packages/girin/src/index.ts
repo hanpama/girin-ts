@@ -6,4 +6,4 @@ export * from './sdl';
 export * from './global';
 export * from './field';
 export * from './type-expression';
-export * from './component';
+export * from './reducer';

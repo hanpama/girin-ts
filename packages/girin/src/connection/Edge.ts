@@ -1,4 +1,4 @@
-import { gql, Definition, Component } from "..";
+import { gql, Definition, Reducer } from "..";
 
 
 @Definition.define(gql`
@@ -10,6 +10,6 @@ import { gql, Definition, Component } from "..";
     node: ${def => def.nodeType}
   }
 `)
-export abstract class Edge<TNode> extends Component<TNode> {
+export abstract class Edge<TNode> extends Reducer<TNode> {
   static nodeType: any;
 }

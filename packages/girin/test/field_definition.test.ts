@@ -50,6 +50,5 @@ describe('field definition', () => {
         baz: 'Foobar-4',
       }
     });
-
   });
 });

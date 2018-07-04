@@ -1,8 +1,6 @@
 import { graphql, GraphQLSchema, printSchema } from 'graphql';
 
-import { gql, getGraphQLType } from '../src';
-import { ObjectType } from '../src/metadata/ObjectType';
-import { Component, source } from '../src/component';
+import { getGraphQLType, gql, ObjectType, source, Reducer } from '../src';
 
 
 interface TestSource {
@@ -19,7 +17,7 @@ interface TestSource {
     fieldWithDefaultResolver: String
   }
 `)
-class Test extends Component<TestSource> {
+class Test extends Reducer<TestSource> {
   public resolverGotDefinitionInstance() {
     return this instanceof Test;
   }
@@ -31,7 +29,6 @@ class Test extends Component<TestSource> {
   }
 
   @source() fieldWithDefaultResolver?: string;
-
 }
 
 @ObjectType.define(gql`
@@ -41,7 +38,7 @@ class Test extends Component<TestSource> {
     testPassingSource: ${Test}
   }
 `)
-class Query extends Component {
+class Query extends Reducer {
   public static test() {
     return new Test({});
   }
