@@ -1,7 +1,6 @@
 import { GraphQLFieldConfigMap, GraphQLTypeResolver, GraphQLInterfaceType, GraphQLFieldConfig } from "graphql";
 
-import { Definition, DefinitionConfig } from "../base/Definition";
-import { MetadataStorage, FieldReferenceEntry } from "../base/MetadataStorage";
+import { Definition, DefinitionConfig, MetadataStorage, FieldReferenceEntry } from "../base";
 import { ASTParser } from "../sdl/ast";
 
 
@@ -14,6 +13,8 @@ export interface InterfaceTypeConfig extends DefinitionConfig {
  * Metadata type for InterfaceType
  */
 export class InterfaceType<T extends InterfaceTypeConfig = InterfaceTypeConfig> extends Definition<T> {
+  public isOutputType() { return true; }
+  public isInputType() { return false; }
 
   protected static decorate(astParser: ASTParser, storage: MetadataStorage, linkedClass: Function) {
     super.decorate(astParser, storage, linkedClass);
@@ -39,7 +40,7 @@ export class InterfaceType<T extends InterfaceTypeConfig = InterfaceTypeConfig> 
     const refs = storage.queryFieldReferences(targetClass);
     return (
       refs.reduce((results, entry) => {
-        const name = entry.mountName || entry.field.defaultName;
+        const name = entry.field.defaultName;
 
         results[name] = this.buildFieldConfig(storage, targetClass, entry);
         return results;

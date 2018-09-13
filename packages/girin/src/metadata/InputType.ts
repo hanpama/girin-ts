@@ -1,7 +1,6 @@
 import { GraphQLInputObjectType, GraphQLInputFieldConfigMap, GraphQLInputFieldConfig } from "graphql";
 
-import { Definition, DefinitionConfig } from "../base/Definition";
-import { MetadataStorage, InputFieldReferenceEntry } from "../base/MetadataStorage";
+import { Definition, DefinitionConfig, MetadataStorage, InputFieldReferenceEntry } from "../base";
 import { ASTParser } from "../sdl/ast";
 
 
@@ -11,6 +10,8 @@ export interface InputTypeConfig extends DefinitionConfig {}
  * Metadata type for InputObjectType
  */
 export class InputType<T extends InputTypeConfig = InputTypeConfig> extends Definition<T> {
+  public isOutputType() { return false; }
+  public isInputType() { return true; }
 
   protected static decorate(astParser: ASTParser, storage: MetadataStorage, linkedClass: Function) {
     super.decorate(astParser, storage, linkedClass);
@@ -40,5 +41,31 @@ export class InputType<T extends InputTypeConfig = InputTypeConfig> extends Defi
     const fields = this.buildInputFieldConfigMap.bind(this, storage, targetClass);
     const description = this.description;
     return new GraphQLInputObjectType({ name, fields, description });
+  }
+
+  protected instantiationCache = new WeakMap();
+
+  public buildInstantiator(storage: MetadataStorage, targetClass: Function) {
+    const fieldEntries = storage.queryInputFieldReference(targetClass);
+
+    const fieldInstantiators = fieldEntries.reduce((res, entry) => {
+      res[entry.field.defaultName] = entry.field.buildInstantiator(storage, targetClass);
+      return res;
+    }, {} as any);
+
+    const instantiator = (values: any) => {
+      let cached = this.instantiationCache.get(values);
+      if (!cached) {
+        cached = Object.create(targetClass.prototype);
+        Object.keys(values).forEach(fieldName => {
+          cached[fieldName] = fieldInstantiators[fieldName](values[fieldName]);
+        });
+        this.instantiationCache.set(values, cached);
+      }
+      return cached;
+    }
+
+    Object.defineProperty(instantiator, 'name', { value: 'instantiate' + targetClass.name});
+    return instantiator;
   }
 }

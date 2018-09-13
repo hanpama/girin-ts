@@ -1,10 +1,8 @@
-import { MetadataStorage } from "./base/MetadataStorage";
-import { TypeArg, TypeExpression } from "./type-expression/TypeExpression";
-import { loadBuiltInScalar } from './builtins/scalar';
-import { FieldMount } from "./field";
+import { TypeArg, TypeExpression, MetadataStorage, loadBuiltInScalar, TypeExpressionKind } from "./base";
 
 
 export function createMetadataStorage() {
+
   const storage = new MetadataStorage();
   loadBuiltInScalar(storage);
   return storage;
@@ -28,16 +26,8 @@ export function getGlobalMetadataStorage() {
  * @param typeArg
  * @param storage
  */
-export function getGraphQLType(typeArg: TypeArg, maybeStorage?: MetadataStorage): any {
+export function getGraphQLType(typeArg: TypeArg, as: TypeExpressionKind = 'any', maybeStorage?: MetadataStorage): any {
   const storage = maybeStorage || getGlobalMetadataStorage();
-  const typeExpression = new TypeExpression(typeArg);
-  return typeExpression.buildTypeInstance(storage!);
-}
-
-export function mountField(resolver: any, asName?: string, maybeStorage?: MetadataStorage) {
-  const storage = maybeStorage || getGlobalMetadataStorage();
-  const ref = storage!.getFieldReference(resolver);
-  const field = ref.field;
-  const mountName = asName || ref.mountName;
-  return new FieldMount({ field, mountName, resolver });
+  const typeExpression = new TypeExpression(typeArg, as);
+  return typeExpression.getTypeInstance(storage!);
 }

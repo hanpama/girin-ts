@@ -1,7 +1,6 @@
-import { gql, getGraphQLType } from "../src";
 import { GraphQLSchema, graphql, printSchema } from "graphql";
-import { ObjectType } from "../src/metadata/ObjectType";
-import { InputType } from "../src/metadata/InputType";
+
+import { gql, getGraphQLType, ObjectType, InputType } from "../src";
 
 
 @InputType.define(gql`
@@ -10,19 +9,68 @@ import { InputType } from "../src/metadata/InputType";
     lastName: String!
   }
 `)
-class NameInput {
+@ObjectType.define(gql`
+  type Name {
+    firstName: String!
+    lastName: String!
+  }
+`)
+class Name {
   firstName: string;
   lastName: string;
+
+  get fullName() {
+    return `${this.firstName} ${this.lastName}`;
+  }
 }
 
+@InputType.define(gql`
+  input PersonInput {
+    address: String!
+    name: ${Name}
+  }
+`)
 @ObjectType.define(gql`
-  type Query {
-    formatFullName(input: ${NameInput}): String!
+  type Person {
+    address: String!
+    name: ${Name}
+  }
+`)
+class Person {
+  address: string;
+  name: Name;
+}
+
+
+@ObjectType.define(gql`
+  type Query {            # resolved to NameInput
+    formatFullName(input: ${Name}): String!
+                                    # resolved to PersonInput
+    personInputInstantiated(person: ${Person}): Boolean!
+    personNonNullInputWorks(person: ${Person}!): Boolean!
+    personNonNullListInputWorks(people: [${Person}!]): Boolean!
+
+
+    echoPerson(person: ${Person}): Person! # resolved to Person
   }
 `)
 class Query {
-  static formatFullName(source: null, args: { input: NameInput }) {
-    return `${args.input.firstName} ${args.input.lastName}`;
+  static formatFullName(_source: null, args: { input: Name }) {
+    return args.input.fullName;
+  }
+  static personInputInstantiated(_source: null, args: { person: Person }) {
+    return (args.person instanceof Person) && (args.person.name instanceof Name);
+  }
+  static personNonNullInputWorks(_source: null, args: { person: Person }) {
+    return (args.person instanceof Person) && (args.person.name instanceof Name);
+  }
+  static personNonNullListInputWorks(_source: null, args: { people: Person[] }) {
+    return args.people.reduce((res, person) => {
+      return res && (person instanceof Person) && (person.name instanceof Name);
+    }, true);
+  }
+  static echoPerson(_source: null, args: { person: Person }) {
+    return args.person;
   }
 }
 
@@ -36,11 +84,66 @@ describe('Input type', () => {
 
     const results = await graphql({ schema, source: `
       query {
-        formatFullName(input: { firstName: "Kibum", lastName: "Kim" })
+        formatFullName(input: { firstName: "Foo", lastName: "Bar" })
+        personInputInstantiated(person: {
+          address: "A",
+          name: {
+            firstName: "Foo",
+            lastName: "Bar"
+          }
+        })
+        personNonNullInputWorks(person: {
+          address: "A",
+          name: {
+            firstName: "Foo",
+            lastName: "Bar"
+          }
+        })
+        personNonNullListInputWorks(people: [
+          {
+            address: "A",
+            name: {
+              firstName: "Foo",
+              lastName: "Bar"
+            }
+          },
+          {
+            address: "B",
+            name: {
+              firstName: "Foo",
+              lastName: "Bar"
+            }
+          }
+        ])
+
+        echoPerson(person: {
+          address: "A",
+          name: {
+            firstName: "Foo",
+            lastName: "Bar"
+          }
+        }) {
+          address
+          name {
+            firstName
+            lastName
+          }
+        }
       }
     ` });
 
-    expect(results).toEqual({ data: { formatFullName: 'Kibum Kim' } });
-
+    expect(results).toEqual({ data: {
+      formatFullName: 'Foo Bar',
+      personInputInstantiated: true,
+      personNonNullInputWorks: true,
+      personNonNullListInputWorks: true,
+      echoPerson: {
+        address: "A",
+        name: {
+          firstName: "Foo",
+          lastName: "Bar"
+        }
+      }
+    } });
   });
 });

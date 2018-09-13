@@ -1,6 +1,5 @@
-import { GraphQLFieldConfigArgumentMap, GraphQLOutputType, GraphQLFieldResolver } from "graphql";
-import { TypeExpression } from "../type-expression/TypeExpression";
-import { MetadataStorage } from "../base/MetadataStorage";
+import { GraphQLFieldConfigArgumentMap, GraphQLOutputType, GraphQLFieldResolver, defaultFieldResolver } from "graphql";
+import { TypeExpression, MetadataStorage } from "../base";
 import { InputField } from "./InputField";
 
 
@@ -33,14 +32,27 @@ export class Field<TConfig extends FieldConfig = FieldConfig> {
   }
 
   public buildType(storage: MetadataStorage, targetClass?: Function): GraphQLOutputType {
-    return this.config.type.buildTypeInstance(storage, targetClass) as GraphQLOutputType;
+    return this.config.type.getTypeInstance(storage, targetClass) as GraphQLOutputType;
   }
-}
 
-export class FieldMount {
-  public field: Field;
-  public mountName: string;
-  public resolver?: GraphQLFieldResolver<any, any>;
+  public buildResolver(storage: MetadataStorage, targetClass?: Function, innerResolver: GraphQLFieldResolver<any, any> = defaultFieldResolver): GraphQLFieldResolver<any, any> {
+    const { args } = this.config;
 
-  constructor(values: FieldMount) { Object.assign(this, values); }
+    const instantiators = args.reduce((res, meta) => {
+      res[meta.defaultName] = meta.buildInstantiator(storage, targetClass);
+      return res;
+    }, {} as any);
+
+    const argumentInstantiator = (argValues: any) => {
+      return Object.keys(argValues).reduce((res, fieldName) => {
+        res[fieldName] = instantiators[fieldName](argValues[fieldName]);
+        return res;
+      }, {} as any);
+    };
+
+    const resolver = function(source: any, args: any, context: any, info: any) {
+      return innerResolver(source, argumentInstantiator(args), context, info);
+    }
+    return resolver;
+  }
 }

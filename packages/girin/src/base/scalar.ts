@@ -1,7 +1,28 @@
-import { GraphQLString, GraphQLBoolean, GraphQLFloat, GraphQLInt, GraphQLID } from "graphql";
-import { ScalarType } from "../metadata/ScalarType";
-import { MetadataStorage } from "../base/MetadataStorage";
+import { GraphQLScalarType, GraphQLString, GraphQLBoolean, GraphQLFloat, GraphQLInt, GraphQLID } from "graphql";
 
+import { Definition, DefinitionConfig } from "./Definition";
+import { MetadataStorage } from "./MetadataStorage";
+
+
+export interface ScalarTypeConfig extends DefinitionConfig {
+  typeInstance: GraphQLScalarType;
+}
+
+/**
+ * Metadata type for ScalarType
+ */
+export class ScalarType<T extends ScalarTypeConfig = ScalarTypeConfig> extends Definition<T> {
+  public isOutputType() { return true; }
+  public isInputType() { return true; }
+
+  public get typeName(): string {
+    return this.config.typeInstance.name;
+  }
+
+  public buildTypeInstance() {
+    return this.config.typeInstance;
+  }
+}
 
 export class StringScalar {}
 export class BooleanScalar {}

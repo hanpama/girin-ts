@@ -18,21 +18,6 @@
       "outFiles": [
         "${workspaceRoot}/dist/**/*"
       ]
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Girin Relay Tests",
-      "program": "${workspaceRoot}/node_modules/jest/bin/jest.js",
-      "cwd": "${workspaceRoot}/packages/girin-relay",
-      "args": [
-        "-i",
-        "${relativeFile}",
-      ],
-      "internalConsoleOptions": "openOnSessionStart",
-      "outFiles": [
-        "${workspaceRoot}/dist/**/*"
-      ]
-    },
+    }
   ]
 }

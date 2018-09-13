@@ -1,4 +1,4 @@
 export * from './InputType';
 export * from './ObjectType';
-export * from './ScalarType';
+export * from '../base/scalar';
 export * from './InterfaceType';

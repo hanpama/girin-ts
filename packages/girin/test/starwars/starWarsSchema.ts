@@ -1,9 +1,8 @@
 import { GraphQLEnumType, GraphQLSchema } from "graphql";
 
 import { getFriends, getHero, getHuman, getDroid, EpisodeValue, CharacterSource, HumanSource, DroidSource } from "./starWarsData";
-import { gql, getGraphQLType } from '../../src';
-import { InterfaceType } from "../../src/metadata/InterfaceType";
-import { ObjectType } from "../../src/metadata/ObjectType";
+import { gql, getGraphQLType, InterfaceType, ObjectType } from '../../src';
+import { ResolverContext, source } from "../../src/utilities/ResolverContext";
 
 
 const episodeEnum = new GraphQLEnumType({
@@ -44,7 +43,7 @@ interface Character {
   """
   The friends of the character, or an empty list if they have none.
   """
-  friends: [Character]
+  friends: [${Character}]
 
   """
   Which movies they appear in.
@@ -57,21 +56,28 @@ interface Character {
   secretBackstory: String
 }
 `)
-class Character {
-  id: string;
-  name: string;
-  friends: any;
-  appearsIn: EpisodeValue[];
+abstract class Character<TSource extends CharacterSource> extends ResolverContext<TSource> {
+  @source() id: string;
+  @source() name: string;
+  @source() appearsIn: EpisodeValue[];
 
   get secretBackstory(): string {
     throw new Error('secretBackstory is secret.')
   }
 
-  static fromSource(source: CharacterSource): Human | Droid | null {
+  async friends() {
+    const friendSources = await Promise.all(getFriends(this.$source));
+    if (friendSources) {
+      return friendSources.map(Character.$fromSource);
+    }
+    return null;
+  }
+
+  static $fromSource = (source: CharacterSource): Human | Droid | null => {
     if (source.type === 'Human') {
-      return Human.fromSource(source as HumanSource);
+      return new Human(source as HumanSource);
     } else if (source.type === 'Droid') {
-      return Droid.fromSource(source as DroidSource);
+      return new Droid(source as DroidSource);
     } else {
       return null;
     }
@@ -92,19 +98,8 @@ class Character {
     # and fields from class Character
   }
 `)
-class Human extends Character {
-
-  public friendIds: string[];
-
-  get friends() {
-    return getFriends(this).map(promise => promise.then(source => (source && Character.fromSource(source))));
-  }
-
-  homePlanet?: string;
-
-  static fromSource(source: HumanSource) {
-    return source && Object.assign(new Human(), source);
-  }
+class Human extends Character<HumanSource> {
+  @source() homePlanet?: string;
 }
 
 
@@ -112,7 +107,7 @@ class Human extends Character {
   """
   A mechanical creature in the Star Wars universe.
   """
-  type Droid implements Character {
+  type Droid implements ${Character} {
 
     """
     The primary function of the droid.
@@ -122,19 +117,8 @@ class Human extends Character {
     # and fields from class Character
   }
 `)
-class Droid extends Character {
-
-  public friendIds: string[];
-
-  get friends() {
-    return getFriends(this).map(promise => promise.then(source => (source && Character.fromSource(source))));
-  }
-
-  primaryFunction: string;
-
-  static fromSource(source: DroidSource) {
-    return source && Object.assign(new Droid(), source);
-  }
+class Droid extends Character<DroidSource> {
+  @source() primaryFunction: string;
 }
 
 
@@ -143,28 +127,30 @@ class Droid extends Character {
     hero(
       """If omitted, returns the hero of the whole saga. If provided, returns the hero of that particular episode."""
       episode: ${episodeEnum}
-    ): Character
+    ): ${Character}
 
     human(
       """id of the human"""
       id: String!
-    ): Human
+    ): ${Human}
 
     droid(
       """id of the droid"""
       id: String!
-    ): Droid
+    ): ${Droid}
   }
 `)
 class Query {
-  public static hero(source: null, { episode }: { episode: number }) {
-    return Character.fromSource(getHero(episode));
+  public static hero(_source: null, { episode }: { episode: number }) {
+    return Character.$fromSource(getHero(episode));
   }
-  public static human(source: null, { id }: { id: string }) {
-    return Human.fromSource(getHuman(id)!);
+  public static human(_source: null, { id }: { id: string }) {
+    const source = getHuman(id);
+    return source && new Human(source);
   }
-  public static droid(source: null, { id }: { id: string }) {
-    return Droid.fromSource(getDroid(id)!);
+  public static droid(_source: null, { id }: { id: string }) {
+    const source = getDroid(id);
+    return source && new Droid(source);
   }
 }
 

@@ -1,13 +1,32 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Input type generates schema as expected 1`] = `
-"input NameInput {
+"type Name {
   firstName: String!
   lastName: String!
 }
 
+input NameInput {
+  firstName: String!
+  lastName: String!
+}
+
+type Person {
+  address: String!
+  name: Name
+}
+
+input PersonInput {
+  address: String!
+  name: NameInput
+}
+
 type Query {
   formatFullName(input: NameInput): String!
+  personInputInstantiated(person: PersonInput): Boolean!
+  personNonNullInputWorks(person: PersonInput!): Boolean!
+  personNonNullListInputWorks(people: [PersonInput!]): Boolean!
+  echoPerson(person: PersonInput): Person!
 }
 "
 `;

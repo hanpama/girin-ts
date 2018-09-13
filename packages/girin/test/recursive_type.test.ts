@@ -1,7 +1,6 @@
 import { graphql, GraphQLSchema, printSchema } from 'graphql';
 
-import { gql, getGraphQLType } from '../src';
-import { ObjectType } from '../src/metadata/ObjectType';
+import { gql, getGraphQLType, ObjectType } from '../src';
 
 
 interface MemberSource {
@@ -21,7 +20,7 @@ const members: MemberSource[] = [
     id: Int!
     name: String!
     email: String!
-    friend: Member
+    friend: ${Member}
   }
 `)
 class Member {

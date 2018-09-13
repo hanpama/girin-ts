@@ -12,7 +12,7 @@ Girin is a GraphQL framework written in TypeScript.
 * Documentation: https://hanpama.github.io/girin
 
 ```typescript
-@Definition(gql`
+@ObjectType.define(gql`
   type Member {
     id: Int!
     name: String!

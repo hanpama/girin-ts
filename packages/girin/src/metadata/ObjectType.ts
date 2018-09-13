@@ -1,8 +1,6 @@
 import { GraphQLObjectType, GraphQLFieldConfigMap, GraphQLInterfaceType, GraphQLFieldConfig } from "graphql";
 
-import { Definition, DefinitionConfig } from "../base/Definition";
-import { MetadataStorage, FieldReferenceEntry } from "../base/MetadataStorage";
-import { TypeExpression } from "../type-expression/TypeExpression";
+import { Definition, DefinitionConfig, MetadataStorage, FieldReferenceEntry, TypeExpression } from "../base";
 import { ASTParser } from "../sdl/ast";
 
 
@@ -15,6 +13,8 @@ export interface ObjectTypeConfig extends DefinitionConfig {
  * Metadata type for ObjectType
  */
 export class ObjectType<TConfig extends ObjectTypeConfig = ObjectTypeConfig> extends Definition<TConfig> {
+  public isOutputType() { return true; }
+  public isInputType() { return false; }
 
   protected static decorate(astParser: ASTParser | undefined, storage: MetadataStorage, linkedClass: Function) {
     super.decorate(astParser, storage, linkedClass);
@@ -34,7 +34,7 @@ export class ObjectType<TConfig extends ObjectTypeConfig = ObjectTypeConfig> ext
     return {
       type: entry.field.buildType(storage, targetClass),
       args: entry.field.buildArgs(storage, targetClass),
-      resolve: entry.resolver,
+      resolve: entry.field.buildResolver(storage, targetClass, entry.resolver),
       description,
       deprecationReason,
     };
@@ -44,8 +44,7 @@ export class ObjectType<TConfig extends ObjectTypeConfig = ObjectTypeConfig> ext
     const refs = storage.queryFieldReferences(targetClass);
     return (
       refs.reduce((results, entry) => {
-        const name = entry.mountName;
-
+        const name = entry.field.defaultName;
         results[name] = this.buildFieldConfig(storage, targetClass, entry);
         return results;
       }, {} as GraphQLFieldConfigMap<any, any>)
@@ -67,7 +66,7 @@ export class ObjectType<TConfig extends ObjectTypeConfig = ObjectTypeConfig> ext
   public findInterfaces(storage: MetadataStorage, targetClass: Function): GraphQLInterfaceType[] | undefined {
     const { interfaces } = this.config;
     return interfaces && interfaces.map(i => (
-      i.buildTypeInstance(storage, targetClass) as GraphQLInterfaceType)
+      i.getTypeInstance(storage, targetClass) as GraphQLInterfaceType)
     );
   }
 

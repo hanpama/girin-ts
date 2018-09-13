@@ -1,19 +1,31 @@
-import { isSubClassOf } from '../types';
+import { GraphQLNamedType, GraphQLFieldResolver, GraphQLType } from 'graphql';
+
 import { Definition } from './Definition';
-import { Field } from '../field';
-import { InputField } from '../field/InputField';
-import { GraphQLNamedType, GraphQLFieldResolver } from 'graphql';
+import { isSubClassOf } from '../types';
+import { Field, InputField } from '../field';
+import { formatObjectInfo } from '../utilities/formatObjectInfo';
+import { TypeExpressionKind } from './TypeExpression';
 
 
 export class DefinitionEntry<T extends Definition = Definition> {
   constructor(
+    public storage: MetadataStorage,
     public key: Function,
     public metadata: T,
   ) { };
+
+  protected graphqlType: GraphQLType;
+
+  public getOrCreateTypeInstance() {
+    if (!this.graphqlType) {
+      const { metadata, storage, key } = this;
+      this.graphqlType = metadata.buildTypeInstance(storage, key);
+    }
+    return this.graphqlType;
+  }
 }
 
 export class FieldReferenceEntry {
-  public mountName: string;
   public container: Function;
   public field: Field;
   public resolver?: GraphQLFieldResolver<any, any>;
@@ -38,7 +50,7 @@ export class InputFieldReferenceEntry {
  */
 export class MetadataStorage {
   public readonly definitionMetadata: Array<DefinitionEntry<Definition>> = [];
-  public readonly memoizedTypeInstanceMap: Map<Function, GraphQLNamedType> = new Map();
+  public readonly memoizedTypeInstanceMap: Map<DefinitionEntry, GraphQLNamedType> = new Map();
   public readonly fieldReferences: Array<FieldReferenceEntry> = [];
   public readonly inputFieldReferences: Array<InputFieldReferenceEntry> = [];
 
@@ -48,7 +60,7 @@ export class MetadataStorage {
    */
   register(metadata: Definition<any>, key: Function) {
     if (metadata instanceof Definition) {
-      this.definitionMetadata.push(new DefinitionEntry(key, metadata));
+      this.definitionMetadata.push(new DefinitionEntry(this, key, metadata));
 
     } else {
       throw new Error(`Cannot register to stroage: ${metadata}`);
@@ -64,28 +76,35 @@ export class MetadataStorage {
   }
 
   /**
-   * Get a [[Definition]] object which is instance of the `metadataClass` and associated to `componentClass`
+   * Get a [[Definition]] object which is instance of the `metadataClass` and associated to `linkedClass`
    * @param metadataClass A [[Definition]] subclass to query
-   * @param componentClass A class associated with metadata to query
+   * @param targetClassOrName A class associated with metadata to query
+   * @param asOutput
    */
-  getDefinition<T extends Definition>(metadataClass: { new (...args: any[]): T; }, componentClass: Function) {
-    const entry = this.definitionMetadata.find(entry => entry.key === componentClass);
+  getDefinition<T extends Definition>(metadataClass: { new (...args: any[]): T; }, targetClassOrName: Function | string, asKind: TypeExpressionKind) {
+    const entry = this.definitionMetadata.find(entry => {
+      const { metadata, key } = entry;
+      let classOrNameMatched: boolean;
+      if (typeof targetClassOrName === 'string') {
+        classOrNameMatched = metadata.typeName === targetClassOrName;
+      } else {
+        classOrNameMatched = key === targetClassOrName;
+      }
+      let typeMatched: boolean;
+      if (asKind === 'input') {
+        typeMatched = metadata.isInputType();
+      } else if (asKind === 'output') {
+        typeMatched = metadata.isOutputType();
+      } else {
+        typeMatched = true;
+      }
+
+      return classOrNameMatched && (metadata instanceof metadataClass) && typeMatched;
+    });
     if (!entry) {
-      throw new Error(`Cannot get ${metadataClass.name} of ${componentClass.name} from MetadataStorage`);
+      throw new Error(`Cannot get ${metadataClass.name} of ${formatObjectInfo(targetClassOrName)} from MetadataStorage`);
     }
     return entry as DefinitionEntry<T>;
-  }
-
-  /**
-   * Get a [[Definition]] object by the name of the GraphQLType that the metadata will generate.
-   * @param name The name of a GraphQLType which will be built from metadata to query
-   */
-  getDefinitionByName(name: string) {
-    const entry = this.definitionMetadata.find(entry => entry.metadata.typeName === name);
-    if (!entry) {
-      throw new Error(`Cannot find metadata with given name: ${name}`);
-    }
-    return entry as DefinitionEntry<any>;
   }
 
   getFieldReference(resolver: Function): FieldReferenceEntry {
@@ -96,15 +115,15 @@ export class MetadataStorage {
     return entry;
   }
 
-  queryFieldReferences(componentClass: Function): FieldReferenceEntry[] {
+  queryFieldReferences(linkedClass: Function): FieldReferenceEntry[] {
     return this.fieldReferences.filter(entry => (
-      componentClass === entry.container || isSubClassOf(componentClass, entry.container)
+      linkedClass === entry.container || isSubClassOf(linkedClass, entry.container)
     ));
   }
 
-  queryInputFieldReference(componentClass: Function): InputFieldReferenceEntry[] {
+  queryInputFieldReference(linkedClass: Function): InputFieldReferenceEntry[] {
     return this.inputFieldReferences.filter(entry => (
-      componentClass === entry.container || isSubClassOf(componentClass, entry.container)
+      linkedClass === entry.container || isSubClassOf(linkedClass, entry.container)
     ));
   }
 }

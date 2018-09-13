@@ -1,15 +1,13 @@
-node_modules/
-.DS_Store
-
+/node_modules/
 /coverage/
 
 /decorators/
 /base/
 /builtins/
-/reducer/
 /connection/
 /field/
 /metadata/
+/model/
 /sdl/
 /type-expression/
 /utilities/

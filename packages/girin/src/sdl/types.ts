@@ -1,5 +1,5 @@
 import { DocumentNode } from "graphql";
-import { TypeArg, TypeExpression } from "../type-expression/TypeExpression";
+import { TypeArg, TypeExpression } from "../base/TypeExpression";
 import { Lazy } from "../types";
 
 

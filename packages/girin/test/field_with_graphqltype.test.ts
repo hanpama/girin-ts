@@ -7,8 +7,7 @@ import {
   GraphQLEnumType
 } from "graphql";
 
-import { gql, getGraphQLType } from '../src';
-import { ObjectType } from "../src/metadata/ObjectType";
+import { gql, getGraphQLType, ObjectType } from '../src';
 
 
 @ObjectType.define(gql`
