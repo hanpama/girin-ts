@@ -16,6 +16,7 @@ import { gql, getGraphQLType, ObjectType, InputType } from "../src";
   }
 `)
 class Name {
+
   firstName: string;
   lastName: string;
 
@@ -23,6 +24,8 @@ class Name {
     return `${this.firstName} ${this.lastName}`;
   }
 }
+
+let instantiationCount = 0;
 
 @InputType.define(gql`
   input PersonInput {
@@ -39,8 +42,21 @@ class Name {
 class Person {
   address: string;
   name: Name;
+  constructor() {
+    instantiationCount ++;
+  }
 }
 
+@ObjectType.define(gql`
+  type Group {
+    echoPerson(person: ${Person}): ${Person}!
+  }
+`)
+class Group {
+  echoPerson(args: { person: Person }) {
+    return args.person;
+  }
+}
 
 @ObjectType.define(gql`
   type Query {            # resolved to NameInput
@@ -50,8 +66,8 @@ class Person {
     personNonNullInputWorks(person: ${Person}!): Boolean!
     personNonNullListInputWorks(people: [${Person}!]): Boolean!
 
-
-    echoPerson(person: ${Person}): Person! # resolved to Person
+    echoPerson(person: ${Person}): ${Person}! # resolved to Person
+    tenGroups: [${Group}]!
   }
 `)
 class Query {
@@ -72,13 +88,21 @@ class Query {
   static echoPerson(_source: null, args: { person: Person }) {
     return args.person;
   }
+  static tenGroups() {
+    const groups = [];
+    for (let i = 0; i < 10; i++) {
+      groups.push(new Group());
+    }
+    return groups;
+  }
 }
 
+const schema = new GraphQLSchema({
+  query: getGraphQLType(Query),
+});
+
 describe('Input type', () => {
-  it('generates schema as expected', async () => {
-    const schema = new GraphQLSchema({
-      query: getGraphQLType(Query),
-    });
+  it('generates schema and works as expected', async () => {
 
     expect(printSchema(schema)).toMatchSnapshot();
 
@@ -146,4 +170,26 @@ describe('Input type', () => {
       }
     } });
   });
+
+  it('should not instantiate input type which is already cached', async () => {
+    instantiationCount = 0;
+    await graphql({ schema, source: `
+      query($person: PersonInput) {
+        tenGroups {
+          echoPerson(person: $person) {
+            address
+          }
+        }
+      }
+    `, variableValues: {
+      person: {
+        address: "A",
+        name: {
+          firstName: "Foo",
+          lastName: "Bar"
+        }
+      },
+    }}); // giving argument as variable lets us avoid extra instantiations
+    expect(instantiationCount).toBe(1);
+  })
 });

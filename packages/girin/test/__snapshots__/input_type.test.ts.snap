@@ -1,7 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Input type generates schema as expected 1`] = `
-"type Name {
+exports[`Input type generates schema and works as expected 1`] = `
+"type Group {
+  echoPerson(person: PersonInput): Person!
+}
+
+type Name {
   firstName: String!
   lastName: String!
 }
@@ -27,6 +31,7 @@ type Query {
   personNonNullInputWorks(person: PersonInput!): Boolean!
   personNonNullListInputWorks(people: [PersonInput!]): Boolean!
   echoPerson(person: PersonInput): Person!
+  tenGroups: [Group]!
 }
 "
 `;

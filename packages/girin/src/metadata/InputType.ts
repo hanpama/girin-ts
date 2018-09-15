@@ -4,6 +4,10 @@ import { Definition, DefinitionConfig, MetadataStorage, InputFieldReferenceEntry
 import { ASTParser } from "../sdl/ast";
 
 
+export interface InputTypeLinkedClass extends Function {
+  new(): Object;
+}
+
 export interface InputTypeConfig extends DefinitionConfig {}
 
 /**
@@ -12,6 +16,10 @@ export interface InputTypeConfig extends DefinitionConfig {}
 export class InputType<T extends InputTypeConfig = InputTypeConfig> extends Definition<T> {
   public isOutputType() { return false; }
   public isInputType() { return true; }
+
+  public static define(astParser?: ASTParser, storage?: MetadataStorage) {
+    return super.define(astParser, storage) as (linkedClass: InputTypeLinkedClass) => void;
+  };
 
   protected static decorate(astParser: ASTParser, storage: MetadataStorage, linkedClass: Function) {
     super.decorate(astParser, storage, linkedClass);
@@ -56,13 +64,13 @@ export class InputType<T extends InputTypeConfig = InputTypeConfig> extends Defi
     const instantiator = (values: any) => {
       let cached = this.instantiationCache.get(values);
       if (!cached) {
-        cached = Object.create(targetClass.prototype);
+        cached = new (targetClass as InputTypeLinkedClass)();
         Object.keys(values).forEach(fieldName => {
           cached[fieldName] = fieldInstantiators[fieldName](values[fieldName]);
         });
         this.instantiationCache.set(values, cached);
       }
-      return cached;
+      return this.instantiationCache.get(values);
     }
 
     Object.defineProperty(instantiator, 'name', { value: 'instantiate' + targetClass.name});
