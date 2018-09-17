@@ -1,6 +1,6 @@
 {
   "name": "girin",
-  "version": "0.5.0-alpha.3",
+  "version": "0.5.0-alpha.4",
   "description": "GraphQL bootstrapper up and running",
   "main": "index.js",
   "module": "index.js",
@@ -29,9 +29,9 @@
   "homepage": "https://github.com/hanpama/girin",
   "dependencies": {
     "apollo-server": "^2.0.8",
-    "girin-auth": "^0.5.0-alpha.3",
-    "girin-model": "^0.5.0-alpha.3",
-    "girin-typelinker": "^0.5.0-alpha.3"
+    "girin-auth": "^0.5.0-alpha.4",
+    "girin-model": "^0.5.0-alpha.4",
+    "girin-typelinker": "^0.5.0-alpha.4"
   },
   "jest": {
     "transform": {
