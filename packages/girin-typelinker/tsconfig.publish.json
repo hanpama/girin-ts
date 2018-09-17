@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "."
+  },
+  "include": [
+    "src/typings.d.ts",
+    "src/"
+  ],
+  "exclude": [
+    "lib",
+    "node_modules"
+  ]
+}

@@ -3,7 +3,7 @@
 node_modules/
 
 /connection
-/model
+/definition
 /utils
 /*.d.ts
 /*.js

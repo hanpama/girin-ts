@@ -1,0 +1,15 @@
+# for test
+version: '3.3'
+
+services:
+  mongodb:
+    image: mongo
+    # volumes:
+    #   - ./tmp/data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: mongorelay
+      MONGO_INITDB_ROOT_USERNAME: test
+      MONGO_INITDB_ROOT_PASSWORD: verystrongpassword
+    ports:
+      - 27017:27017
+    command: mongod --auth

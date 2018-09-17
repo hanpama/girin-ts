@@ -1,36 +1,44 @@
 {
-  "name": "girin",
+  "name": "girin-model-auth",
   "version": "0.1.2",
-  "description": "GraphQL bootstrapper up and running",
+  "description": "girin-model-auth",
   "main": "index.js",
   "module": "index.js",
   "types": "index.d.ts",
   "scripts": {
-    "test": "../../node_modules/.bin/jest --runInBand",
-    "coverage": "../../node_modules/.bin/jest --runInBand --coverage",
-    "build": "tsc -p ./tsconfig.publish.json",
+    "test": "../../node_modules/.bin/jest",
+    "coverage": "../../node_modules/.bin/jest --coverage",
+    "build": "../../node_modules/.bin/tsc -p tsconfig.publish.json",
     "prepublish": "npm run build"
   },
   "keywords": [
-    "graphql"
+    "graphql",
+    "mongodb",
+    "dataloader"
   ],
   "license": "MIT",
   "author": "Max Choi <hanpama@gmail.com>",
   "tags": [
-    "graphql"
+    "graphql",
+    "mongodb",
+    "dataloader"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hanpama/girin.git"
+    "url": "git+https://github.com/hanpama/mongorelay.git"
   },
   "bugs": {
-    "url": "https://github.com/hanpama/girin/issues"
+    "url": "https://github.com/hanpama/mongorelay/issues"
   },
-  "homepage": "https://github.com/hanpama/girin",
+  "homepage": "https://github.com/hanpama/mongorelay",
+  "devDependencies": {
+    "@types/jsonwebtoken": "^7.2.8"
+  },
   "dependencies": {
-    "apollo-server": "^2.0.8",
+    "argon2": "^0.19.3",
     "girin-model": "^0.1.2",
-    "girin-typelinker": "^0.4.2"
+    "girin-typelinker": "^0.4.2",
+    "jsonwebtoken": "^8.3.0"
   },
   "jest": {
     "transform": {

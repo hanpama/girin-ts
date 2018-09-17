@@ -1,0 +1,50 @@
+{
+  "name": "girin-typelinker",
+  "version": "0.4.2",
+  "description": "GraphQL framework for building flexible and maintainable schema",
+  "author": "Max Choi <hanpama@gmail.com>",
+  "main": "./lib/index.js",
+  "module": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "scripts": {
+    "prepublish": "npm run build",
+    "build": "../../node_modules/.bin/tsc -p tsconfig.publish.json",
+    "test": "../../node_modules/.bin/tsc && npm run testonly",
+    "testonly": "../../node_modules/.bin/jest",
+    "coverage": "../../node_modules/.bin/jest --coverage",
+    "typedoc": "../../node_modules/.bin/typedoc --out ../../docs/girin --exclude node_modules --target es5 --module commonjs src/index.ts --json typedoc.json"
+  },
+  "tags": [
+    "graphql"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hanpama/girin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hanpama/girin/issues"
+  },
+  "homepage": "https://github.com/hanpama/girin",
+  "license": "MIT",
+  "peerDependencies": {
+    "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testMatch": [
+      "**/test/**/*.test.ts",
+      "**/test/*.test.ts"
+    ],
+    "testPathIgnorePatterns": [
+      "<rootDir>/node_modules/",
+      "<rootDir>/lib/",
+      "<rootDir>/test/fixtures/"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ]
+  }
+}
