@@ -1,6 +1,6 @@
 {
   "name": "girin-typelinker",
-  "version": "0.5.0-alpha.1",
+  "version": "0.5.0-alpha.2",
   "description": "GraphQL framework for building flexible and maintainable schema",
   "author": "Max Choi <hanpama@gmail.com>",
   "main": "./lib/index.js",
