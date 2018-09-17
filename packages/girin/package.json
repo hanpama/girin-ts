@@ -1,13 +1,13 @@
 {
   "name": "girin",
-  "version": "0.1.2",
+  "version": "0.5.0-alpha.1",
   "description": "GraphQL bootstrapper up and running",
   "main": "index.js",
   "module": "index.js",
   "types": "index.d.ts",
   "scripts": {
-    "test": "../../node_modules/.bin/jest --runInBand",
-    "coverage": "../../node_modules/.bin/jest --runInBand --coverage",
+    "test": "../../node_modules/.bin/jest",
+    "coverage": "../../node_modules/.bin/jest --coverage",
     "build": "tsc -p ./tsconfig.publish.json",
     "prepublish": "npm run build"
   },
@@ -29,8 +29,9 @@
   "homepage": "https://github.com/hanpama/girin",
   "dependencies": {
     "apollo-server": "^2.0.8",
-    "girin-model": "^0.1.2",
-    "girin-typelinker": "^0.4.2"
+    "girin-auth": "^0.5.0-alpha.1",
+    "girin-model": "^0.5.0-alpha.1",
+    "girin-typelinker": "^0.5.0-alpha.1"
   },
   "jest": {
     "transform": {

@@ -1,7 +1,7 @@
 {
-  "name": "girin-model-auth",
-  "version": "0.1.2",
-  "description": "girin-model-auth",
+  "name": "girin-auth",
+  "version": "0.5.0-alpha.1",
+  "description": "girin auth package",
   "main": "index.js",
   "module": "index.js",
   "types": "index.d.ts",
@@ -36,8 +36,8 @@
   },
   "dependencies": {
     "argon2": "^0.19.3",
-    "girin-model": "^0.1.2",
-    "girin-typelinker": "^0.4.2",
+    "girin-model": "^0.5.0-alpha.1",
+    "girin-typelinker": "^0.5.0-alpha.1",
     "jsonwebtoken": "^8.3.0"
   },
   "jest": {

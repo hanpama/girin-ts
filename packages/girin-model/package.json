@@ -1,6 +1,6 @@
 {
   "name": "girin-model",
-  "version": "0.1.2",
+  "version": "0.5.0-alpha.1",
   "description": "MongoDB Object Document Model 🍃",
   "main": "index.js",
   "module": "index.js",
@@ -35,7 +35,7 @@
     "@types/mongodb": "^3.1.4",
     "dataloader": "^1.4.0",
     "fast-deep-equal": "^2.0.1",
-    "girin-typelinker": "^0.4.2"
+    "girin-typelinker": "^0.5.0-alpha.1"
   },
   "peerDependencies": {
     "mongodb": "^3.1.4"
