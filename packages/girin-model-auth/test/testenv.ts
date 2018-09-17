@@ -7,7 +7,7 @@ export async function prepareTestClient() {
     authSource: 'admin',
     useNewUrlParser: true,
   });
-  const dbName = 'girin-model';
+  const dbName = 'girinmodelauth';
   setEnvironment({ client, dbName });
   return client;
 }

@@ -7,7 +7,7 @@ export async function prepareTestClient() {
     authSource: 'admin',
     useNewUrlParser: true,
   });
-  const dbName = 'mongorelay';
+  const dbName = 'girinmodel';
   setEnvironment({ client, dbName });
   return client;
 }

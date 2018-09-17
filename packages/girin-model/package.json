@@ -6,8 +6,8 @@
   "module": "index.js",
   "types": "index.d.ts",
   "scripts": {
-    "test": "../../node_modules/.bin/jest --runInBand",
-    "coverage": "../../node_modules/.bin/jest --runInBand --coverage",
+    "test": "../../node_modules/.bin/jest",
+    "coverage": "../../node_modules/.bin/jest --coverage",
     "build": "../../node_modules/.bin/tsc -p tsconfig.publish.json",
     "prepublish": "npm run build"
   },

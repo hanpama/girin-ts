@@ -18,7 +18,7 @@ describe('BaseUser', () => {
     client = await prepareTestClient();
   });
   afterEach(async () => {
-    await User.getContext().db.dropDatabase();
+    await User.getManager().db.dropDatabase();
     await client.close(true);
   });
 
