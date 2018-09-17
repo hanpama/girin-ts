@@ -48,7 +48,7 @@ export class BaseUser extends Model {
 
   public static async decodeToken<T extends BaseUser>(this: BaseUserClass<T>, token: string): Promise<T> {
     const result: any = jwt.verify(token, this.SECRET_KEY);
-    const user = await this.get(result._id);
+    const user = await this.getOne(result._id);
     if (!user) {
       throw new Error('Authentication Error');
     }

@@ -147,7 +147,7 @@ export class ModelConnectionBuilder<
       selector = { $and: selectors };
     }
 
-    let cursor = options.modelClass
+    let cursor = options.modelClass.getManager().collection
       .find(selector)
       .sort(appliedSortOrder)
       .limit(limit + extraAdjacent);
