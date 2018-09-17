@@ -6,8 +6,8 @@
   "module": "index.js",
   "types": "index.d.ts",
   "scripts": {
-    "test": "../../node_modules/.bin/jest --runInBand",
-    "coverage": "../../node_modules/.bin/jest --runInBand --coverage",
+    "test": "../../node_modules/.bin/jest",
+    "coverage": "../../node_modules/.bin/jest --coverage",
     "build": "tsc -p ./tsconfig.publish.json",
     "prepublish": "npm run build"
   },
@@ -29,6 +29,7 @@
   "homepage": "https://github.com/hanpama/girin",
   "dependencies": {
     "apollo-server": "^2.0.8",
+    "girin-auth": "^0.5.0-alpha.0",
     "girin-model": "^0.5.0-alpha.0",
     "girin-typelinker": "^0.5.0-alpha.0"
   },

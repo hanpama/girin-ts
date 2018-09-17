@@ -45,7 +45,7 @@ describe('index connection', () => {
   })
 
   afterAll(async () => {
-    await Post.getManager().db.dropDatabase();
+    await Post.getManager().db.dropCollection(Post.collectionName);
     await client.close(true);
   });
 
