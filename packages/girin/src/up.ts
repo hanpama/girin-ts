@@ -32,6 +32,8 @@ export async function up(options: UpOptions) {
 
   if (options.mongo) {
     const client = new MongoClient(options.mongo.url, options.mongo.options);
+    await client.connect();
+
     const dbName = options.mongo.dbName;
     setEnvironment({ client, dbName });
   }

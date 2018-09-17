@@ -1,5 +1,5 @@
 import * as DataLoader from 'dataloader';
-import { FilterQuery, CollectionInsertOneOptions, Cursor, ReplaceOneOptions, CommonOptions, Db, Collection } from 'mongodb';
+import { FilterQuery, CollectionInsertOneOptions, ReplaceOneOptions, CommonOptions, Db, Collection } from 'mongodb';
 
 import { getEnvironment } from '../environment';
 import { CompositeKeySorter } from '../utils/CompositeKeySorter';
@@ -59,22 +59,30 @@ export class Model {
   }
   public $getManager(): ModelManager<this> { return (this.constructor as any).getManager(); }
 
+  public static create<TModel extends Model>(this: ModelClass<TModel>, source: any) {
+    return source ? new this(source) : null;
+  }
+
   // shortcuts and dataloader
   public static async insert<TModel extends Model>(this: ModelClass<TModel>, source: Document, options?: CollectionInsertOneOptions): Promise<TModel> {
     await this.getManager().collection.insertOne(source, options);
     return new this(source) as any;
   }
 
-  public static find<TModel extends Model>(this: ModelClass<TModel>, query: FilterQuery<TModel>): Cursor {
-    return this.getManager().collection.find(query);
+  public static findOne<TModel extends Model>(this: ModelClass<TModel>, query: FilterQuery<TModel>) {
+    return this.getManager().collection.findOne(query).then(this.create.bind(this));
   }
 
-  public static async get<TModel extends Model> (this: ModelClass<TModel>, id: any): Promise<TModel | null> {
-    return this.getManager().dataloader.load(id).then(doc => doc ? new this(doc) as TModel : null);
+  public static findMany<TModel extends Model>(this: ModelClass<TModel>, query: FilterQuery<TModel>) {
+    return this.getManager().collection.find(query).toArray().then(docs => docs.map(this.create.bind(this)));
+  }
+
+  public static async getOne<TModel extends Model> (this: ModelClass<TModel>, id: any): Promise<TModel | null> {
+    return this.getManager().dataloader.load(id).then(this.create.bind(this));
   }
 
   public static async getMany<TModel extends Model> (this: ModelClass<TModel>, ids: any[]): Promise<(TModel | null)[]> {
-    return this.getManager().dataloader.loadMany(ids).then(docs => docs.map(doc => doc ? new this(doc) as TModel : null));
+    return this.getManager().dataloader.loadMany(ids).then(docs => docs.map(doc => this.create(doc)));
   }
 
   public set _id(value: any) { this.$source._id = value; }

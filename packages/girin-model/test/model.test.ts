@@ -48,7 +48,7 @@ describe('model', () => {
     // not found resut to be null
     const generatedId1 = new ObjectID();
     const generatedId2 = new ObjectID();
-    expect(await User.get(generatedId1)).toBe(null);
+    expect(await User.getOne(generatedId1)).toBe(null);
     const manyDocs = await User.getMany([
       generatedId1,
       savedUser._id,
@@ -64,7 +64,7 @@ describe('model', () => {
     // delete
     const id = await insertedUser.$delete();
     expect(id).toBe(insertedUser._id);
-    const maybeNull = await User.get(insertedUser._id);
+    const maybeNull = await User.getOne(insertedUser._id);
     expect(maybeNull).toBeNull();
   });
 });
