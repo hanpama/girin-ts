@@ -1,23 +1,26 @@
 {
   "scripts": {
     "bootstrap": "npm i && lerna bootstrap",
-    "test": "lerna run -- test",
-    "build": "lerna run -- build",
-    "coverage": "lerna run -- coverage",
+    "test": "lerna run test",
+    "build": "lerna run build",
+    "coverage": "lerna run coverage",
     "coverage:upload": "codecov",
     "docs": "docsify serve docs"
   },
   "devDependencies": {
-    "@types/graphql-relay": "^0.4.5",
+    "@types/graphql": "^14.0.0",
+    "@types/graphql-relay": "^0.4.6",
+    "@types/jest": "^23.3.2",
+    "@types/mongodb": "^3.1.7",
+    "@types/node": "^10.10.0",
+    "codecov": "^3.1.0",
+    "graphql": "^14.0.2",
     "graphql-relay": "^0.5.5",
-    "@types/graphql": "^0.13.1",
-    "@types/jest": "^23.0.0",
-    "codecov": "^3.0.2",
-    "graphql": "^0.13.2",
-    "jest": "^23.1.0",
-    "lerna": "^2.11.0",
-    "ts-jest": "^22.4.6",
-    "typedoc": "^0.11.1",
-    "typescript": "2.9.1"
+    "jest": "^23.6.0",
+    "lerna": "^3.4.0",
+    "mongodb": "^3.1.6",
+    "ts-jest": "^23.1.4",
+    "typedoc": "^0.12.0",
+    "typescript": "3.0.3"
   }
 }

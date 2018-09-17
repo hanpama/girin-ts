@@ -12,9 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "girin": "^0.2.1",
-    "graphql": "^0.13.2",
-    "graphql-yoga": "^1.7.0",
-    "typescript": "^2.8.1"
+    "girin": "../../packages/girin",
+    "graphql-yoga": "^1.7.0"
   }
 }

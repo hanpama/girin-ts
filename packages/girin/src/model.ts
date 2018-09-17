@@ -1,0 +1,1 @@
+export * from 'girin-model';

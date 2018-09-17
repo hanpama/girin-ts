@@ -1,23 +1,27 @@
 {
-  "name": "girin",
+  "name": "girin-model",
   "version": "0.1.2",
-  "description": "GraphQL bootstrapper up and running",
+  "description": "MongoDB Object Document Model 🍃",
   "main": "index.js",
   "module": "index.js",
   "types": "index.d.ts",
   "scripts": {
     "test": "../../node_modules/.bin/jest --runInBand",
     "coverage": "../../node_modules/.bin/jest --runInBand --coverage",
-    "build": "tsc -p ./tsconfig.publish.json",
+    "build": "../../node_modules/.bin/tsc -p tsconfig.publish.json",
     "prepublish": "npm run build"
   },
   "keywords": [
-    "graphql"
+    "graphql",
+    "mongodb",
+    "dataloader"
   ],
   "license": "MIT",
   "author": "Max Choi <hanpama@gmail.com>",
   "tags": [
-    "graphql"
+    "graphql",
+    "mongodb",
+    "dataloader"
   ],
   "repository": {
     "type": "git",
@@ -26,11 +30,15 @@
   "bugs": {
     "url": "https://github.com/hanpama/girin/issues"
   },
-  "homepage": "https://github.com/hanpama/girin",
+  "homepage": "https://github.com/hanpama/girin/tree/master/packages/girin-model",
   "dependencies": {
-    "apollo-server": "^2.0.8",
-    "girin-model": "^0.1.2",
+    "@types/mongodb": "^3.1.4",
+    "dataloader": "^1.4.0",
+    "fast-deep-equal": "^2.0.1",
     "girin-typelinker": "^0.4.2"
+  },
+  "peerDependencies": {
+    "mongodb": "^3.1.4"
   },
   "jest": {
     "transform": {

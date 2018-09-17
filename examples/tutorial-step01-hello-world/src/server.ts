@@ -1,9 +1,9 @@
 import { GraphQLServer } from 'graphql-yoga';
-import { Definition, gql, getGraphQLType } from 'girin';
+import { gql, getGraphQLType, ObjectType } from 'girin';
 import { GraphQLSchema } from 'graphql';
 
 
-@Definition(gql`
+@ObjectType.define(gql`
   type Query {
     hello: String
   }

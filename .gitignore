@@ -4,3 +4,5 @@ lib
 .DS_Store
 *.explore.*
 *.log
+package-lock.json
+coverage/

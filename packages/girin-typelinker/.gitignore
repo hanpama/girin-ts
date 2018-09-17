@@ -1,0 +1,16 @@
+/node_modules/
+/coverage/
+
+/decorators/
+/base/
+/builtins/
+/connection/
+/field/
+/metadata/
+/model/
+/sdl/
+/type-expression/
+/utilities/
+/global.*
+/index.*
+/types.*
