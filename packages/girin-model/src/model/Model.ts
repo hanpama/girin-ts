@@ -69,12 +69,12 @@ export class Model {
     return new this(source) as any;
   }
 
-  public static findOne<TModel extends Model>(this: ModelClass<TModel>, query: FilterQuery<TModel>) {
+  public static findOne<TModel extends Model>(this: ModelClass<TModel>, query: FilterQuery<TModel>): Promise<TModel> {
     return this.getManager().collection.findOne(query).then(this.create.bind(this));
   }
 
-  public static findMany<TModel extends Model>(this: ModelClass<TModel>, query: FilterQuery<TModel>) {
-    return this.getManager().collection.find(query).toArray().then(docs => docs.map(this.create.bind(this)));
+  public static findMany<TModel extends Model>(this: ModelClass<TModel>, query: FilterQuery<TModel>): Promise<(TModel | null)[]> {
+    return this.getManager().collection.find(query).toArray().then(docs => docs.map(doc => this.create(doc)));
   }
 
   public static async getOne<TModel extends Model> (this: ModelClass<TModel>, id: any): Promise<TModel | null> {

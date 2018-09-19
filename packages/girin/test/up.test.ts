@@ -1,10 +1,10 @@
-import { ObjectType, gql, up } from "../src";
+import { typedef, gql, up } from "../src";
 import { fetch } from "apollo-server-env";
 
 describe('Up', () => {
   it('runs server', async () => {
 
-    @ObjectType.define(gql`
+    @typedef(gql`
       type Query {
         hello: String!
       }
