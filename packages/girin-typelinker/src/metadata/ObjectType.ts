@@ -1,11 +1,10 @@
 import { GraphQLObjectType, GraphQLFieldConfigMap, GraphQLInterfaceType, GraphQLFieldConfig } from "graphql";
 
-import { Definition, DefinitionConfig, MetadataStorage, FieldReferenceEntry, TypeExpression, ExtensionFieldReferenceEntry } from "../base";
+import { Definition, DefinitionConfig, MetadataStorage, FieldReferenceEntry, ExtensionFieldReferenceEntry } from "../base";
 
 
 export interface ObjectTypeConfig extends DefinitionConfig {
   description?: string;
-  // interfaces?: TypeExpression[];
 }
 
 /**

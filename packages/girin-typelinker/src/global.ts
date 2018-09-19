@@ -1,4 +1,4 @@
-import { TypeArg, TypeExpression, MetadataStorage, loadBuiltInScalar, TypeExpressionKind, TypeExpressionConstructorOptions, Definition } from "./base";
+import { TypeArg, TypeExpression, MetadataStorage, loadBuiltInScalar, TypeExpressionKind, TypeExpressionConstructorOptions } from "./base";
 import { SubstitutionMap, DefinitionParser } from "./sdl/ast";
 import { parse } from "graphql";
 import { ObjectType, InputType, InterfaceType, loadFallbackRootTypes } from "./metadata";
