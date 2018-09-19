@@ -1,5 +1,4 @@
 import {
-  parse,
   DefinitionNode,
   FieldDefinitionNode,
   InputObjectTypeDefinitionNode,
@@ -9,54 +8,30 @@ import {
   NamedTypeNode,
   NonNullTypeNode,
   ObjectTypeDefinitionNode,
+  ObjectTypeExtensionNode,
 } from 'graphql';
 
-import { List, NonNull, TypeArg, TypeExpression, TypeExpressionKind } from '../base';
+import { List, NonNull, TypeArg, TypeExpression, TypeExpressionKind, TypeExpressionConstructorOptions } from '../base';
 import { completeDirectives, completeValueNode } from './directive';
 import { InputTypeConfig, ObjectTypeConfig, InterfaceTypeConfig } from '../metadata';
 import { Lazy } from '../types';
 import { Field, InputField } from '../field';
 
 
-const SUBSTITUTION_PREFIX = '__GIRIN__SUBS__';
-
 export interface SubstitutionMap {
-  [tempName: string]: GQLInterpolatable;
-
-}
-export type GQLInterpolatable =
-  | TypeArg | TypeExpression
-  | Lazy<TypeArg> | Lazy<TypeExpression>;
-
-
-export function gql(strings: TemplateStringsArray, ...interpolated: Array<GQLInterpolatable>) {
-  const result = [strings[0]];
-  const subsMap: SubstitutionMap = {};
-
-  for (let i = 0; i < interpolated.length; i++) {
-    const item = interpolated[i];
-    const name = `${SUBSTITUTION_PREFIX}${i}`;
-    subsMap[name] = item;
-    result.push(name);
-    result.push(strings[i + 1]);
-  }
-
-  const ast = parse(result.join(''));
-  if (ast.definitions.length > 1) {
-    throw new Error('Only one type definition should be passed to gql tag');
-  }
-  const rootNode = ast.definitions[0];
-  return new ASTParser(rootNode, subsMap);
+  [tempName: string]: TypeExpressionConstructorOptions | TypeExpression;
 }
 
-export class ASTParser {
+export class DefinitionParser {
 
   public readonly objectTypeMetadataConfigs: ObjectTypeConfig[] = [];
   public readonly interfaceTypeMetadataConfigs: InterfaceTypeConfig[] = [];
   public readonly inputObjectTypeMetadataConfigs: InputTypeConfig[] = [];
 
+  public readonly implementTypeExpressions: TypeExpression[] = [];
   public readonly fieldMetadataConfigs: Field[] = [];
   public readonly inputFieldMetadataConfigs: InputField[] = [];
+  public extendingTypeName?: string;
 
   constructor(
     rootNode: DefinitionNode,
@@ -82,6 +57,13 @@ export class ASTParser {
     }
     else if (rootNode.kind === 'InputObjectTypeDefinition') {
       this.appendInputObjectTypeMetadataConfig(rootNode);
+    }
+    else if (rootNode.kind === 'ObjectTypeExtension') {
+      const { name, interfaces, fields } = rootNode;
+
+      if (fields) { fields.forEach(fieldNode => this.appendFieldMetadataConfig(fieldNode)); }
+      if (interfaces) { interfaces.forEach(interfaceNode => this.appendImplementTypeExpression(interfaceNode)); }
+      this.extendingTypeName = name.value;
     }
     else {
       throw new Error(`Node type not supported: ${rootNode.kind}`);
@@ -111,23 +93,21 @@ export class ASTParser {
     }
   }
 
-  protected appendObjectTypeConfig(node: ObjectTypeDefinitionNode): void {
-    const { name, description, interfaces, fields } = node;
+  protected appendObjectTypeConfig(rootNode: ObjectTypeDefinitionNode | ObjectTypeExtensionNode): void {
+    const { name, interfaces, fields } = rootNode;
 
-    if (fields) {
-      fields.forEach(fieldNode => this.appendFieldMetadataConfig(fieldNode));
+    if (fields) { fields.forEach(fieldNode => this.appendFieldMetadataConfig(fieldNode)); }
+    if (interfaces) { interfaces.forEach(interfaceNode => this.appendImplementTypeExpression(interfaceNode)); }
+
+    if (rootNode.kind === "ObjectTypeDefinition") {
+      const { description } = rootNode;
+      this.objectTypeMetadataConfigs.push({
+        // interfaces: interfacesTypeExpressions,
+        typeName: name.value,
+        description: description && description.value,
+        directives: rootNode.directives && completeDirectives(rootNode.directives),
+      });
     }
-
-    const interfacesTypeExpressions = interfaces && interfaces.map(interfaceNode => (
-      this.completeTypeExpression(interfaceNode, 'output')
-    ));
-
-    this.objectTypeMetadataConfigs.push({
-      interfaces: interfacesTypeExpressions,
-      typeName: name.value,
-      description: description && description.value,
-      directives: node.directives && completeDirectives(node.directives),
-    });
   }
 
   protected appendInterfaceTypeMetadataConfig(node: InterfaceTypeDefinitionNode): void {
@@ -156,6 +136,10 @@ export class ASTParser {
       description: description && description.value,
       directives: node.directives && completeDirectives(node.directives),
     });
+  }
+
+  protected appendImplementTypeExpression(node: NamedTypeNode): void {
+    this.implementTypeExpressions.push(this.completeTypeExpression(node, 'output'));
   }
 
   protected appendFieldMetadataConfig(node: FieldDefinitionNode): void {

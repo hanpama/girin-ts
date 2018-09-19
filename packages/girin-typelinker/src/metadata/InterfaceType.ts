@@ -1,7 +1,6 @@
 import { GraphQLFieldConfigMap, GraphQLTypeResolver, GraphQLInterfaceType, GraphQLFieldConfig } from "graphql";
 
 import { Definition, DefinitionConfig, MetadataStorage, FieldReferenceEntry } from "../base";
-import { ASTParser } from "../sdl/ast";
 
 
 export interface InterfaceTypeConfig extends DefinitionConfig {
@@ -15,14 +14,6 @@ export interface InterfaceTypeConfig extends DefinitionConfig {
 export class InterfaceType<T extends InterfaceTypeConfig = InterfaceTypeConfig> extends Definition<T> {
   public isOutputType() { return true; }
   public isInputType() { return false; }
-
-  protected static decorate(astParser: ASTParser, storage: MetadataStorage, linkedClass: Function) {
-    super.decorate(astParser, storage, linkedClass);
-
-    astParser.interfaceTypeMetadataConfigs.forEach(config => {
-      storage.register(new this(config), linkedClass);
-    });
-  }
 
   public buildFieldConfig(storage: MetadataStorage, targetClass: Function, entry: FieldReferenceEntry): GraphQLFieldConfig<any, any> {
     const { description, deprecationReason } = entry.field;

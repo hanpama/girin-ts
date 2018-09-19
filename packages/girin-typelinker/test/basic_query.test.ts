@@ -1,6 +1,6 @@
 import { graphql, GraphQLSchema, printSchema } from 'graphql';
 
-import { getGraphQLType, gql, ObjectType } from '../src';
+import { getGraphQLType, gql, typedef } from '../src';
 
 import { ResolverContext, source } from '../src/utilities/ResolverContext';
 
@@ -9,7 +9,7 @@ interface TestSource {
   fieldWithDefaultResolver?: string;
 }
 
-@ObjectType.define(gql`
+@typedef(gql`
   type Test {
     """description1"""
     resolverGotDefinitionInstance: Boolean!
@@ -33,7 +33,7 @@ class Test extends ResolverContext<TestSource> {
   @source() fieldWithDefaultResolver?: string;
 }
 
-@ObjectType.define(gql`
+@typedef(gql`
   type Query {
     test: ${Test}
     erroneousTest: ${Test}

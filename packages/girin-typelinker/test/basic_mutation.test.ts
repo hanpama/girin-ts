@@ -1,9 +1,9 @@
 import { graphql, GraphQLSchema, printSchema } from 'graphql';
 
-import { gql, getGraphQLType, ObjectType } from '../src';
+import { getGraphQLType, gql, typedef } from '../src';
 
 
-@ObjectType.define(gql`
+@typedef(gql`
   type Member {
     id: Int!
     name: String!
@@ -18,7 +18,7 @@ class Member {
   ){ }
 }
 
-@ObjectType.define(gql`
+@typedef(gql`
   type Query {
     getMember: ${Member}! @resolver
   }
@@ -29,13 +29,13 @@ class Query {
   }
 }
 
-@ObjectType.define(gql`
+@typedef(gql`
   type Mutation {
     createMember(name: String!, email: String!): ${Member}!
   }
 `)
 class Mutation {
-  public static createMember(source: null, { name, email }: { name: string, email: string }) {
+  public static createMember(_source: null, { name, email }: { name: string, email: string }) {
     return new Member(2, name, email);
   }
 }

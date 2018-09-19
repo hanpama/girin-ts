@@ -12,6 +12,8 @@ export interface ResolvedTypeExpression extends TypeExpression {
   typeArg: TypeArg
 }
 
+export type TypeExpressionConstructorOptions = TypeArg | Lazy<TypeArg> | Lazy<TypeExpression>;
+
 export type TypeExpressionKind = 'any' | 'input' | 'output';
 /**
  * Contain an argument which can be resolved to GraphQLType instance.
@@ -19,8 +21,8 @@ export type TypeExpressionKind = 'any' | 'input' | 'output';
 export class TypeExpression {
 
   constructor(
-    public typeArg: TypeArg | Lazy<TypeArg> | Lazy<TypeExpression>,
-    public asInput: TypeExpressionKind = 'any',
+    public typeArg: TypeExpressionConstructorOptions,
+    public kind: TypeExpressionKind = 'any',
   ) { }
 
   public resolveLazy(targetClass?: Function): ResolvedTypeExpression {
@@ -29,12 +31,12 @@ export class TypeExpression {
     if (resolvedLazy instanceof TypeExpression) {
       return resolvedLazy as ResolvedTypeExpression;
     }
-    return new TypeExpression(resolvedLazy, this.asInput) as ResolvedTypeExpression;
+    return new TypeExpression(resolvedLazy, this.kind) as ResolvedTypeExpression;
   }
 
   public getDefinitionEntry(storage: MetadataStorage): DefinitionEntry {
     const { typeArg } = this.resolveLazy();
-    return storage.getDefinition(Definition, typeArg as string | Function, this.asInput);
+    return storage.getDefinition(Definition, typeArg as string | Function, this.kind);
   }
 
   public getTypeInstance(storage: MetadataStorage, targetClass?: Function): GraphQLType {
@@ -53,9 +55,9 @@ export class TypeExpression {
     if (isType(exp.typeArg)) {
       return defaultInputFieldInstantiator;
     }
-    const { metadata, key } = exp.getDefinitionEntry(storage);
+    const { metadata, linkedClass } = exp.getDefinitionEntry(storage);
     if (metadata instanceof InputType) {
-      return metadata.buildInstantiator(storage, key);
+      return metadata.buildInstantiator(storage, linkedClass);
     } else {
       return defaultInputFieldInstantiator;
     }

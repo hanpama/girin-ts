@@ -1,12 +1,7 @@
 import { GraphQLInputObjectType, GraphQLInputFieldConfigMap, GraphQLInputFieldConfig } from "graphql";
 
 import { Definition, DefinitionConfig, MetadataStorage, InputFieldReferenceEntry } from "../base";
-import { ASTParser } from "../sdl/ast";
 
-
-export interface InputTypeLinkedClass extends Function {
-  new(): Object;
-}
 
 export interface InputTypeConfig extends DefinitionConfig {}
 
@@ -16,17 +11,6 @@ export interface InputTypeConfig extends DefinitionConfig {}
 export class InputType<T extends InputTypeConfig = InputTypeConfig> extends Definition<T> {
   public isOutputType() { return false; }
   public isInputType() { return true; }
-
-  public static define(astParser?: ASTParser, storage?: MetadataStorage) {
-    return super.define(astParser, storage) as (linkedClass: InputTypeLinkedClass) => void;
-  };
-
-  protected static decorate(astParser: ASTParser, storage: MetadataStorage, linkedClass: Function) {
-    super.decorate(astParser, storage, linkedClass);
-    astParser.inputObjectTypeMetadataConfigs.forEach(config => {
-      storage.register(new this(config), linkedClass);
-    });
-  }
 
   public buildInputFieldConfig(storage: MetadataStorage, targetClass: Function, entry: InputFieldReferenceEntry): GraphQLInputFieldConfig {
     return {
@@ -64,7 +48,7 @@ export class InputType<T extends InputTypeConfig = InputTypeConfig> extends Defi
     const instantiator = (values: any) => {
       let cached = this.instantiationCache.get(values);
       if (!cached) {
-        cached = new (targetClass as InputTypeLinkedClass)();
+        cached = new (targetClass as any)();
         Object.keys(values).forEach(fieldName => {
           cached[fieldName] = fieldInstantiators[fieldName](values[fieldName]);
         });

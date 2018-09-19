@@ -1,7 +1,5 @@
 import { GraphQLNamedType } from "graphql";
 import { MetadataStorage } from "./MetadataStorage";
-import { ASTParser } from "../sdl/ast";
-import { getGlobalMetadataStorage } from "../global";
 
 
 export interface DefinitionConfig {
@@ -15,24 +13,8 @@ export interface DefinitionConfig {
  * Guarantee its type instance only created once.
  */
 export class Definition<TConfig extends DefinitionConfig = DefinitionConfig> {
-  public static define(astParser?: ASTParser, storage?: MetadataStorage) {
-    const targetStorage: MetadataStorage = storage || getGlobalMetadataStorage();
-    return (linkedClass: Function) => this.decorate(astParser, targetStorage, linkedClass);
-  }
 
-  protected static decorate(astParser: ASTParser | undefined, storage: MetadataStorage, linkedClass: Function) {
-    astParser && astParser.fieldMetadataConfigs.forEach(field => {
-      const maybeStaticResolver = (linkedClass as any)[field.defaultName];
-      const resolver = maybeStaticResolver instanceof Function ? maybeStaticResolver : undefined;
-      storage.registerFieldReference({ field, container: linkedClass, resolver });
-    });
-
-    astParser && astParser.inputFieldMetadataConfigs.forEach(config => {
-      storage.registerInputFieldReference({ container: linkedClass, field: config })
-    });
-  }
-
-  protected readonly config: TConfig
+  public readonly config: TConfig
   public isOutputType() { return false; }
   public isInputType() { return false; }
 

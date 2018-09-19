@@ -1,6 +1,6 @@
 import { graphql, GraphQLSchema, printSchema } from 'graphql';
 
-import { gql, getGraphQLType, ObjectType } from '../src';
+import { getGraphQLType, gql, typedef } from '../src';
 
 
 interface MemberSource {
@@ -15,12 +15,16 @@ const members: MemberSource[] = [
   { id: 1, name: 'Jonghyun', email: 'j@example.com', friendId: 0 },
 ]
 
-@ObjectType.define(gql`
+@typedef(gql`
   type Member {
     id: Int!
     name: String!
     email: String!
     friend: ${Member}
+  }
+
+  extend type Query {
+    getMember(id: Int!): ${Member}
   }
 `)
 class Member {
@@ -40,7 +44,7 @@ class Member {
   }
 }
 
-@ObjectType.define(gql`
+@typedef(gql`
   type Query {
     getMember(id: Int!): ${Member}
   }

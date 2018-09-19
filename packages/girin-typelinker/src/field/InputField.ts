@@ -11,7 +11,7 @@ export interface InputFieldConfig {
 }
 
 export class InputField<TConfig extends InputFieldConfig = InputFieldConfig> {
-  constructor(protected config: TConfig) { }
+  constructor(public readonly config: TConfig) { }
 
   public get defaultName() { return this.config.defaultName; }
   public get defaultValue() { return this.config.defaultValue; }

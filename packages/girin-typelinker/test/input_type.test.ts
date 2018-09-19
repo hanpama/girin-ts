@@ -1,15 +1,13 @@
 import { GraphQLSchema, graphql, printSchema } from "graphql";
 
-import { gql, getGraphQLType, ObjectType, InputType } from "../src";
+import { getGraphQLType, gql, typedef } from "../src";
 
 
-@InputType.define(gql`
+@typedef(gql`
   input NameInput {
     firstName: String!
     lastName: String!
   }
-`)
-@ObjectType.define(gql`
   type Name {
     firstName: String!
     lastName: String!
@@ -27,13 +25,11 @@ class Name {
 
 let instantiationCount = 0;
 
-@InputType.define(gql`
+@typedef(gql`
   input PersonInput {
     address: String!
     name: ${Name}
   }
-`)
-@ObjectType.define(gql`
   type Person {
     address: String!
     name: ${Name}
@@ -47,7 +43,7 @@ class Person {
   }
 }
 
-@ObjectType.define(gql`
+@typedef(gql`
   type Group {
     echoPerson(person: ${Person}): ${Person}!
   }
@@ -58,7 +54,7 @@ class Group {
   }
 }
 
-@ObjectType.define(gql`
+@typedef(gql`
   type Query {            # resolved to NameInput
     formatFullName(input: ${Name}): String!
                                     # resolved to PersonInput

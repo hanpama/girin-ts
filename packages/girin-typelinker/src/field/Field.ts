@@ -13,7 +13,7 @@ export interface FieldConfig {
 }
 
 export class Field<TConfig extends FieldConfig = FieldConfig> {
-  constructor(protected config: TConfig) { }
+  constructor(public readonly config: TConfig) { }
 
   public get defaultName() { return this.config.defaultName; };
   public get description() { return this.config.description; };

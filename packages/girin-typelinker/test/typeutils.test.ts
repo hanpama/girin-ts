@@ -12,4 +12,4 @@ test('isSubClassOf', () => {
   expect(isSubClassOf(Baz, Bar)).toBe(true);
   expect(isSubClassOf(Foo, Bar)).toBe(false);
   expect(isSubClassOf(Foo, Baz)).toBe(false);
-})
+});

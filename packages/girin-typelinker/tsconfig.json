@@ -4,7 +4,6 @@
     "noEmit": true
   },
   "include": [
-    "src/typings.d.ts",
     "src/",
     "test/"
   ],
