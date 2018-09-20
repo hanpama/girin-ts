@@ -1,5 +1,6 @@
 import { emptyObject } from "../utils/base";
 
+
 export abstract class ConnectionQueryBuilder<TNode, TResponse = any, TItem = any> {
   createConnection(connectionArgs: any = emptyObject): Connection<TNode, TResponse, TItem> {
     return new Connection(this, connectionArgs);
@@ -20,7 +21,7 @@ export abstract class ConnectionQueryBuilder<TNode, TResponse = any, TItem = any
   abstract query(connectionArgs: any): Promise<TResponse>;
 }
 
-export class Connection<TNode, TResponse, TItem> {
+export class Connection<TNode, TResponse = any, TItem = any> {
   constructor(
     protected queryBuilder: ConnectionQueryBuilder<TNode, TResponse, TItem>,
     protected connectionArgs: any,

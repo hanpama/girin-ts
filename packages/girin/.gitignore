@@ -2,9 +2,6 @@
 /tmp
 node_modules/
 
-/connection
-/model
-/utils
-/*.d.ts
-/*.js
-/*.js.map
+*.d.ts
+*.js
+*.js.map

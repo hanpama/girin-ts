@@ -1,5 +1,6 @@
 import { typedef, gql, up } from "../src";
 import { fetch } from "apollo-server-env";
+import { introspectionQuery } from "graphql";
 
 describe('Up', () => {
   it('runs server', async () => {
@@ -14,8 +15,17 @@ describe('Up', () => {
     }
 
     const { server } = await up({ Query });
+    const expectedURL = 'http://localhost:4000';
+    let res: any;
 
-    const res = await fetch('http://localhost:4000/graphql', {
+    res = await fetch(expectedURL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: introspectionQuery }),
+    });
+    expect(await res.json()).toMatchSnapshot();
+
+    res = await fetch(expectedURL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query: `{ hello }` }),

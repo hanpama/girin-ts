@@ -1,12 +1,14 @@
 function compareKey(key1: any, key2: any): 1 | 0 | -1 {
-  const h1 = String(key1);
-  const h2 = String(key2);
+  const h1 = key1;
+  const h2 = key2;
   if (h1 > h2) {
     return 1;
   } else if (h1 === h2) {
     return 0;
-  } else {
+  } if (h1 < h2) {
     return -1;
+  } else {
+    return compareKey(String(h1), String(h2));
   }
 }
 

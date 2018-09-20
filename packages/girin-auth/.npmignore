@@ -1,9 +1,0 @@
-.DS_Store
-/tmp
-
-/test
-/src
-/docker-compose.yaml
-/tsconfig.*
-/.travis.yml
-/.vscode

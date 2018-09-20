@@ -28,9 +28,14 @@
   },
   "homepage": "https://github.com/hanpama/girin",
   "dependencies": {
+    "argon2": "^0.19.3",
+    "@types/jsonwebtoken": "^7.2.8",
+    "jsonwebtoken": "^8.3.0",
+    "fast-deep-equal": "^2.0.1",
+    "dataloader": "^1.4.0",
+    "@types/graphql-relay": "^0.4.7",
     "apollo-server": "^2.0.8",
-    "girin-auth": "^0.5.0-alpha.4",
-    "girin-model": "^0.5.0-alpha.4",
+    "apollo-upload-server": "^7.1.0",
     "girin-typelinker": "^0.5.0-alpha.4"
   },
   "jest": {

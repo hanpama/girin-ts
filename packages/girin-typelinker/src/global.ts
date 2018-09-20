@@ -59,13 +59,6 @@ export function gql(strings: TemplateStringsArray, ...interpolated: Array<TypeEx
   return ast.definitions.map(rootNode => new DefinitionParser(rootNode, subsMap));
 }
 
-// export interface TypeDefOptions {
-//   defs: DefinitionParser[],
-//   storage: MetadataStorage,
-//   derive:
-// }
-
-// export function typedef(options: TypeDefOptions): void;
 export function typedef(astParsers: DefinitionParser[], maybeStorage?: MetadataStorage) {
   const storage = maybeStorage || getGlobalMetadataStorage();
 

@@ -1,8 +1,5 @@
-import * as DataLoader from 'dataloader';
-import { FilterQuery, CollectionInsertOneOptions, ReplaceOneOptions, CommonOptions, Db, Collection } from 'mongodb';
-
-import { getEnvironment } from '../environment';
-import { CompositeKeySorter } from '../utils/CompositeKeySorter';
+import { FilterQuery, CollectionInsertOneOptions, ReplaceOneOptions, CommonOptions, MongoClient } from 'mongodb';
+import { ModelManager } from './ModelManager';
 
 
 export type Document = { [key: string]: any };
@@ -11,51 +8,31 @@ export type ModelClass<TModel extends Model> = typeof Model & {
   new(source: any): TModel;
 }
 
-export class ModelManager<T extends Model> {
-  constructor(public modelClass: ModelClass<T>) {
-    this.collection
-    this.dataloader = new DataLoader(this.batchQuery, { cache: false });
-  }
-
-  public dataloader: DataLoader<any, T>;
-
-  batchQuery = async (keys: any[]) => {
-    const res = await this.collection.find({ _id: { $in: keys }}).toArray();
-    if (res.length === keys.length) {
-      return res;
-    } else {
-      const cks = new CompositeKeySorter(keys);
-      const alignedRes = new Array(keys.length);
-
-      res.forEach(doc => {
-        const idx = cks.indexOf(doc._id);
-        if (idx !== -1) { alignedRes[idx] = doc; }
-      })
-      return alignedRes;
-    }
-  }
-
-  get db(): Db {
-    return getEnvironment('client').db(this.modelClass.dbName || getEnvironment('dbName'));
-  }
-
-  get collection(): Collection {
-    return this.db.collection(this.modelClass.collectionName);
-  }
+export interface ModelConfigs {
+  client?: MongoClient;
+  dbName: string;
 }
 
 export class Model {
   static limit: number = 50;
-  static dbName: string | undefined;
   static collectionName: string;
 
+  // configuration
+  static _configs: ModelConfigs = { dbName: 'test' };
+  public static get configs() {
+    return this._configs;
+  }
+  public static configure(configs: Partial<ModelConfigs>) {
+    Object.assign(this._configs, configs);
+  }
+
   // meta and context
-  protected static _context: any;
+  protected static manager: any;
   public static getManager<TModel extends Model>(this: ModelClass<TModel>) {
-    if (!this._context) {
-      this._context = new ModelManager(this);
+    if (!this.manager) {
+      this.manager = new ModelManager(this);
     }
-    return this._context as ModelManager<TModel>;
+    return this.manager as ModelManager<TModel>;
   }
   public $getManager(): ModelManager<this> { return (this.constructor as any).getManager(); }
 

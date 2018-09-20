@@ -46,12 +46,8 @@ export class BaseUser extends Model {
     return jwt.sign(rest, (this.constructor as typeof BaseUser).SECRET_KEY);
   }
 
-  public static async decodeToken<T extends BaseUser>(this: BaseUserClass<T>, token: string): Promise<T> {
+  public static decodeToken<T extends BaseUser>(this: BaseUserClass<T>, token: string): T {
     const result: any = jwt.verify(token, this.SECRET_KEY);
-    const user = await this.getOne(result._id);
-    if (!user) {
-      throw new Error('Authentication Error');
-    }
-    return user as T;
+    return new this(result);
   }
 }

@@ -1,8 +1,0 @@
-{
-  "version": "2.6.1",
-  "extends": "../../tsconfig.json",
-  "compilerOptions": {
-      "outDir": "."
-  },
-  "files": ["src/index.ts"],
-}

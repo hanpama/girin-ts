@@ -1,11 +1,11 @@
 import { gzip, gunzip, InputType } from 'zlib';
 import { promisify } from 'util';
+import { ConnectionArguments } from 'graphql-relay';
 
 import * as equal from 'fast-deep-equal';
 
 import { ConnectionQueryBuilder, Connection } from "./base";
 import { Model, ModelClass } from "../model";
-import { ConnectionArgs } from './types';
 import { emptyObject } from '../utils/base';
 
 
@@ -91,7 +91,7 @@ export class ModelConnectionBuilder<
     return response.docs;
   };
 
-  createConnection(args: ConnectionArgs = emptyObject): Connection<TNode, ModelConnectionState, TItem> {
+  createConnection(args: ConnectionArguments = emptyObject): Connection<TNode, ModelConnectionState, TItem> {
     if (args.first && args.last) {
       throw new Error('Argument "first" and "last" must not be included at the same time');
     }
@@ -112,7 +112,7 @@ export class ModelConnectionBuilder<
     });
   }
 
-  async query(args: ConnectionArgs): Promise<ModelConnectionState> {
+  async query(args: ConnectionArguments): Promise<ModelConnectionState> {
 
     const { options } = this;
     const reverse = Boolean(args.last);
