@@ -1,6 +1,7 @@
 import { GraphQLObjectType, GraphQLFieldConfigMap, GraphQLInterfaceType, GraphQLFieldConfig } from "graphql";
 
-import { Definition, DefinitionConfig, MetadataStorage, FieldReferenceEntry, ExtensionFieldReferenceEntry } from "../base";
+import { MetadataStorage,  FieldReferenceEntry, FieldMixinEntry, ImplementReferenceEntry, ImplementMixinEntry } from "../metadata";
+import { Definition, DefinitionConfig } from "../definition/Definition";
 
 
 export interface ObjectTypeConfig extends DefinitionConfig {
@@ -14,27 +15,27 @@ export class ObjectType<TConfig extends ObjectTypeConfig = ObjectTypeConfig> ext
   public isOutputType() { return true; }
   public isInputType() { return false; }
 
-  public buildFieldConfig(storage: MetadataStorage, targetClass: Function, entry: FieldReferenceEntry | ExtensionFieldReferenceEntry): GraphQLFieldConfig<any, any> {
+  public buildFieldConfig(storage: MetadataStorage, entry: FieldReferenceEntry | FieldMixinEntry): GraphQLFieldConfig<any, any> {
     const { description, deprecationReason } = entry.field;
 
     return {
-      type: entry.field.buildType(storage, targetClass),
-      args: entry.field.buildArgs(storage, targetClass),
-      resolve: entry.field.buildResolver(storage, targetClass, entry.resolver),
+      type: entry.field.buildType(storage, entry.definitionClass),
+      args: entry.field.buildArgs(storage, entry.definitionClass),
+      resolve: entry.field.buildResolver(storage, entry.definitionClass),
       description,
       deprecationReason,
     };
   }
 
   public buildFieldConfigMap(storage: MetadataStorage, targetClass: Function): GraphQLFieldConfigMap<any, any> {
-    const refs = [
-      ...storage.queryExtensionFieldReferences(this.typeName),
-      ...storage.queryFieldReferences(targetClass),
+    const entries = [
+      ...storage.findMixinEntries(FieldMixinEntry, this.typeName),
+      ...storage.findReferenceEntries(FieldReferenceEntry, targetClass),
     ];
     return (
-      refs.reduce((results, entry) => {
+      entries.reduce((results, entry) => {
         const name = entry.field.defaultName;
-        results[name] = this.buildFieldConfig(storage, targetClass, entry);
+        results[name] = this.buildFieldConfig(storage, entry);
         return results;
       }, {} as GraphQLFieldConfigMap<any, any>)
     );
@@ -52,10 +53,12 @@ export class ObjectType<TConfig extends ObjectTypeConfig = ObjectTypeConfig> ext
     return new GraphQLObjectType({ name, fields, interfaces, description, isTypeOf });
   }
 
-  public findInterfaces(storage: MetadataStorage, targetClass: Function): GraphQLInterfaceType[] | undefined {
-    return storage.queryImplementReferences(targetClass).map(entry => (
-      entry.interfaceType.getTypeInstance(storage, targetClass) as GraphQLInterfaceType
-    ))
+  public findInterfaces(storage: MetadataStorage, targetClass: Function): GraphQLInterfaceType[] {
+    const entries = [
+      ...storage.findMixinEntries(ImplementMixinEntry, this.typeName),
+      ...storage.findReferenceEntries(ImplementReferenceEntry, targetClass),
+    ];
+    return entries.map(entry => entry.interfaceType.getTypeInstance(storage) as GraphQLInterfaceType);
   }
 
   public buildIsTypeOf(storage: MetadataStorage, targetClass: Function) {

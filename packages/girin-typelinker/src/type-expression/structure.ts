@@ -1,6 +1,6 @@
 import { TypeExpression, TypeArg } from "./TypeExpression";
 import { GraphQLList, GraphQLType, GraphQLNonNull } from "graphql";
-import { MetadataStorage } from "./MetadataStorage";
+import { MetadataStorage } from "../metadata";
 import { ConcreteClass } from "../types";
 
 
@@ -18,24 +18,24 @@ export abstract class Structure extends TypeExpression {
 }
 
 export class List extends Structure {
-  public getTypeInstance(storage: MetadataStorage, targetClass?: Function): GraphQLType {
-    const innerTypeInstance = this.innerType.getTypeInstance(storage, targetClass);
+  public getTypeInstance(storage: MetadataStorage): GraphQLType {
+    const innerTypeInstance = this.innerType.getTypeInstance(storage);
     return new GraphQLList(innerTypeInstance);
   }
 
-  public getInstantiator(storage: MetadataStorage, targetClass?: Function) {
-    const innerInstantiator = this.innerType.getInstantiator(storage, targetClass);
+  public getInstantiator(storage: MetadataStorage) {
+    const innerInstantiator = this.innerType.getInstantiator(storage);
     return (values: any[]) => values.map(value => innerInstantiator(value));
   }
 }
 
 export class NonNull extends Structure {
-  public getTypeInstance(storage: MetadataStorage, targetClass?: Function): GraphQLType {
-    const innerTypeInstance = this.innerType.getTypeInstance(storage, targetClass);
+  public getTypeInstance(storage: MetadataStorage): GraphQLType {
+    const innerTypeInstance = this.innerType.getTypeInstance(storage);
     return new GraphQLNonNull(innerTypeInstance);
   }
 
-  public getInstantiator(storage: MetadataStorage, targetClass?: Function) {
-    return this.innerType.getInstantiator(storage, targetClass);
+  public getInstantiator(storage: MetadataStorage) {
+    return this.innerType.getInstantiator(storage);
   }
 }

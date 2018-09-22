@@ -1,6 +1,8 @@
 import { GraphQLFieldConfigArgumentMap, GraphQLOutputType, GraphQLFieldResolver, defaultFieldResolver } from "graphql";
-import { TypeExpression, MetadataStorage } from "../base";
+
+import { TypeExpression } from "../type-expression";
 import { InputField } from "./InputField";
+import { MetadataStorage } from "../metadata";
 
 
 export interface FieldConfig {
@@ -19,11 +21,11 @@ export class Field<TConfig extends FieldConfig = FieldConfig> {
   public get description() { return this.config.description; };
   public get deprecationReason() { return this.config.deprecationReason; };
 
-  public buildArgs(storage: MetadataStorage, targetClass?: Function): GraphQLFieldConfigArgumentMap {
+  public buildArgs(storage: MetadataStorage, definitionClass: Function): GraphQLFieldConfigArgumentMap {
     const { args } = this.config;
     return args.reduce((args, ref) => {
       args[ref.defaultName] = {
-        type: ref.buildType(storage, targetClass),
+        type: ref.buildType(storage, definitionClass),
         defaultValue: ref.defaultValue,
         description: ref.description,
       };
@@ -31,15 +33,20 @@ export class Field<TConfig extends FieldConfig = FieldConfig> {
     }, {} as GraphQLFieldConfigArgumentMap);
   }
 
-  public buildType(storage: MetadataStorage, targetClass?: Function): GraphQLOutputType {
-    return this.config.type.getTypeInstance(storage, targetClass) as GraphQLOutputType;
+  public buildType(storage: MetadataStorage, definitionClass: Function): GraphQLOutputType {
+    return this.config.type.getTypeInstance(storage) as GraphQLOutputType;
   }
 
-  public buildResolver(storage: MetadataStorage, targetClass?: Function, innerResolver: GraphQLFieldResolver<any, any> = defaultFieldResolver): GraphQLFieldResolver<any, any> {
+  public buildResolver(storage: MetadataStorage, definitionClass: Function): GraphQLFieldResolver<any, any> {
     const { args } = this.config;
 
+    const maybeStaticResolver = (definitionClass as any)[this.defaultName];
+    const innerResolver = maybeStaticResolver instanceof Function
+      ? maybeStaticResolver.bind(definitionClass)
+      : defaultFieldResolver;
+
     const instantiators = args.reduce((res, meta) => {
-      res[meta.defaultName] = meta.buildInstantiator(storage, targetClass);
+      res[meta.defaultName] = meta.buildInstantiator(storage);
       return res;
     }, {} as any);
 

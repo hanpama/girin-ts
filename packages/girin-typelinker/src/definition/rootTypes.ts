@@ -1,4 +1,4 @@
-import { MetadataStorage } from "../base";
+import { MetadataStorage, DefinitionEntry } from "../metadata";
 import { ObjectType } from "./ObjectType";
 
 /**
@@ -16,6 +16,6 @@ export class Query {}
 export class Mutation {}
 
 export function loadFallbackRootTypes(storage: MetadataStorage) {
-  storage.register(new ObjectType({ typeName: 'Query' }), Query);
-  storage.register(new ObjectType({ typeName: 'Mutation' }), Mutation);
+  storage.registerEntry(Query, new DefinitionEntry({ metadata: new ObjectType({ typeName: 'Query' }) }));
+  storage.registerEntry(Mutation, new DefinitionEntry({ metadata: new ObjectType({ typeName: 'Mutation' })}));
 }

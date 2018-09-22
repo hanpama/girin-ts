@@ -1,5 +1,6 @@
 import { GraphQLInputType } from "graphql";
-import { TypeExpression, MetadataStorage } from "../base";
+import { TypeExpression } from "../type-expression";
+import { MetadataStorage } from "../metadata";
 
 
 export interface InputFieldConfig {
@@ -19,10 +20,10 @@ export class InputField<TConfig extends InputFieldConfig = InputFieldConfig> {
   public get directives() { return this.config.directives; }
 
   public buildType(storage: MetadataStorage, targetClass?: Function): GraphQLInputType {
-    return this.config.type.getTypeInstance(storage, targetClass) as GraphQLInputType;
+    return this.config.type.getTypeInstance(storage) as GraphQLInputType;
   }
 
   public buildInstantiator(storage: MetadataStorage, targetClass?: Function) {
-    return this.config.type.getInstantiator(storage, targetClass);
+    return this.config.type.getInstantiator(storage);
   }
 }

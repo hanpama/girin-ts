@@ -1,9 +1,9 @@
 import { GraphQLType, isType } from "graphql";
 
-import { Definition } from "./Definition";
-import { MetadataStorage, DefinitionEntry } from "./MetadataStorage";
+import { Definition } from "../definition/Definition";
+import { MetadataStorage, DefinitionEntry } from "../metadata";
 import { isLazy, Lazy, Instantiator } from "../types";
-import { InputType } from "../metadata";
+import { InputType } from "../definition";
 
 
 export type TypeArg = GraphQLType | string | Function;
@@ -25,39 +25,39 @@ export class TypeExpression {
     public kind: TypeExpressionKind = 'any',
   ) { }
 
-  public resolveLazy(targetClass?: Function): ResolvedTypeExpression {
+  public resolveLazy(): ResolvedTypeExpression {
     const { typeArg } = this;
-    let resolvedLazy = isLazy(typeArg) ? typeArg(targetClass) : typeArg;
+    let resolvedLazy = isLazy(typeArg) ? typeArg() : typeArg;
     if (resolvedLazy instanceof TypeExpression) {
       return resolvedLazy as ResolvedTypeExpression;
     }
     return new TypeExpression(resolvedLazy, this.kind) as ResolvedTypeExpression;
   }
 
-  public getDefinitionEntry(storage: MetadataStorage): DefinitionEntry {
+  public getDefinitionEntry(storage: MetadataStorage): DefinitionEntry<any, any> {
     const { typeArg } = this.resolveLazy();
     return storage.getDefinition(Definition, typeArg as string | Function, this.kind);
   }
 
-  public getTypeInstance(storage: MetadataStorage, targetClass?: Function): GraphQLType {
-    const exp = this.resolveLazy(targetClass);
+  public getTypeInstance(storage: MetadataStorage): GraphQLType {
+    const exp = this.resolveLazy();
 
     if (isType(exp.typeArg)) {
       return exp.typeArg;
     }
-    let definitionEntry = exp.getDefinitionEntry(storage);
-    return definitionEntry.getOrCreateTypeInstance();
+    let { definitionClass, metadata } = exp.getDefinitionEntry(storage);
+    return metadata.getOrCreateTypeInstance(storage, definitionClass);
   }
 
-  public getInstantiator(storage: MetadataStorage, targetClass?: Function): Instantiator {
-    const exp = this.resolveLazy(targetClass);
+  public getInstantiator(storage: MetadataStorage): Instantiator {
+    const exp = this.resolveLazy();
 
     if (isType(exp.typeArg)) {
       return defaultInputFieldInstantiator;
     }
-    const { metadata, linkedClass } = exp.getDefinitionEntry(storage);
+    const { metadata, definitionClass } = exp.getDefinitionEntry(storage);
     if (metadata instanceof InputType) {
-      return metadata.buildInstantiator(storage, linkedClass);
+      return metadata.buildInstantiator(storage, definitionClass);
     } else {
       return defaultInputFieldInstantiator;
     }

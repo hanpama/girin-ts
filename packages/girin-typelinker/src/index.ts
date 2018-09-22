@@ -1,4 +1,5 @@
-export * from './base';
-export * from './metadata';
+export * from './sdl';
+export * from './definition';
 export * from './field';
 export * from './global';
+export * from './type-expression';

@@ -1,6 +1,6 @@
 import { GraphQLInputObjectType, GraphQLInputFieldConfigMap, GraphQLInputFieldConfig } from "graphql";
-
-import { Definition, DefinitionConfig, MetadataStorage, InputFieldReferenceEntry } from "../base";
+import { MetadataStorage, InputFieldReferenceEntry, InputFieldMixinEntry } from "../metadata";
+import { Definition, DefinitionConfig } from "../definition/Definition";
 
 
 export interface InputTypeConfig extends DefinitionConfig {}
@@ -12,18 +12,21 @@ export class InputType<T extends InputTypeConfig = InputTypeConfig> extends Defi
   public isOutputType() { return false; }
   public isInputType() { return true; }
 
-  public buildInputFieldConfig(storage: MetadataStorage, targetClass: Function, entry: InputFieldReferenceEntry): GraphQLInputFieldConfig {
+  public buildInputFieldConfig(storage: MetadataStorage, entry: InputFieldReferenceEntry | InputFieldMixinEntry): GraphQLInputFieldConfig {
     return {
-      type: entry.field.buildType(storage, targetClass),
+      type: entry.field.buildType(storage, entry.definitionClass),
       defaultValue: entry.field.defaultValue,
       description: entry.field.description,
     };
   }
 
   public buildInputFieldConfigMap(storage: MetadataStorage, targetClass: Function): GraphQLInputFieldConfigMap {
-    const inputFieldMetadata = storage.queryInputFieldReference(targetClass);
-    return inputFieldMetadata.reduce((results, entry) => {
-      results[entry.field.defaultName] = this.buildInputFieldConfig(storage, targetClass, entry);
+    const entries = [
+      ...storage.findMixinEntries(InputFieldMixinEntry, this.typeName),
+      ...storage.findReferenceEntries(InputFieldReferenceEntry, targetClass),
+    ];
+    return entries.reduce((results, entry) => {
+      results[entry.field.defaultName] = this.buildInputFieldConfig(storage, entry);
       return results;
     }, {} as GraphQLInputFieldConfigMap);
   }
@@ -38,9 +41,12 @@ export class InputType<T extends InputTypeConfig = InputTypeConfig> extends Defi
   protected instantiationCache = new WeakMap();
 
   public buildInstantiator(storage: MetadataStorage, targetClass: Function) {
-    const fieldEntries = storage.queryInputFieldReference(targetClass);
+    const entries = [
+      ...storage.findMixinEntries(InputFieldMixinEntry, this.typeName),
+      ...storage.findReferenceEntries(InputFieldReferenceEntry, targetClass),
+    ];
 
-    const fieldInstantiators = fieldEntries.reduce((res, entry) => {
+    const fieldInstantiators = entries.reduce((res, entry) => {
       res[entry.field.defaultName] = entry.field.buildInstantiator(storage, targetClass);
       return res;
     }, {} as any);

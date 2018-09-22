@@ -1,4 +1,5 @@
-import { isSubClassOf } from "../src/types";
+import { equalsOrInherits } from "../src/metadata";
+
 
 test('isSubClassOf', () => {
 
@@ -6,10 +7,10 @@ test('isSubClassOf', () => {
   class Bar extends Foo {}
   class Baz extends Bar {}
 
-  expect(isSubClassOf(Foo, Foo)).toBe(false);
-  expect(isSubClassOf(Bar, Foo)).toBe(true);
-  expect(isSubClassOf(Baz, Foo)).toBe(true);
-  expect(isSubClassOf(Baz, Bar)).toBe(true);
-  expect(isSubClassOf(Foo, Bar)).toBe(false);
-  expect(isSubClassOf(Foo, Baz)).toBe(false);
+  expect(equalsOrInherits(Foo, Foo)).toBe(true);
+  expect(equalsOrInherits(Bar, Foo)).toBe(true);
+  expect(equalsOrInherits(Baz, Foo)).toBe(true);
+  expect(equalsOrInherits(Baz, Bar)).toBe(true);
+  expect(equalsOrInherits(Foo, Bar)).toBe(false);
+  expect(equalsOrInherits(Foo, Baz)).toBe(false);
 });

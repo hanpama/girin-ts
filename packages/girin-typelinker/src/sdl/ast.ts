@@ -9,11 +9,14 @@ import {
   NonNullTypeNode,
   ObjectTypeDefinitionNode,
   ObjectTypeExtensionNode,
+  InterfaceTypeExtensionNode,
+  InputObjectTypeExtensionNode,
 } from 'graphql';
 
-import { List, NonNull, TypeArg, TypeExpression, TypeExpressionKind, TypeExpressionConstructorOptions } from '../base';
+import { TypeArg, TypeExpression, TypeExpressionKind, TypeExpressionConstructorOptions, List, NonNull } from '../type-expression';
+import { Entry, DefinitionEntry, ImplementReferenceEntry, FieldReferenceEntry, FieldMixinEntry, InputFieldMixinEntry, InputFieldReferenceEntry, ImplementMixinEntry } from '../metadata';
 import { completeDirectives, completeValueNode } from './directive';
-import { InputTypeConfig, ObjectTypeConfig, InterfaceTypeConfig } from '../metadata';
+import { ObjectType, InterfaceType, InputType } from '../definition';
 import { Lazy } from '../types';
 import { Field, InputField } from '../field';
 
@@ -24,46 +27,35 @@ export interface SubstitutionMap {
 
 export class DefinitionParser {
 
-  public readonly objectTypeMetadataConfigs: ObjectTypeConfig[] = [];
-  public readonly interfaceTypeMetadataConfigs: InterfaceTypeConfig[] = [];
-  public readonly inputObjectTypeMetadataConfigs: InputTypeConfig[] = [];
-
-  public readonly implementTypeExpressions: TypeExpression[] = [];
-  public readonly fieldMetadataConfigs: Field[] = [];
-  public readonly inputFieldMetadataConfigs: InputField[] = [];
+  public entries: Entry<any>[];
   public extendingTypeName?: string;
 
-  constructor(
-    rootNode: DefinitionNode,
-    subsMap: SubstitutionMap,
-  ) {
-    this.rootNode = rootNode;
-    this.subsMap = subsMap;
 
+  constructor(
+    public rootNode: DefinitionNode,
+    public subsMap: SubstitutionMap,
+  ) {
     this.createMetadataFromAST();
   }
 
-  protected rootNode: DefinitionNode;
-  protected subsMap: SubstitutionMap;
-
   protected createMetadataFromAST(): void {
     const { rootNode } = this;
+    this.entries = [];
 
     if (rootNode.kind === 'ObjectTypeDefinition') {
-      this.appendObjectTypeConfig(rootNode);
-    }
-    else if (rootNode.kind === 'InterfaceTypeDefinition') {
-      this.appendInterfaceTypeMetadataConfig(rootNode);
-    }
-    else if (rootNode.kind === 'InputObjectTypeDefinition') {
-      this.appendInputObjectTypeMetadataConfig(rootNode);
+      this.handleObjectTypeDefinition(rootNode);
     }
     else if (rootNode.kind === 'ObjectTypeExtension') {
-      const { name, interfaces, fields } = rootNode;
-
-      if (fields) { fields.forEach(fieldNode => this.appendFieldMetadataConfig(fieldNode)); }
-      if (interfaces) { interfaces.forEach(interfaceNode => this.appendImplementTypeExpression(interfaceNode)); }
-      this.extendingTypeName = name.value;
+      this.handleObjectTypeExtension(rootNode);
+    }
+    else if (rootNode.kind === 'InterfaceTypeDefinition') {
+      this.handleInterfaceTypeDefinition(rootNode);
+    }
+    else if (rootNode.kind === 'InterfaceTypeExtension') {
+      this.handleInterfaceTypeExtension(rootNode);
+    }
+    else if (rootNode.kind === 'InputObjectTypeDefinition') {
+      this.handleInputObjectTypeDefinition(rootNode);
     }
     else {
       throw new Error(`Node type not supported: ${rootNode.kind}`);
@@ -93,56 +85,85 @@ export class DefinitionParser {
     }
   }
 
-  protected appendObjectTypeConfig(rootNode: ObjectTypeDefinitionNode | ObjectTypeExtensionNode): void {
-    const { name, interfaces, fields } = rootNode;
+  protected handleObjectTypeDefinition(rootNode: ObjectTypeDefinitionNode): void {
+    const { name, interfaces, fields, description } = rootNode;
 
-    if (fields) { fields.forEach(fieldNode => this.appendFieldMetadataConfig(fieldNode)); }
-    if (interfaces) { interfaces.forEach(interfaceNode => this.appendImplementTypeExpression(interfaceNode)); }
+    if (fields) {
+      fields.forEach(fieldNode => this.appendFieldMetadataConfig(fieldNode));
+    }
+    if (interfaces) {
+      interfaces.forEach(interfaceNode => this.appendImplementTypeExpression(interfaceNode));
+    }
 
-    if (rootNode.kind === "ObjectTypeDefinition") {
-      const { description } = rootNode;
-      this.objectTypeMetadataConfigs.push({
-        // interfaces: interfacesTypeExpressions,
+    this.entries.push(new DefinitionEntry({
+      metadata: new ObjectType({
         typeName: name.value,
         description: description && description.value,
         directives: rootNode.directives && completeDirectives(rootNode.directives),
-      });
+      }),
+    }));
+  }
+
+  protected handleObjectTypeExtension(rootNode: ObjectTypeExtensionNode): void {
+    const { name, interfaces, fields } = rootNode;
+
+    if (fields) {
+      fields.forEach(fieldNode => this.appendFieldMetadataConfig(fieldNode, name.value));
+    }
+    if (interfaces) {
+      interfaces.forEach(interfaceNode => this.appendImplementTypeExpression(interfaceNode, name.value));
     }
   }
 
-  protected appendInterfaceTypeMetadataConfig(node: InterfaceTypeDefinitionNode): void {
-    const { name, description, fields } = node;
+  protected handleInterfaceTypeDefinition(rootNode: InterfaceTypeDefinitionNode): void {
+    const { name, description, fields } = rootNode;
 
     if (fields) {
       fields.forEach(fieldNode => this.appendFieldMetadataConfig(fieldNode));
     }
 
-    this.interfaceTypeMetadataConfigs.push({
-      typeName: name.value,
-      description: description && description.value,
-      directives: node.directives && completeDirectives(node.directives),
-    });
+    this.entries.push(new DefinitionEntry({
+      metadata: new InterfaceType({
+        typeName: name.value,
+        description: description && description.value,
+        directives: rootNode.directives && completeDirectives(rootNode.directives),
+      }),
+    }));
   }
 
-  protected appendInputObjectTypeMetadataConfig(node: InputObjectTypeDefinitionNode): void {
+  protected handleInterfaceTypeExtension(rootNode: InterfaceTypeExtensionNode): void {
+    const { name, fields } = rootNode;
+
+    if (fields) {
+      fields.forEach(fieldNode => this.appendFieldMetadataConfig(fieldNode, name.value));
+    }
+  }
+
+  protected handleInputObjectTypeDefinition(node: InputObjectTypeDefinitionNode): void {
     const { name, description, fields } = node;
 
     if (fields) {
       fields.forEach(fieldNode => this.appendInputFieldMetadataConfig(fieldNode))
     }
 
-    this.inputObjectTypeMetadataConfigs.push({
-      typeName: name.value,
-      description: description && description.value,
-      directives: node.directives && completeDirectives(node.directives),
-    });
+    this.entries.push(new DefinitionEntry({
+      metadata: new InputType({
+        typeName: name.value,
+        description: description && description.value,
+        directives: node.directives && completeDirectives(node.directives),
+      }),
+    }));
   }
 
-  protected appendImplementTypeExpression(node: NamedTypeNode): void {
-    this.implementTypeExpressions.push(this.completeTypeExpression(node, 'output'));
+  protected handleInputObjectExtension(node: InputObjectTypeExtensionNode): void {
+    const { name, fields } = node;
+
+    if (fields) {
+      fields.forEach(fieldNode => this.appendInputFieldMetadataConfig(fieldNode, name.value))
+    }
   }
 
-  protected appendFieldMetadataConfig(node: FieldDefinitionNode): void {
+  protected appendFieldMetadataConfig(node: FieldDefinitionNode, extendingTypeName?: string): void {
     const { name, type, description, directives, arguments: args } = node;
 
     const argumentRefs = args && args.map(argumentNode => (
@@ -157,7 +178,11 @@ export class DefinitionParser {
       directives: directives && completeDirectives(directives),
     });
 
-    this.fieldMetadataConfigs.push(field);
+    if (extendingTypeName) {
+      this.entries.push(new FieldMixinEntry({ field, extendingTypeName }));
+    } else {
+      this.entries.push(new FieldReferenceEntry({ field }));
+    }
   }
 
   protected createInputField(node: InputValueDefinitionNode): InputField {
@@ -172,7 +197,22 @@ export class DefinitionParser {
     });
   }
 
-  protected appendInputFieldMetadataConfig(node: InputValueDefinitionNode): void {
-    this.inputFieldMetadataConfigs.push(this.createInputField(node));
+  protected appendInputFieldMetadataConfig(node: InputValueDefinitionNode, extendingTypeName?: string): void {
+    const field = this.createInputField(node);
+    if (extendingTypeName) {
+      this.entries.push(new InputFieldMixinEntry({ field, extendingTypeName }));
+    } else {
+      this.entries.push(new InputFieldReferenceEntry({ field }));
+    }
+  }
+
+  protected appendImplementTypeExpression(node: NamedTypeNode, extendingTypeName?: string): void {
+    const interfaceType = this.completeTypeExpression(node, 'output');
+
+    if (extendingTypeName) {
+      this.entries.push(new ImplementMixinEntry({ extendingTypeName, interfaceType }));
+    } else {
+      this.entries.push(new ImplementReferenceEntry({ interfaceType,}))
+    }
   }
 }

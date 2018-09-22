@@ -1,7 +1,7 @@
 import { GraphQLScalarType, GraphQLString, GraphQLBoolean, GraphQLFloat, GraphQLInt, GraphQLID } from "graphql";
 
 import { Definition, DefinitionConfig } from "./Definition";
-import { MetadataStorage } from "./MetadataStorage";
+import { MetadataStorage, DefinitionEntry } from "../metadata";
 
 
 export interface ScalarTypeConfig extends DefinitionConfig {
@@ -35,9 +35,20 @@ export class IDScalar {}
  * @param storage
  */
 export function loadBuiltInScalar(storage: MetadataStorage) {
-  storage.register(new ScalarType({ typeInstance: GraphQLString }), StringScalar);
-  storage.register(new ScalarType({ typeInstance: GraphQLBoolean }), BooleanScalar);
-  storage.register(new ScalarType({ typeInstance: GraphQLFloat }), FloatScalar);
-  storage.register(new ScalarType({ typeInstance: GraphQLInt }), IntScalar);
-  storage.register(new ScalarType({ typeInstance: GraphQLID }), IDScalar);
+
+  storage.registerEntry(StringScalar, new DefinitionEntry({
+    metadata: new ScalarType({ typeInstance: GraphQLString }),
+  }));
+  storage.registerEntry(BooleanScalar, new DefinitionEntry({
+    metadata: new ScalarType({ typeInstance: GraphQLBoolean }),
+  }));
+  storage.registerEntry(FloatScalar, new DefinitionEntry({
+    metadata: new ScalarType({ typeInstance: GraphQLFloat }),
+  }));
+  storage.registerEntry(IntScalar, new DefinitionEntry({
+    metadata: new ScalarType({ typeInstance: GraphQLInt }),
+  }));
+  storage.registerEntry(IDScalar, new DefinitionEntry({
+    metadata: new ScalarType({ typeInstance: GraphQLID }),
+  }));
 }

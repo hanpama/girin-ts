@@ -1,6 +1,7 @@
 import { GraphQLFieldConfigMap, GraphQLTypeResolver, GraphQLInterfaceType, GraphQLFieldConfig } from "graphql";
 
-import { Definition, DefinitionConfig, MetadataStorage, FieldReferenceEntry } from "../base";
+import { MetadataStorage, FieldReferenceEntry, FieldMixinEntry } from "../metadata";
+import { Definition, DefinitionConfig } from "../definition/Definition";
 
 
 export interface InterfaceTypeConfig extends DefinitionConfig {
@@ -15,25 +16,28 @@ export class InterfaceType<T extends InterfaceTypeConfig = InterfaceTypeConfig> 
   public isOutputType() { return true; }
   public isInputType() { return false; }
 
-  public buildFieldConfig(storage: MetadataStorage, targetClass: Function, entry: FieldReferenceEntry): GraphQLFieldConfig<any, any> {
+  public buildFieldConfig(storage: MetadataStorage, entry: FieldReferenceEntry | FieldMixinEntry): GraphQLFieldConfig<any, any> {
     const { description, deprecationReason } = entry.field;
 
     return {
-      type: entry.field.buildType(storage, targetClass),
-      args: entry.field.buildArgs(storage, targetClass),
+      type: entry.field.buildType(storage, entry.definitionClass),
+      args: entry.field.buildArgs(storage, entry.definitionClass),
+      resolve: entry.field.buildResolver(storage, entry.definitionClass),
       description,
       deprecationReason,
-      resolve: entry.resolver,
     };
   }
 
   public buildFieldConfigMap(storage: MetadataStorage, targetClass: Function): GraphQLFieldConfigMap<any, any> {
-    const refs = storage.queryFieldReferences(targetClass);
+    const entries = [
+      ...storage.findMixinEntries(FieldMixinEntry, this.typeName),
+      ...storage.findReferenceEntries(FieldReferenceEntry, targetClass),
+    ];
     return (
-      refs.reduce((results, entry) => {
+      entries.reduce((results, entry) => {
         const name = entry.field.defaultName;
 
-        results[name] = this.buildFieldConfig(storage, targetClass, entry);
+        results[name] = this.buildFieldConfig(storage, entry);
         return results;
       }, {} as GraphQLFieldConfigMap<any, any>)
     );

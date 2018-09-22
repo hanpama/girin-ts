@@ -7,10 +7,6 @@ export function isLazy<T>(arg: Lazy<T> | any): arg is Lazy<T> {
   return (arg instanceof Function) && (arg.name === '');
 }
 
-export function isSubClassOf(cls: Function, superClass: Function) {
-  return cls.prototype instanceof superClass;
-}
-
 export interface ConcreteClass<T = any> {
   new(...args: any[]): T
 }

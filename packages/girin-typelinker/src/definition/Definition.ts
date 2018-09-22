@@ -1,5 +1,5 @@
 import { GraphQLNamedType } from "graphql";
-import { MetadataStorage } from "./MetadataStorage";
+import { MetadataStorage } from "../metadata";
 
 
 export interface DefinitionConfig {
@@ -30,6 +30,15 @@ export class Definition<TConfig extends DefinitionConfig = DefinitionConfig> {
 
   public get description(): string | undefined {
     return this.config.description;
+  }
+
+  protected graphqlType: GraphQLNamedType;
+
+  public getOrCreateTypeInstance(storage: MetadataStorage, targetClass: Function) {
+    if (!this.graphqlType) {
+      this.graphqlType = this.buildTypeInstance(storage, targetClass);
+    }
+    return this.graphqlType;
   }
 
   /**
