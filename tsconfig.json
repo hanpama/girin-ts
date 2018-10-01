@@ -1,13 +1,13 @@
 {
-  "version": "2.6.1",
   "compilerOptions": {
-      "lib": ["es5", "es6", "esnext.asynciterable", "dom"],
+      "lib": ["es5", "es6", "esnext.asynciterable"],
       "target": "es5",
       "module": "commonjs",
       "moduleResolution": "node",
       "allowJs": false,
       "emitDecoratorMetadata": true,
       "experimentalDecorators": true,
+      "downlevelIteration": true,
       "sourceMap": true,
       "noImplicitAny": true,
       "declaration": true,

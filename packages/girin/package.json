@@ -1,15 +1,13 @@
 {
-  "name": "girin",
+  "name": "@girin/girin",
   "version": "0.5.0-alpha.4",
   "description": "GraphQL bootstrapper up and running",
-  "main": "index.js",
-  "module": "index.js",
-  "types": "index.d.ts",
+  "main": "dist",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "test": "../../node_modules/.bin/jest",
-    "coverage": "../../node_modules/.bin/jest --coverage",
-    "build": "tsc -p ./tsconfig.publish.json",
-    "prepublish": "npm run build"
+    "clean": "rm -rf dist",
+    "prepare": "npm run clean && npm run compile",
+    "compile": "tsc"
   },
   "keywords": [
     "graphql"
@@ -28,33 +26,16 @@
   },
   "homepage": "https://github.com/hanpama/girin",
   "dependencies": {
-    "argon2": "^0.19.3",
+    "@girin/environment": "^0.5.0-alpha.4",
+    "@girin/typelinker": "^0.5.0-alpha.4",
     "@types/jsonwebtoken": "^7.2.8",
-    "jsonwebtoken": "^8.3.0",
-    "fast-deep-equal": "^2.0.1",
-    "dataloader": "^1.4.0",
     "@types/graphql-relay": "^0.4.7",
     "apollo-server": "^2.0.8",
     "apollo-upload-server": "^7.1.0",
-    "girin-typelinker": "^0.5.0-alpha.4"
-  },
-  "jest": {
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest"
-    },
-    "testMatch": [
-      "**/test/**/*.test.ts",
-      "**/test/*.test.ts"
-    ],
-    "testPathIgnorePatterns": [
-      "<rootDir>/node_modules/",
-      "<rootDir>/lib/",
-      "<rootDir>/test/fixtures/"
-    ],
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ]
+    "argon2": "^0.19.3",
+    "dataloader": "^1.4.0",
+    "fast-deep-equal": "^2.0.1",
+    "jsonwebtoken": "^8.3.0"
   },
   "gitHead": "7f87fc9641454bbe0e6367e5b1f15eea4a6fa956"
 }

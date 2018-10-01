@@ -1,0 +1,29 @@
+{
+  "name": "@girin/typelinker",
+  "version": "0.5.0-alpha.4",
+  "description": "Define GraphQL types linked to class",
+  "author": "Max Choi <hanpama@gmail.com>",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "clean": "rm -rf dist",
+    "prepare": "npm run clean && npm run compile",
+    "compile": "tsc"
+  },
+  "tags": [
+    "graphql"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hanpama/girin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hanpama/girin/issues"
+  },
+  "homepage": "https://github.com/hanpama/girin",
+  "license": "MIT",
+  "peerDependencies": {
+    "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0"
+  },
+  "gitHead": "7f87fc9641454bbe0e6367e5b1f15eea4a6fa956"
+}

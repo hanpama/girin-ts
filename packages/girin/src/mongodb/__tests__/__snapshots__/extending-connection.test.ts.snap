@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Extending connection generates schema as expected 1`] = `
+"type PageInfo {
+  hasNextPage: Boolean
+  hasPreviousPage: Boolean
+  startCursor: String
+  endCursor: String
+}
+
+type Post {
+  id: String!
+  title: String!
+}
+
+type PostConnection {
+  edges: PostEdge
+  pageInfo: PageInfo
+  count: Int
+}
+
+type PostEdge {
+  node: Post
+  cursor: String
+}
+
+type Query {
+  posts(first: Int, last: Int, before: String, after: String): PostConnection
+}
+"
+`;

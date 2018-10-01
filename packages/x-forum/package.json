@@ -1,0 +1,23 @@
+{
+  "name": "forum",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@girin/environment": "file:../../packages/environment",
+    "@girin/typelinker": "file:../../packages/typelinker",
+    "@girin/girin": "file:../../packages/girin",
+    "graphql": "^0.13.0",
+    "mongodb": "^3.1.4",
+    "ts-node": "^7.0.1",
+    "typescript": "^3.0.3"
+  }
+}

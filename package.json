@@ -1,26 +1,54 @@
 {
+  "name": "girin-project",
+  "private": true,
+  "license": "MIT",
   "scripts": {
     "bootstrap": "npm i && lerna bootstrap",
-    "test": "lerna run test",
-    "build": "lerna run build",
-    "coverage": "lerna run coverage",
+    "compile": "lerna run compile",
+    "test": "jest --verbose",
+    "test:ci": "npm run coverage -- --ci --maxWorkers=2  --reporters=default --reporters=jest-junit",
+    "testonly": "npm test",
+    "coverage": "npm test -- --coverage",
     "coverage:upload": "codecov",
     "docs": "docsify serve docs"
   },
+  "dependencies": {
+    "@girin/environment": "file:packages/environment",
+    "@girin/typelinker": "file:packages/typelinker",
+    "@girin/girin": "file:packages/girin"
+  },
   "devDependencies": {
-    "@types/graphql": "^14.0.0",
-    "@types/graphql-relay": "^0.4.6",
+    "@types/graphql": "^14.0.1",
+    "@types/graphql-relay": "^0.4.7",
     "@types/jest": "^23.3.2",
-    "@types/mongodb": "^3.1.7",
-    "@types/node": "^10.10.0",
+    "@types/mongodb": "^3.1.9",
+    "@types/node": "^10.11.1",
     "codecov": "^3.1.0",
     "graphql": "^14.0.2",
     "graphql-relay": "^0.5.5",
     "jest": "^23.6.0",
+    "jest-junit": "^5.1.0",
     "lerna": "^3.4.0",
     "mongodb": "^3.1.6",
-    "ts-jest": "^23.1.4",
+    "ts-jest": "^23.10.2",
     "typedoc": "^0.12.0",
-    "typescript": "3.0.3"
+    "typescript": "3.1.1",
+    "tslint": "^5.11.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    },
+    "testRegex": "/__tests__/.*\\.test\\.(js|ts)$",
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/dist/"
+    ],
+    "clearMocks": true
   }
 }
