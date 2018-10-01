@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "clean": "rm -rf dist",
-    "prepare": "npm run clean && npm run compile",
+    "build": "npm run clean && npm run compile",
     "compile": "tsc"
   },
   "keywords": [

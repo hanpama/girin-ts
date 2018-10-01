@@ -3,6 +3,7 @@
   "private": true,
   "license": "MIT",
   "scripts": {
+    "postinstall": "lerna run prepare",
     "bootstrap": "npm i && lerna bootstrap",
     "compile": "lerna run compile",
     "test": "jest --verbose",
@@ -11,11 +12,6 @@
     "coverage": "npm test -- --coverage",
     "coverage:upload": "codecov",
     "docs": "docsify serve docs"
-  },
-  "dependencies": {
-    "@girin/envirinment": "file:./packages/environment",
-    "@girin/typelinker": "file:./packages/typelinker",
-    "@girin/girin": "file:./packages/girin"
   },
   "devDependencies": {
     "@types/graphql": "^14.0.1",
