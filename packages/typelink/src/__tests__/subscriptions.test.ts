@@ -1,5 +1,6 @@
 import { GraphQLSchema, subscribe, parse } from "graphql";
 import { typedef, gql, getGraphQLType, Query } from "..";
+import { forAwaitEach } from 'iterall';
 
 
 @typedef(gql`
@@ -58,17 +59,16 @@ describe('Subscription', () => {
     `)});
 
     let countFromZero: number[] = [];
-    for (const resPromise of subsFromZero as any) {
-      const res = await resPromise;
+
+    await forAwaitEach(subsFromZero as any, (res: any) => {
       countFromZero.push(res.data.countUp);
-    }
+    })
     expect(countFromZero).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
 
     let countFromFive: number[] = [];
-    for (const resPromise of subsFromFive as any) {
-      const res = await resPromise;
+    await forAwaitEach(subsFromFive as any, (res: any) => {
       countFromFive.push(res.data.countUp);
-    }
+    })
     expect(countFromFive).toEqual([5, 6, 7, 8, 9]);
   });
 
