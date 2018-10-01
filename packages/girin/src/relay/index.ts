@@ -1,4 +1,4 @@
-import { typedef, gql } from "@girin/typelinker";
+import { typedef, gql } from "@girin/typelink";
 
 export interface ConnectionArguments {
   first?: number | null;

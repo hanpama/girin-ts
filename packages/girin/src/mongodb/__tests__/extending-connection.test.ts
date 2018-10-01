@@ -1,4 +1,4 @@
-import { typedef, gql, getGraphQLType } from "@girin/typelinker";
+import { typedef, gql, getGraphQLType } from "@girin/typelink";
 import { printSchema, GraphQLSchema } from "graphql";
 
 import { ModelConnection, field, Model } from "..";

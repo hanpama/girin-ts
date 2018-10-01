@@ -1,6 +1,6 @@
 import { cleanUpTestEnv, prepareTestEnv } from "./testenv";
 import { BaseUser } from "..";
-import { typedef, gql } from "@girin/typelinker";
+import { typedef, gql } from "@girin/typelink";
 import { field } from "../../mongodb";
 
 

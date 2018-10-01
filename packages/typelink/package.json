@@ -1,13 +1,13 @@
 {
-  "name": "@girin/typelinker",
+  "name": "@girin/typelink",
   "version": "0.5.0-alpha.4",
   "description": "Define GraphQL types linked to class",
   "author": "Max Choi <hanpama@gmail.com>",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./index.js",
+  "types": "./index.d.ts",
   "scripts": {
-    "clean": "rm -rf dist",
-    "build": "npm run clean && npm run compile",
+    "prepublish": "npm run build",
+    "build": "npm run compile",
     "compile": "tsc"
   },
   "tags": [

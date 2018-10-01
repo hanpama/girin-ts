@@ -1,5 +1,5 @@
 import { fetch } from "apollo-server-env";
-import { typedef, gql } from '@girin/typelinker';
+import { typedef, gql } from '@girin/typelink';
 import { introspectionQuery } from "graphql";
 
 import SchemaModule from "../core/schema";

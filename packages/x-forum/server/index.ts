@@ -1,5 +1,5 @@
 import { app } from '@girin/girin';
-import { Query, Mutation } from '@girin/typelinker';
+import { Query, Mutation } from '@girin/typelink';
 import { User } from './models';
 
 

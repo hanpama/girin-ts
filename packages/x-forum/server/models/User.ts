@@ -1,4 +1,4 @@
-import { typedef, gql,  } from '@girin/typelinker';
+import { typedef, gql,  } from '@girin/typelink';
 import { BaseUser } from '@girin/girin/dist/auth-local'
 import { ObjectIDType, field } from '@girin/girin/dist/mongodb';
 

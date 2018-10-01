@@ -9,7 +9,7 @@
 //   FieldReferenceEntry,
 //   DefinitionEntry,
 //   FieldMixinEntry,
-// } from "@girin/typelinker";
+// } from "@girin/typelink";
 
 // import { Connection, Edge } from "./base";
 

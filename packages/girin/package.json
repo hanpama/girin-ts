@@ -5,8 +5,8 @@
   "main": "dist",
   "types": "dist/index.d.ts",
   "scripts": {
-    "clean": "rm -rf dist",
-    "build": "npm run clean && npm run compile",
+    "prepublish": "npm run build",
+    "build": "npm run compile",
     "compile": "tsc"
   },
   "keywords": [
@@ -27,7 +27,7 @@
   "homepage": "https://github.com/hanpama/girin",
   "dependencies": {
     "@girin/environment": "^0.5.0-alpha.4",
-    "@girin/typelinker": "^0.5.0-alpha.4",
+    "@girin/typelink": "^0.5.0-alpha.4",
     "@types/jsonwebtoken": "^7.2.8",
     "@types/graphql-relay": "^0.4.7",
     "apollo-server": "^2.1.0",

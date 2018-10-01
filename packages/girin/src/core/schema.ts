@@ -1,6 +1,6 @@
 import { GraphQLSchemaConfig, GraphQLNamedType } from "graphql";
 import { Module } from "@girin/environment";
-import { TypeArg, getGraphQLType } from "@girin/typelinker";
+import { TypeArg, getGraphQLType } from "@girin/typelink";
 import { GraphQLSchema } from "graphql";
 import { GraphQLDirective } from "graphql";
 
