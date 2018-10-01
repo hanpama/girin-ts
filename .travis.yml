@@ -14,5 +14,5 @@ before_script:
   - docker-compose up -d
 
 script:
-  - npm run coverage
+  - npm run test:ci
   - npm run coverage:upload
