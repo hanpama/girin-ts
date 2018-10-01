@@ -12,6 +12,11 @@
     "coverage:upload": "codecov",
     "docs": "docsify serve docs"
   },
+  "dependencies": {
+    "@girin/envirinment": "file:./packages/environment",
+    "@girin/typelinker": "file:./packages/typelinker",
+    "@girin/girin": "file:./packages/girin"
+  },
   "devDependencies": {
     "@types/graphql": "^14.0.1",
     "@types/graphql-relay": "^0.4.7",

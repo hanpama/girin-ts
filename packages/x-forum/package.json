@@ -12,9 +12,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@girin/environment": "file:../../packages/environment",
-    "@girin/typelinker": "file:../../packages/typelinker",
-    "@girin/girin": "file:../../packages/girin",
+    "@girin/environment": "0.5.0-alpha.4",
+    "@girin/typelinker": "0.5.0-alpha.4",
+    "@girin/girin": "0.5.0-alpha.4",
     "graphql": "^0.13.0",
     "mongodb": "^3.1.4",
     "ts-node": "^7.0.1",

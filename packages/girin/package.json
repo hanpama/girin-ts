@@ -30,7 +30,7 @@
     "@girin/typelinker": "^0.5.0-alpha.4",
     "@types/jsonwebtoken": "^7.2.8",
     "@types/graphql-relay": "^0.4.7",
-    "apollo-server": "^2.0.8",
+    "apollo-server": "^2.1.0",
     "apollo-upload-server": "^7.1.0",
     "argon2": "^0.19.3",
     "dataloader": "^1.4.0",
