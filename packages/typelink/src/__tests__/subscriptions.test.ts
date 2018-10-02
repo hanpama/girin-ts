@@ -61,9 +61,6 @@ describe('Subscription', () => {
       }
     `)}) as AsyncIterator<any>;
 
-    console.log(subsFromZero, subsFromZero.constructor, typeof subsFromZero);
-    console.log(subsFromOne);
-
     expect(await subsFromZero.next()).toEqual({
       done: false, value: { data: { countUp: 0 } },
     });
