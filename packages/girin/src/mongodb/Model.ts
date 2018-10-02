@@ -1,4 +1,4 @@
-import { FilterQuery, CollectionInsertOneOptions, ReplaceOneOptions, CommonOptions, ObjectID, FindAndModifyWriteOpResultObject } from 'MongoDB';
+import { FilterQuery, CollectionInsertOneOptions, ReplaceOneOptions, CommonOptions, ObjectID, FindAndModifyWriteOpResultObject } from 'mongodb';
 import { ModelManager } from './ModelManager';
 
 
@@ -54,9 +54,9 @@ export class Model {
     return this.getManager().collection.findOne(query).then(this.create.bind(this));
   }
 
-  public static async findMany<TModel extends Model>(this: ModelClass<TModel>, query: FilterQuery<TModel>): Promise<(TModel | null)[]> {
+  public static async findMany<TModel extends Model>(this: ModelClass<TModel>, query: FilterQuery<TModel>): Promise<TModel[]> {
     const docs = await this.getManager().collection.find(query).toArray();
-    return docs.map(doc => this.create(doc));
+    return docs.map(doc => this.create(doc)!);
   }
 
   public static async getOne<TModel extends Model> (this: ModelClass<TModel>, id: any): Promise<TModel | null> {

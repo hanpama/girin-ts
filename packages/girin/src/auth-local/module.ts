@@ -21,10 +21,14 @@ export default class AuthLocalModule extends Module<AuthLocalModuleConfigs, void
   async bootstrap() {
     const mongoDBModule = await this.environment.bootstrap(MongoDBModule);
     const collection = mongoDBModule.db.collection(this.configs.AUTH_MODEL.collectionName);
-    await collection.createIndexes([
-      { key: { username: 1 }, unique: true, sparse: true },
-      { key: { 'email.address': 1 }, unique: true, sparse: true },
-    ]);
+    try {
+      await collection.createIndexes([
+        { key: { username: 1 }, unique: true, sparse: true },
+        { key: { 'email.address': 1 }, unique: true, sparse: true },
+      ]);
+    } catch(e) {
+      console.warn(e);
+    }
   }
   configure() {
     this.PASSWORD_SALT = this.configs.AUTH_PASSWORD_SALT;
@@ -35,7 +39,12 @@ export default class AuthLocalModule extends Module<AuthLocalModuleConfigs, void
     serverModule.context = async (prevContext: any) => {
       const context = await innerFn(prevContext);
       const token = context.req.headers.authorization;
-      const user = token ? await this.configs.AUTH_MODEL.fromToken(token) : null;
+      let user: any;
+      try {
+        user = await this.configs.AUTH_MODEL.fromToken(token);
+      } catch(e) {
+        user = null;
+      }
       return { user, ...context };
     }
   }

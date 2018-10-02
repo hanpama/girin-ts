@@ -30,8 +30,10 @@ export class ModelManager<T extends Model> {
 
   batchQuery = async (keys: ObjectID[]) => {
     const res = await this.collection.find({ _id: { $in: keys }}).toArray();
+    // if the returned array has same length with keys, no problem
     if (res.length === keys.length) { return res; }
 
+    // but when its length smaller than keys' we should find which key has no matched document
     const cks = new CompositeKeySorter<ObjectID>(res.map(doc => doc._id), compareObjectID);
     return keys.map(key => {
       const idx = cks.indexOf(key);
@@ -41,9 +43,7 @@ export class ModelManager<T extends Model> {
 
   get db(): Db {
     const { dbName, client } = this.module;
-    if (!client) {
-      throw new Error('No Client is provided');
-    }
+    if (!client) { throw new Error('No Client is provided'); }
     return client.db(dbName);
   }
 
