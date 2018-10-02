@@ -7,7 +7,7 @@
     "bootstrap": "npm i && lerna bootstrap",
     "compile": "lerna run compile",
     "test": "jest --verbose",
-    "test:ci": "npm run coverage -- --ci --maxWorkers=2 --runInBand",
+    "test:ci": "npm run coverage -- --ci --runInBand",
     "testonly": "npm test",
     "coverage": "npm test -- --coverage",
     "coverage:upload": "codecov",
