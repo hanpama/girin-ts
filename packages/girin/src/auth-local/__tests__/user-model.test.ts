@@ -1,7 +1,6 @@
 import { cleanUpTestEnv, prepareTestEnv } from "./testenv";
 import { BaseUser } from "..";
 import { typedef, gql } from "@girin/typelink";
-import { field } from "../../mongodb";
 
 
 @typedef(gql`
@@ -16,12 +15,10 @@ class Query {
 describe('BaseUser', () => {
   class User extends BaseUser {
     static collectionName = 'base-user-test';
-
-    @field() public username: string;
   }
 
   beforeAll(async () => {
-    await prepareTestEnv(Query);
+    await prepareTestEnv(User, Query);
   });
   afterAll(async () => {
     await User.getManager().db.dropCollection(User.collectionName);
@@ -41,7 +38,7 @@ describe('BaseUser', () => {
 
     // creating token
     const token = await user.encodeToken('mystrongpassword');
-    const userFromToken = await User.decodeToken(token);
+    const userFromToken = await User.fromToken(token);
 
     expect(userFromToken._id.equals(user._id)).toBeTruthy();
 

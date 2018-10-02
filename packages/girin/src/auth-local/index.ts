@@ -18,13 +18,24 @@ export type BaseUserClass<T extends BaseUser> = typeof BaseUser & {
   new(source: any): T;
 }
 
-export class BaseUser extends Model {
+export class CreateUserInput {
+  username: string;
+  profile: any;
+}
 
-  @field()
-  protected hashedPassword: string;
+/**
+ * Base class for user model
+ */
+export class BaseUser<TProfile = any> extends Model {
 
-  public static async createUserWithPassword(source: { [fieldName: string]: any }, password: string) {
+  @field() protected hashedPassword: string;
 
+  @field() public username: string;
+  @field() public createdAt: Date;
+  // @field() public profile: TProfile;
+  // @field() public emails: Array<{ address: string, verified: boolean }>;
+
+  public static async createUserWithPassword(source: { username: string }, password: string) {
     const hashedPassword = await argon2.hash(password + getPasswordSalt());
     const user = await this.insert({ hashedPassword, ...source });
     return user;
@@ -47,15 +58,16 @@ export class BaseUser extends Model {
     if (!authenticated) {
       throw new Error('Authentication Error');
     }
-    const { hashedPassword, ...rest } = this.$source;
-    return jwt.sign(rest, getJWTSecretKey());
+    return jwt.sign({ _id: this._id }, getJWTSecretKey());
   }
 
-  public static decodeToken<T extends BaseUser>(this: BaseUserClass<T>, token: string): T {
-    const result: any = jwt.verify(token, getJWTSecretKey());
-    console.log(result);
-    const user = new this(result);
-    user._id = new ObjectID(result._id);
+  public static async fromToken<T extends BaseUser>(this: BaseUserClass<T>, token: string): Promise<T> {
+    const { _id }: any = jwt.verify(token, getJWTSecretKey());
+    const user = await this.getOne(new ObjectID(_id));
+
+    if (!user) {
+      throw new Error('Authentication Error');
+    }
     return user;
   }
 }

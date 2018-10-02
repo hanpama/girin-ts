@@ -8,11 +8,9 @@ import * as net from 'net';
 import SchemaModule from './schema';
 
 
-
 export interface ServerModuleConfigs {
   SERVER_APOLLO?: Pick<ApolloServerConfig,
     'schemaDirectives' |
-    'context' |
     'introspection' |
     'mocks' |
     'mockEntireSchema' |
@@ -29,7 +27,7 @@ export interface ServerModuleConfigs {
 
 export default class ServerModule extends Module<ServerModuleConfigs, http.Server> {
   public app: express.Express;
-  public context: (context: { req: any }) => { req: any } = ctx => ctx;
+  public context: (context: { req: any }) => any = ctx => ctx;
 
   protected apolloServer: ApolloServer;
   protected httpServer: http.Server;
@@ -55,11 +53,11 @@ export default class ServerModule extends Module<ServerModuleConfigs, http.Serve
   }
 
   async bootstrap() {
-    const { configs, environment } = this;
+    const { configs, environment, context } = this;
     const schema = await environment.bootstrap(SchemaModule);
     const apolloServerConfig = this.configs.SERVER_APOLLO || {};
 
-    this.apolloServer = new ApolloServer({ ...apolloServerConfig, schema });
+    this.apolloServer = new ApolloServer({ ...apolloServerConfig, schema, context });
     this.apolloServer.applyMiddleware({
       app: this.app,
       path: '/',

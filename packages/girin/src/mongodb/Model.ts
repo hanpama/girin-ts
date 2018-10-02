@@ -1,4 +1,4 @@
-import { FilterQuery, CollectionInsertOneOptions, ReplaceOneOptions, CommonOptions, ObjectID, FindAndModifyWriteOpResultObject } from 'mongodb';
+import { FilterQuery, CollectionInsertOneOptions, ReplaceOneOptions, CommonOptions, ObjectID, FindAndModifyWriteOpResultObject } from 'MongoDB';
 import { ModelManager } from './ModelManager';
 
 
@@ -8,6 +8,13 @@ export type ModelClass<TModel extends Model> = typeof Model & {
   new(source: any): TModel;
 }
 
+/**
+ * Model object acts as a container of document including _id
+ * with useful static and prototype methods for dealing with data.
+ *
+ * The prototype methods has names starting with dollar sign($) to
+ * avoid name collision in GraphQL type.
+ */
 export class Model {
   static limit: number = 50;
 
@@ -63,8 +70,14 @@ export class Model {
 
   public set _id(value: ObjectID) { this.$source._id = value; }
   public get _id() { return this.$source._id; }
+  /**
+   * proxy getter for the document's _id
+   */
   public get id() { return this.$source._id; }
 
+  /**
+   * state object of the model object
+   */
   protected $source: Document;
   constructor(source?: Document) {
     this.$source = source || {};
@@ -73,12 +86,22 @@ export class Model {
   ///////////////////////////////////////////
   // model methods
   //
+  /**
+   * Update this model's state with a document fetched from database
+   */
   public async $pull(): Promise<this> {
+    if (!this._id) {
+      throw new Error('Cannot pull the document: the model object has no _id')
+    }
     const doc = await this.$getManager().dataloader.load(this._id);
     this.$source = doc;
     return this;
   }
 
+  /**
+   * If this model has _id, try to $set model's state to the corresponding document.
+   * if not, insert the model's state to collection.
+   */
   public async $save(): Promise<this> {
     const { collection } = this.$getManager();
     const { $source } = this;
@@ -93,6 +116,11 @@ export class Model {
     return this;
   }
 
+  /**
+   * Update this model object with update operator
+   * @param operators update operator
+   * @param options MongoDB update operation options
+   */
   public async $update(operators: Object, options?: ReplaceOneOptions): Promise<FindAndModifyWriteOpResultObject> {
     const { _id } = this.$source;
     if (!_id) {
@@ -104,6 +132,10 @@ export class Model {
     // return this;
   }
 
+  /**
+   * Delete model's corresponding document in collection
+   * @param options MongoDB delete opration options
+   */
   public async $delete(options?: CommonOptions & { bypassDocumentValidation?: boolean }): Promise<ObjectID> {
     const { _id } = this;
     if (!_id) { throw new Error('Cannot delete a model instance with no _id'); }
