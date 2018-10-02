@@ -1,6 +1,5 @@
 import { GraphQLSchema, subscribe, parse } from "graphql";
 import { typedef, gql, getGraphQLType, Query } from "..";
-import { forAwaitEach } from 'iterall';
 
 
 @typedef(gql`
@@ -30,7 +29,7 @@ class Foo {
 `)
 class Subscription {
   static async *countUp(_source: null, args: { from: number }) {
-    for(let i = args.from || 0; i < 10; i++) {
+    for (let i = args.from || 0; i < 3; i++) {
       yield i;
     }
   }
@@ -52,24 +51,34 @@ describe('Subscription', () => {
       }
     `)}) as AsyncIterator<any>;
 
-    const subsFromFive = await subscribe({ schema, document: parse(`
+    const subsFromOne = await subscribe({ schema, document: parse(`
       subscription {
-        countUp(from: 5)
+        countUp(from: 1)
       }
-    `)});
+    `)}) as AsyncIterator<any>;
 
-    let countFromZero: number[] = [];
+    expect(await subsFromZero.next()).toEqual({
+      done: false, value: { data: { countUp: 0 } },
+    });
+    expect(await subsFromZero.next()).toEqual({
+      done: false, value: { data: { countUp: 1 } },
+    });
+    expect(await subsFromZero.next()).toEqual({
+      done: false, value: { data: { countUp: 2 } },
+    });
+    expect(await subsFromZero.next()).toEqual({
+      done: true,
+    });
 
-    await forAwaitEach(subsFromZero as any, (res: any) => {
-      countFromZero.push(res.data.countUp);
-    })
-    expect(countFromZero).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
-
-    let countFromFive: number[] = [];
-    await forAwaitEach(subsFromFive as any, (res: any) => {
-      countFromFive.push(res.data.countUp);
-    })
-    expect(countFromFive).toEqual([5, 6, 7, 8, 9]);
+    expect(await subsFromOne.next()).toEqual({
+      done: false, value: { data: { countUp: 1 } },
+    });
+    expect(await subsFromOne.next()).toEqual({
+      done: false, value: { data: { countUp: 2 } },
+    });
+    expect(await subsFromOne.next()).toEqual({
+      done: true,
+    });
   });
 
   it('instantiates input objects', async () => {
@@ -79,7 +88,11 @@ describe('Subscription', () => {
       }
     `)}) as AsyncIterator<any>;
 
-    const instantiated = await subs.next();
-    expect(instantiated).toBeTruthy();
-  })
+    expect(await subs.next()).toEqual({
+      done: false, value: { data: { inputIsInstantiated: true } },
+    });
+    expect(await subs.next()).toEqual({
+      done: true,
+    });
+  });
 });
