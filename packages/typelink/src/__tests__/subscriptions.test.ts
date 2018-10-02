@@ -1,6 +1,8 @@
 import { GraphQLSchema, subscribe, parse } from "graphql";
 import { typedef, gql, getGraphQLType, Query } from "..";
 
+import { createAsyncIterator } from 'iterall';
+
 
 @typedef(gql`
   extend type Subscription {
@@ -11,8 +13,8 @@ import { typedef, gql, getGraphQLType, Query } from "..";
   }
 `)
 class Foo {
-  static async *inputIsInstantiated(_source: null, args: { foo: Foo }) {
-    yield args.foo instanceof this;
+  static inputIsInstantiated(_source: null, args: { foo: Foo }) {
+    return createAsyncIterator([args.foo instanceof this]);
   }
 
   field: number;
@@ -28,10 +30,12 @@ class Foo {
   }
 `)
 class Subscription {
-  static async *countUp(_source: null, args: { from: number }) {
+  static countUp(_source: null, args: { from: number }) {
+    const numbers = [];
     for (let i = args.from || 0; i < 3; i++) {
-      yield i;
+      numbers.push(i);
     }
+    return createAsyncIterator(numbers);
   }
 
   static hello() { return 'subscriptions'; }
@@ -56,6 +60,9 @@ describe('Subscription', () => {
         countUp(from: 1)
       }
     `)}) as AsyncIterator<any>;
+
+    console.log(subsFromZero, subsFromZero.constructor, typeof subsFromZero);
+    console.log(subsFromOne);
 
     expect(await subsFromZero.next()).toEqual({
       done: false, value: { data: { countUp: 0 } },
