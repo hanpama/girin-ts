@@ -1,10 +1,10 @@
 import { GraphQLSchema, subscribe, parse } from "graphql";
-import { typedef, gql, getGraphQLType, Query } from "..";
+import { defineType, gql, getType, Query } from "..";
 
 import { createAsyncIterator } from 'iterall';
 
 
-@typedef(gql`
+@defineType(gql`
   extend type Subscription {
     inputIsInstantiated(foo: ${Foo}): Boolean
   }
@@ -20,7 +20,7 @@ class Foo {
   field: number;
 }
 
-@typedef(gql`
+@defineType(gql`
   type Subscription {
     countUp(from: Int): Int
   }
@@ -42,9 +42,9 @@ class Subscription {
 }
 
 const schema = new GraphQLSchema({
-  query: getGraphQLType(Query),
-  subscription: getGraphQLType(Subscription),
-  types: [getGraphQLType(Foo)],
+  query: getType(Query),
+  subscription: getType(Subscription),
+  types: [getType(Foo)],
 });
 
 describe('Subscription', () => {

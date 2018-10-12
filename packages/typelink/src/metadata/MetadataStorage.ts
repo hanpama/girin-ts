@@ -41,7 +41,7 @@ export class MetadataStorage {
    * Get a [[Definition]] object which is instance of the `metadataClass` and associated to `linkedClass`
    * @param metadataClass A [[Definition]] subclass to query
    * @param targetClassOrName A class associated with metadata to query
-   * @param asOutput
+   * @param asKind
    */
   getDefinition<T extends Definition<U>, U>(metadataClass: { new (...args: any[]): T; }, targetClassOrName: Function | string, asKind: TypeExpressionKind) {
     const entry = this.findEntries(DefinitionEntry).find(entry => {

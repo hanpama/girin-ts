@@ -41,8 +41,8 @@ export class ImplementMixinEntry extends Entry<ImplementMixinEntry> {
 }
 
 export type ReferenceEntry = FieldReferenceEntry | InputFieldReferenceEntry | ImplementReferenceEntry;
-export type MixinEntry = FieldMixinEntry | InputFieldMixinEntry | ImplementMixinEntry;
 
+export type MixinEntry = FieldMixinEntry | InputFieldMixinEntry | ImplementMixinEntry;
 
 export function property(prototype: any, propertyKey: string) {
   const get = function() {

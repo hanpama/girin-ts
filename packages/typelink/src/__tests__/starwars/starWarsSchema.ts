@@ -1,7 +1,7 @@
 import { GraphQLEnumType, GraphQLSchema } from "graphql";
 
 import { getFriends, getHero, getHuman, getDroid, EpisodeValue, CharacterSource, HumanSource, DroidSource } from "./starWarsData";
-import { getGraphQLType, typedef, gql } from '../..';
+import { getType, defineType, gql } from '../..';
 import { ResolverContext, source } from "../../utilities/ResolverContext";
 
 
@@ -25,7 +25,7 @@ const episodeEnum = new GraphQLEnumType({
 });
 
 
-@typedef(gql`
+@defineType(gql`
 """
 A character in the Star Wars Trilogy
 """
@@ -85,7 +85,7 @@ abstract class Character<TSource extends CharacterSource> extends ResolverContex
 }
 
 
-@typedef(gql`
+@defineType(gql`
   """
   A humanoid creature in the Star Wars universe.
   """
@@ -103,7 +103,7 @@ class Human extends Character<HumanSource> {
 }
 
 
-@typedef(gql`
+@defineType(gql`
   """
   A mechanical creature in the Star Wars universe.
   """
@@ -122,7 +122,7 @@ class Droid extends Character<DroidSource> {
 }
 
 
-@typedef(gql`
+@defineType(gql`
   type Query {
     hero(
       """If omitted, returns the hero of the whole saga. If provided, returns the hero of that particular episode."""
@@ -155,9 +155,9 @@ class Query {
 }
 
 export const StarWarsSchema = new GraphQLSchema({
-  query: getGraphQLType(Query),
+  query: getType(Query),
   types: [
-    getGraphQLType(Human),
-    getGraphQLType(Droid),
+    getType(Human),
+    getType(Droid),
   ]
 });

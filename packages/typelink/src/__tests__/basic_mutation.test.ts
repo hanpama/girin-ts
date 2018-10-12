@@ -1,9 +1,9 @@
 import { graphql, GraphQLSchema, printSchema } from 'graphql';
 
-import { getGraphQLType, gql, typedef } from '..';
+import { getType, gql, defineType } from '..';
 
 
-@typedef(gql`
+@defineType(gql`
   type Member {
     id: Int!
     name: String!
@@ -18,7 +18,7 @@ class Member {
   ){ }
 }
 
-@typedef(gql`
+@defineType(gql`
   type Query {
     getMember: ${Member}! @resolver
   }
@@ -29,7 +29,7 @@ class Query {
   }
 }
 
-@typedef(gql`
+@defineType(gql`
   type Mutation {
     createMember(name: String!, email: String!): ${Member}!
   }
@@ -41,8 +41,8 @@ class Mutation {
 }
 
 const schema = new GraphQLSchema({
-  query: getGraphQLType(Query),
-  mutation: getGraphQLType(Mutation),
+  query: getType(Query),
+  mutation: getType(Mutation),
 });
 
 

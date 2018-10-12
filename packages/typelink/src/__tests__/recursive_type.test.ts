@@ -1,6 +1,6 @@
 import { graphql, GraphQLSchema, printSchema } from 'graphql';
 
-import { getGraphQLType, gql, typedef } from '..';
+import { getType, gql, defineType } from '..';
 
 
 interface MemberSource {
@@ -15,7 +15,7 @@ const members: MemberSource[] = [
   { id: 1, name: 'Jonghyun', email: 'j@example.com', friendId: 0 },
 ]
 
-@typedef(gql`
+@defineType(gql`
   type Member {
     id: Int!
     name: String!
@@ -44,7 +44,7 @@ class Member {
   }
 }
 
-@typedef(gql`
+@defineType(gql`
   type Query {
     getMember(id: Int!): ${Member}
   }
@@ -55,7 +55,7 @@ class Query {
   }
 }
 
-const schema = new GraphQLSchema({ query: getGraphQLType(Query) });
+const schema = new GraphQLSchema({ query: getType(Query) });
 
 describe('Schema generation and query of recursive types', async () => {
 

@@ -1,6 +1,7 @@
 import { MetadataStorage, DefinitionEntry } from "../metadata";
 import { ObjectType } from "./ObjectType";
 
+
 /**
  * Fallback class for Query type.
  *

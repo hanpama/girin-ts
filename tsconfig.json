@@ -1,21 +1,9 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-      "lib": ["es5", "es6", "esnext.asynciterable"],
-      "target": "es5",
-      "module": "commonjs",
-      "moduleResolution": "node",
-      "allowJs": false,
-      "emitDecoratorMetadata": true,
-      "experimentalDecorators": true,
-      "downlevelIteration": true,
-      "sourceMap": true,
-      "noImplicitAny": true,
-      "declaration": true,
-      "noFallthroughCasesInSwitch": true,
-      "noImplicitReturns": true,
-      "stripInternal": true,
-      "pretty": true,
-      "strictNullChecks": true,
-      "noUnusedLocals": true
-  }
+    "noEmit": true
+  },
+  "include": [
+    "packages/*/src"
+  ]
 }

@@ -1,0 +1,42 @@
+{
+  "name": "@girin/framework",
+  "version": "0.5.0-alpha.4",
+  "description": "GraphQL bootstrapper up and running",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "prepublish": "npm run build",
+    "build": "npm run compile",
+    "compile": "tsc"
+  },
+  "keywords": [
+    "graphql"
+  ],
+  "license": "MIT",
+  "author": "Max Choi <hanpama@gmail.com>",
+  "tags": [
+    "graphql"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hanpama/girin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hanpama/girin/issues"
+  },
+  "homepage": "https://github.com/hanpama/girin",
+  "dependencies": {
+    "@girin/typelink": "^0.5.0-alpha.4",
+    "@girin/environment": "^0.5.0-alpha.4",
+    "@girin/mongodb": "^0.5.0-alpha.4",
+    "@types/express": "^4.16.0",
+    "@types/jsonwebtoken": "^7.2.8",
+    "@types/graphql-relay": "^0.4.7",
+    "apollo-server-express": "^2.1.0",
+    "apollo-upload-server": "^7.1.0",
+    "argon2": "^0.19.3",
+    "express": "^4.16.4",
+    "jsonwebtoken": "^8.3.0"
+  },
+  "gitHead": "7f87fc9641454bbe0e6367e5b1f15eea4a6fa956"
+}

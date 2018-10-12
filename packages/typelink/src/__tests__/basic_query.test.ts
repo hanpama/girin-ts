@@ -1,6 +1,6 @@
 import { graphql, GraphQLSchema, printSchema } from 'graphql';
 
-import { getGraphQLType, gql, typedef } from '..';
+import { getType, gql, defineType } from '..';
 
 import { ResolverContext, source } from '../utilities/ResolverContext';
 
@@ -9,7 +9,7 @@ interface TestSource {
   fieldWithDefaultResolver?: string;
 }
 
-@typedef(gql`
+@defineType(gql`
   type Test {
     """description1"""
     resolverGotDefinitionInstance: Boolean!
@@ -33,7 +33,7 @@ class Test extends ResolverContext<TestSource> {
   @source() fieldWithDefaultResolver?: string;
 }
 
-@typedef(gql`
+@defineType(gql`
   type Query {
     test: ${Test}
     erroneousTest: ${Test}
@@ -49,7 +49,7 @@ class Query extends ResolverContext {
   }
 }
 
-const schema = new GraphQLSchema({ query: getGraphQLType(Query) });
+const schema = new GraphQLSchema({ query: getType(Query) });
 
 
 describe('Basic queries and schema generation', async () => {

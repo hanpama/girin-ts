@@ -7,10 +7,10 @@ import {
   GraphQLEnumType
 } from "graphql";
 
-import { getGraphQLType, gql, typedef } from '..';
+import { getType, gql, defineType } from '..';
 
 
-@typedef(gql`
+@defineType(gql`
   type ItemInfo {
     description: String
   }
@@ -31,7 +31,7 @@ const itemType = new GraphQLObjectType({
       }
     },
     info: {
-      type: getGraphQLType(ItemInfo),
+      type: getType(ItemInfo),
       resolve() { return new ItemInfo(); }
     }
   }
@@ -42,7 +42,7 @@ const bazEnum = new GraphQLEnumType({
   values: { A: {}, B: {}, C: {}, }
 });
 
-@typedef(gql`
+@defineType(gql`
   type Query {
     item: ${itemType}
     nonNullItem: ${itemType}!
@@ -62,7 +62,7 @@ class Query {
 }
 
 const schema = new GraphQLSchema({
-  query: getGraphQLType(Query)
+  query: getType(Query)
 });
 
 describe('field with GraphQLType', () => {

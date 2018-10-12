@@ -1,0 +1,36 @@
+{
+  "name": "@girin/mongodb",
+  "version": "0.5.0-alpha.4",
+  "description": "Lightweight MongoDB model for Girin",
+  "main": "dist",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "prepublish": "npm run build",
+    "build": "npm run compile",
+    "compile": "tsc"
+  },
+  "keywords": [
+    "graphql"
+  ],
+  "license": "MIT",
+  "author": "Max Choi <hanpama@gmail.com>",
+  "tags": [
+    "graphql"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hanpama/girin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hanpama/girin/issues"
+  },
+  "homepage": "https://github.com/hanpama/girin",
+  "dependencies": {
+    "@girin/environment": "^0.5.0-alpha.4",
+    "@girin/typelink": "^0.5.0-alpha.4",
+    "@girin/relay": "^0.5.0-alpha.4",
+    "dataloader": "^1.4.0",
+    "fast-deep-equal": "^2.0.1"
+  },
+  "gitHead": "7f87fc9641454bbe0e6367e5b1f15eea4a6fa956"
+}

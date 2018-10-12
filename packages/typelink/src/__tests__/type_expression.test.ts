@@ -1,6 +1,6 @@
 import { GraphQLList, GraphQLScalarType } from 'graphql';
 
-import { getGlobalMetadataStorage, List, TypeExpression,  gql, typedef } from '..';
+import { getGlobalMetadataStorage, List, TypeExpression,  gql, defineType } from '..';
 
 
 describe('createFromTypeString', () => {
@@ -25,7 +25,7 @@ describe('createFromTypeString', () => {
   });
 
   it('resolves explicit output/input type expression', () => {
-    @typedef(gql`
+    @defineType(gql`
       type Person {
         name: String!
         email: String

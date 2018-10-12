@@ -1,7 +1,7 @@
 {
-  "name": "@girin/girin",
+  "name": "girin",
   "version": "0.5.0-alpha.4",
-  "description": "GraphQL bootstrapper up and running",
+  "description": "GraphQL Server Framework: Build better GraphQL schema with less code",
   "main": "dist",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -26,16 +26,7 @@
   },
   "homepage": "https://github.com/hanpama/girin",
   "dependencies": {
-    "@girin/environment": "^0.5.0-alpha.4",
-    "@girin/typelink": "^0.5.0-alpha.4",
-    "@types/jsonwebtoken": "^7.2.8",
-    "@types/graphql-relay": "^0.4.7",
-    "apollo-server": "^2.1.0",
-    "apollo-upload-server": "^7.1.0",
-    "argon2": "^0.19.3",
-    "dataloader": "^1.4.0",
-    "fast-deep-equal": "^2.0.1",
-    "jsonwebtoken": "^8.3.0"
+    "@girin/framework": "^0.5.0-alpha.4"
   },
   "gitHead": "7f87fc9641454bbe0e6367e5b1f15eea4a6fa956"
 }

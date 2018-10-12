@@ -1,7 +1,7 @@
 {
   "name": "@girin/environment",
   "version": "0.5.0-alpha.4",
-  "description": "Simple dependency injection manager for Girin",
+  "description": "Environment and module base for Girin: GraphQL server framework",
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {

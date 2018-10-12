@@ -1,9 +1,9 @@
 import { GraphQLSchema, graphql, printSchema } from "graphql";
 
-import { getGraphQLType, gql, typedef } from "..";
+import { getType, gql, defineType } from "..";
 
 
-@typedef(gql`
+@defineType(gql`
   input NameInput {
     firstName: String!
     lastName: String!
@@ -25,7 +25,7 @@ class Name {
 
 let instantiationCount = 0;
 
-@typedef(gql`
+@defineType(gql`
   input PersonInput {
     address: String!
     name: ${Name}
@@ -43,7 +43,7 @@ class Person {
   }
 }
 
-@typedef(gql`
+@defineType(gql`
   type Group {
     echoPerson(person: ${Person}): ${Person}!
   }
@@ -54,7 +54,7 @@ class Group {
   }
 }
 
-@typedef(gql`
+@defineType(gql`
   type Query {            # resolved to NameInput
     formatFullName(input: ${Name}): String!
                                     # resolved to PersonInput
@@ -94,7 +94,7 @@ class Query {
 }
 
 const schema = new GraphQLSchema({
-  query: getGraphQLType(Query),
+  query: getType(Query),
 });
 
 describe('Input type', () => {

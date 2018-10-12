@@ -15,6 +15,7 @@ export interface ResolvedTypeExpression extends TypeExpression {
 export type TypeExpressionConstructorOptions = TypeArg | Lazy<TypeArg> | Lazy<TypeExpression>;
 
 export type TypeExpressionKind = 'any' | 'input' | 'output';
+
 /**
  * Contain an argument which can be resolved to GraphQLType instance.
  */
