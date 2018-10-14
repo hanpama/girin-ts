@@ -1,4 +1,3 @@
 .DS_Store
 src/
 tsconfig.json
-__tests__/
