@@ -1,6 +1,6 @@
 import { defineType, gql } from "@girin/typelink";
 
-import { query } from "../testenv";
+import { query } from "../../testenv";
 
 
 class TestAuthQuery {
@@ -15,7 +15,7 @@ defineType(gql`
   }
 `)(TestAuthQuery);
 
-export function testAuth() {
+export function testAuthClient() {
 
   it('should be null when token is not provided', async () => {
     const { data, errors } = await query(`{ myUserId }`);

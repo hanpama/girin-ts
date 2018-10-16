@@ -79,8 +79,7 @@ export class AuthLocalModule<TUser extends User> extends Module<void> {
 
     mod.validatePassword(args.password);
 
-    const user = await mod.createUserInstance(args.password);
-    user.username = args.username;
+    const user = await mod.createUserInstance(args.username, args.password);
     await user.$save();
 
     return true;
@@ -100,17 +99,14 @@ export class AuthLocalModule<TUser extends User> extends Module<void> {
     throw new Error('Authentication Error');
   }
 
-  public async createUserInstance(password: string): Promise<TUser> {
+  public async createUserInstance(username: string, password: string): Promise<TUser> {
     const salt = await this.createSalt();
     const hashedPassword = await argon2.hash(password, { salt });
     const user = new this.configs.USER();
     user.hashedPassword = hashedPassword;
+    user.username = username;
     user.createdAt = new Date();
     return user;
-  }
-
-  public isValidUserInstance(user: TUser): boolean {
-    return user instanceof this.configs.USER;
   }
 
   public authenticate(user: TUser, password: string): Promise<boolean> {
@@ -150,6 +146,10 @@ export class AuthLocalModule<TUser extends User> extends Module<void> {
     const serialized = jwt.verify(token, this.configs.JWT_SECRET_KEY);
     const user = await this.deserializeUserInstance(serialized);
     return user;
+  }
+
+  public isValidUserInstance(user: TUser): boolean {
+    return user instanceof this.configs.USER;
   }
 
   public validatePassword(password: string): void {

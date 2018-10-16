@@ -1,5 +1,5 @@
 import { Module } from "@girin/environment";
-import { MongoClient, MongoClientOptions } from "mongodb";
+import { MongoClient, MongoClientOptions, GridFSBucket, GridFSBucketOptions } from "mongodb";
 
 
 export interface MongoDBModuleConfigs {
@@ -28,5 +28,9 @@ export class MongoDBModule extends Module<MongoDBModule> {
   public dbName: string;
   public get db() {
     return this.client.db(this.dbName);
+  }
+
+  public createGridFSBucket(options: GridFSBucketOptions): GridFSBucket {
+    return new GridFSBucket(this.db, options);
   }
 }

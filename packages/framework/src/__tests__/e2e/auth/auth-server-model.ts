@@ -1,41 +1,14 @@
-import { prepareTestEnv } from "./testenv";
-import { User, AuthLocalModule } from "..";
+import { AuthLocalModule } from "../../../auth-local";
 
 
-const testUserStorage: User[] = [];
-
-class TestAuthModule extends AuthLocalModule<User> {
-  async bootstrap() {}
-  async deserializeUserInstance(ser: { id: number }) {
-    const user = testUserStorage.find(user => user.id === ser.id);
-    if (!user) { throw new Error('Authentication Error'); }
-    return user;
-  }
-  serializeUserInstance(user: User) {
-    return { id: user.id };
-  }
-}
-
-function saveUser(user: User) {
-  testUserStorage.push(user);
-}
-
-describe('AuthModule', () => {
-  beforeAll(() => {
-    prepareTestEnv().load(new TestAuthModule({
-      JWT_SECRET_KEY: '12345',
-      USER: User,
-    }));
-  });
+export function testAuthServerModel() {
 
   it('should authenticate and work with jwt', async () => {
-    const userModule = TestAuthModule.object();
-    const user = await userModule.createUserInstance('mystrongpassword');
-
-    user.username = 'mytestaccount';
+    const userModule = AuthLocalModule.object();
+    const user = await userModule.createUserInstance('mytestaccount', 'mystrongpassword');
 
     // save user to database
-    saveUser(user);
+    await user.$save();
 
     // with the right password
     let maybeAuthenticated = await userModule.authenticate(user, 'mystrongpassword');
@@ -62,4 +35,4 @@ describe('AuthModule', () => {
     maybeAuthenticated = await userModule.authenticate(user, 'iamchangingmypassword');
     expect(maybeAuthenticated).toBeTruthy();
   });
-});
+}
