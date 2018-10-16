@@ -1,3 +1,0 @@
-# Input Object Types
-
-TODO
