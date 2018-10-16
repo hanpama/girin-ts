@@ -1,55 +1,52 @@
-# Girin: GraphQL framework
+# Girin: GraphQL server framework
 
-Girin is a GraphQL framework written in TypeScript.
-
-* Seamless integration between GraphQL SDL and TypeScript classes
-* Modularization of GraphQL type definitions
+Build better GraphQL schema with less code
+* defining schema, not generating it
+* modularizing your GraphQL server
 
 [![npm version](https://badge.fury.io/js/girin.svg)](https://badge.fury.io/js/girin)
 [![Build Status](https://travis-ci.org/hanpama/girin.svg?branch=master)](https://travis-ci.org/hanpama/girin)
 [![codecov](https://codecov.io/gh/hanpama/girin/branch/master/graph/badge.svg)](https://codecov.io/gh/hanpama/girin)
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
-* Documentation: https://hanpama.github.io/girin
+> This project is in development. not stable!
 
-```typescript
-@ObjectType.define(gql`
-  type Member {
-    id: Int!
-    name: String!
-    email: String!
-    friend: Member
+## Features
+
+* Use GraphQL Schema Definition Language to expose classes to API
+* Lightweight MongoDB model and relay compliant pagination implementation
+* Password authentication based on JWT
+* Built in GraphQL MongoDB subscriptions (WIP)
+* Cache control and file upload powered by apollo-server
+
+
+## How it looks like
+
+```ts
+import { girin } from '@girin/framework';
+import { defineType, gql } from '@girin/typelink';
+
+@defineType(gql`
+  type Query {
+    hello: String!
   }
 `)
-class Member {
-  id: number;
-  name: string;
-  email: string;
-
-  private friendId: number;
-
-  friend() {
-    return members.find(m => m.id === this.friendId);
+class Query {
+  static hello() {
+    return 'World!'
   }
 }
-```
 
-## Installation
+girin({ SCHEMA: { Query } }).run();
+```
+<!--
+## Get started
 
 ```sh
 npm install girin graphql
 ```
 
-## Examples
+`@girin/framework` package is for bootstrapping server with your schema.
 
-### Todolist App
-
-Working example of simple todolist
-
-* [Demo](https://todolist.giringraphql.com/)
-* [Source Code](https://github.com/hanpama/girin/tree/master/examples/todolist-apollo)
-
-
-### Starwars Schema
-
-* [Starwars Schema](https://github.com/hanpama/girin/tree/master/packages/girin/test/starwars/starWarsSchema.ts)
-* [Starwars Schema Relay](https://github.com/hanpama/girin/tree/master/packages/girin-relay/test/starWarsSchema.ts)
+`@girin/typelink` package provides decorator and `gql` template tag,
+a SDL parser for linking class to GraphQL type. -->
