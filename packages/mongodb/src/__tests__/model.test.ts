@@ -75,7 +75,7 @@ describe('model', () => {
   let insertedUser: User;
   it('should be able to created by inserting a document', async () => {
     // insert a document with source
-    insertedUser = await User.insert({ displayName: 'Baz' });
+    insertedUser = await User.insertOne({ displayName: 'Baz' });
     expect(insertedUser.displayName).toBe('Baz');
     expect(insertedUser._id).toHaveLength(24); // ObjectID
     expect(insertedUser).toBeInstanceOf(User);
