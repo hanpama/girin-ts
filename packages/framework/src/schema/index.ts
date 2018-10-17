@@ -13,6 +13,8 @@ export interface SchemaModuleConfigs {
 }
 
 export default class SchemaModule extends Module<GraphQLSchema> {
+  get label() { return 'schema'; }
+
   public schemaOptions: GraphQLSchemaConfig & {
     types: GraphQLNamedType[],
     directives: GraphQLDirective[],

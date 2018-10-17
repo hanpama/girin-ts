@@ -23,7 +23,7 @@ describe('index connection', () => {
         createdAt: new Date(2018, 0, 1, 0, i).getTime(),
       });
     }
-    await Promise.all(posts.map(post => Post.insert(post)));
+    await Promise.all(posts.map(post => Post.insertOne(post)));
   });
   afterAll(async () => {
     await Post.getManager().db.dropCollection(Post.collectionName);

@@ -26,6 +26,8 @@ export interface ServerModuleConfigs {
 }
 
 export default class ServerModule extends Module<http.Server> {
+  get label() { return 'server'; }
+
   public app: express.Express;
   public context: (context: { req: any }) => any = ctx => ctx;
 

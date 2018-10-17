@@ -1,9 +1,10 @@
 import { Module } from "@girin/environment";
 import { MongoDBModule } from "@girin/mongodb";
-import ServerModule from "../server";
 import { GridFSBucketOptions, GridFSBucket, ObjectID, GridFSBucketOpenUploadStreamOptions } from "mongodb";
 import { Request, Response } from "express";
 import { Readable } from "stream";
+
+import ServerModule from "../server";
 
 
 export interface MediaGridFSModuleConfigs {
@@ -12,7 +13,7 @@ export interface MediaGridFSModuleConfigs {
 }
 
 export default class MediaGridFSModule extends Module<void> {
-  get label() { return 'MEDIA'; }
+  get label() { return 'media'; }
 
   constructor(public configs: MediaGridFSModuleConfigs) {
     super();
@@ -38,7 +39,13 @@ export default class MediaGridFSModule extends Module<void> {
     });
   }
 
-  public serveMedia(req: Request, res: Response) {
+  public deleteMedia(id: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.bucket.delete(new ObjectID(id), err => err ? reject(err) : resolve())
+    });
+  }
+
+  public serveMedia(req: Request, res: Response): void {
     const { fileId } = req.params;
     if (!fileId) {
       res.status(404);

@@ -1,6 +1,6 @@
-import { FilterQuery, CollectionInsertOneOptions, ReplaceOneOptions, CommonOptions, ObjectID, FindAndModifyWriteOpResultObject } from 'mongodb';
-import { ModelManager } from './ModelManager';
+import { CollectionInsertOneOptions, CommonOptions, FilterQuery, FindAndModifyWriteOpResultObject, ObjectID, ReplaceOneOptions, UpdateWriteOpResult } from 'mongodb';
 import { MongoDBModule } from '../module';
+import { ModelManager } from './ModelManager';
 
 
 export type Document = {
@@ -49,9 +49,17 @@ export class Model {
   }
 
   // shortcuts and dataloader
-  public static async insert<TModel extends Model>(this: ModelClass<TModel>, source: Document, options?: CollectionInsertOneOptions): Promise<TModel> {
+  public static async insertOne<TModel extends Model>(this: ModelClass<TModel>, source: Document, options?: CollectionInsertOneOptions): Promise<TModel> {
     await this.getManager().collection.insertOne(source, options);
     return new this(source) as any;
+  }
+
+  public static updateOne<TModel extends Model>(this: ModelClass<TModel>, filter: FilterQuery<TModel>, update: Object, options?: ReplaceOneOptions): Promise<UpdateWriteOpResult> {
+    return this.getManager().collection.updateOne(filter, update, options);
+  }
+
+  public static updateMany<TModel extends Model>(this: ModelClass<TModel>, filter: FilterQuery<TModel>, update: Object, options?: CommonOptions & { upsert?: boolean }): Promise<UpdateWriteOpResult> {
+    return this.getManager().collection.updateMany(filter, update, options);
   }
 
   public static async findOne<TModel extends Model>(this: ModelClass<TModel>, query: FilterQuery<TModel>): Promise<TModel | null> {
@@ -151,13 +159,14 @@ export class Model {
     await this.$getManager().collection.deleteOne({ _id }, options);
     return String(_id);
   }
-}
 
-export function field(alias?: string) {
-  return function(prototype: any, propertyKey: string) {
-    const fieldName = alias || propertyKey;
-    const get = function getField() { return this.$source[fieldName]; }
-    const set = function setField(value: any) { this.$source[fieldName] = value; }
-    Object.defineProperty(prototype, propertyKey, { get, set });
+  /**
+   * Check if this model's corresponding document is in collection
+   */
+  public async $exists(): Promise<boolean> {
+    const { _id } = this.$source;
+    if (!_id) { throw new Error('Cannot check existence of a model instance with no _id'); }
+    const res = await this.$getManager().collection.find({ _id }).project({ _id: 1 }).limit(1).count();
+    return res === 1;
   }
 }

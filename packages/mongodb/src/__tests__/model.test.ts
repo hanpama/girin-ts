@@ -1,6 +1,6 @@
 import { ObjectID } from "mongodb";
 
-import { Model, field } from "..";
+import { Model, field, one, many } from "..";
 import { prepareTestEnv, cleanUpTestEnv } from "./testenv";
 
 
@@ -10,6 +10,9 @@ describe('model', () => {
 
     @field('_id') primaryKey: string;
     @field() displayName: string;
+
+    @one(User) toOneReference: User;
+    @many(User) toManyReferece: User[];
   }
 
   beforeAll(prepareTestEnv);
@@ -18,20 +21,26 @@ describe('model', () => {
     await cleanUpTestEnv();
   });
 
+  let savedUser: User;
+  let fetchedUser: User;
 
-  it('should be create, update, and pull document', async () => {
+  it('should be created', async () => {
     // create and save model instance
-    const savedUser = new User({ displayName: 'Foobar' });
+    savedUser = new User({ displayName: 'Foobar' });
     await savedUser.$save();
     expect(savedUser._id).not.toBeUndefined();
+  });
 
+  it('should pull the document', async () => {
     // create and pull model instance
-    const fetchedUser = new User();
+    fetchedUser = new User();
     fetchedUser._id = savedUser._id;
     await fetchedUser.$pull();
     const displayName = fetchedUser.displayName;
     expect(displayName).toBe('Foobar');
+  });
 
+  it('should be updated by assining field values', async () => {
     // make a new revision
     fetchedUser.displayName = 'Manoha';
     await fetchedUser.$save();
@@ -39,11 +48,17 @@ describe('model', () => {
     // pull the new revision
     await savedUser.$pull();
     expect(savedUser.displayName).toBe('Manoha');
+  });
+
+  it('should be directly updated with $update method', async () => {
 
     // directly update
     await savedUser.$update({ $set: { displayName: 'New Manoha' } });
     await savedUser.$pull();
     expect(savedUser.displayName).toBe('New Manoha');
+  });
+
+  it('should should return null when there is no document matched', async () => {
 
     // not found resut to be null
     const generatedId1 = new ObjectID();
@@ -55,13 +70,18 @@ describe('model', () => {
       generatedId2,
     ]);
     expect(manyDocs.map(i => i && i._id)).toEqual([null, savedUser._id, null]);
+  });
 
+  let insertedUser: User;
+  it('should be able to created by inserting a document', async () => {
     // insert a document with source
-    const insertedUser = await User.insert({ displayName: 'Baz' });
+    insertedUser = await User.insert({ displayName: 'Baz' });
     expect(insertedUser.displayName).toBe('Baz');
     expect(insertedUser._id).toHaveLength(24); // ObjectID
     expect(insertedUser).toBeInstanceOf(User);
+  });
 
+  it('should be deleted by $delete method', async () => {
     // delete
     const id = await insertedUser.$delete();
     expect(id).toBe(insertedUser._id);
