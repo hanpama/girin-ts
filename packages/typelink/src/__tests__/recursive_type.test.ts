@@ -13,7 +13,7 @@ interface MemberSource {
 const members: MemberSource[] = [
   { id: 0, name: 'Key', email: 'k@example.com', friendId: 1, },
   { id: 1, name: 'Jonghyun', email: 'j@example.com', friendId: 0 },
-]
+];
 
 @defineType(gql`
   type Member {

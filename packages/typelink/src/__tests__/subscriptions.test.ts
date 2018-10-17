@@ -1,5 +1,5 @@
-import { GraphQLSchema, subscribe, parse } from "graphql";
-import { defineType, gql, getType, Query } from "..";
+import { GraphQLSchema, subscribe, parse } from 'graphql';
+import { defineType, gql, getType, Query } from '..';
 
 import { createAsyncIterator } from 'iterall';
 

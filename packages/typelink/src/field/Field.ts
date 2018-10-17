@@ -1,8 +1,8 @@
-import { GraphQLFieldConfigArgumentMap, GraphQLOutputType, GraphQLFieldResolver, defaultFieldResolver } from "graphql";
+import { GraphQLFieldConfigArgumentMap, GraphQLOutputType, GraphQLFieldResolver, defaultFieldResolver } from 'graphql';
 
-import { TypeExpression } from "../type-expression";
-import { InputField } from "./InputField";
-import { MetadataStorage } from "../metadata";
+import { TypeExpression } from '../type-expression';
+import { InputField } from './InputField';
+import { MetadataStorage } from '../metadata';
 
 
 export interface FieldConfig {
@@ -17,9 +17,9 @@ export interface FieldConfig {
 export class Field<TConfig extends FieldConfig = FieldConfig> {
   constructor(public readonly config: TConfig) { }
 
-  public get defaultName() { return this.config.defaultName; };
-  public get description() { return this.config.description; };
-  public get deprecationReason() { return this.config.deprecationReason; };
+  public get defaultName() { return this.config.defaultName; }
+  public get description() { return this.config.description; }
+  public get deprecationReason() { return this.config.deprecationReason; }
 
   public buildArgs(storage: MetadataStorage, definitionClass: Function): GraphQLFieldConfigArgumentMap {
     const { args } = this.config;
@@ -59,7 +59,7 @@ export class Field<TConfig extends FieldConfig = FieldConfig> {
 
     const resolver = function(source: any, args: any, context: any, info: any) {
       return innerResolver(source, argumentInstantiator(args), context, info);
-    }
+    };
     return resolver;
   }
 }

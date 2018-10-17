@@ -1,5 +1,5 @@
-import { loginRequired } from "../../../auth-local/decorators";
-import { AuthLocalModule } from "../../../auth-local";
+import { loginRequired } from '../../../auth-local/decorators';
+import { AuthLocalModule } from '../../../auth-local';
 
 
 class Profile {
@@ -36,9 +36,9 @@ export function testAuthDecorators() {
     it('throws error when context.user is not an instance of BaseUser', () => {
       const profile = new Profile();
       expect(() => {
-        profile.prototypeSecretInfo({}, { user: { secretInfo: 'testusername' } })
+        profile.prototypeSecretInfo({}, { user: { secretInfo: 'testusername' } });
       }).toThrowError('Authentication Error: login required');
-    })
+    });
 
     it('works fine when context and user exists', () => {
       const profile = new Profile();
@@ -61,9 +61,9 @@ export function testAuthDecorators() {
 
     it('throws error when context.user is not an instance of BaseUser', () => {
       expect(() => {
-        Profile.classSecretInfo(null, {}, { user: { secretInfo: 'testusername' } })
+        Profile.classSecretInfo(null, {}, { user: { secretInfo: 'testusername' } });
       }).toThrowError('Authentication Error: login required');
-    })
+    });
 
     it('works fine when context and user exists', () => {
       expect(Profile.classSecretInfo(null, {}, { user })).toBe('testusername');

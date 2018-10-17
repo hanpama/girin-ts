@@ -1,5 +1,5 @@
-import { environment } from "@girin/environment";
-import { MongoDBModule } from "../module";
+import { environment } from '@girin/environment';
+import { MongoDBModule } from '../module';
 
 
 export function prepareTestEnv() {

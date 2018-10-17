@@ -1,6 +1,6 @@
-import { GraphQLInputType } from "graphql";
-import { TypeExpression } from "../type-expression";
-import { MetadataStorage } from "../metadata";
+import { GraphQLInputType } from 'graphql';
+import { TypeExpression } from '../type-expression';
+import { MetadataStorage } from '../metadata';
 
 
 export interface InputFieldConfig {

@@ -1,6 +1,6 @@
-import { GraphQLInputObjectType, GraphQLInputFieldConfigMap, GraphQLInputFieldConfig } from "graphql";
-import { MetadataStorage, InputFieldReferenceEntry, InputFieldMixinEntry } from "../metadata";
-import { Definition, DefinitionConfig } from "../definition/Definition";
+import { GraphQLInputObjectType, GraphQLInputFieldConfigMap, GraphQLInputFieldConfig } from 'graphql';
+import { MetadataStorage, InputFieldReferenceEntry, InputFieldMixinEntry } from '../metadata';
+import { Definition, DefinitionConfig } from '../definition/Definition';
 
 
 export interface InputTypeConfig extends DefinitionConfig {}
@@ -61,7 +61,7 @@ export class InputType<T extends InputTypeConfig = InputTypeConfig> extends Defi
         this.instantiationCache.set(values, cached);
       }
       return this.instantiationCache.get(values);
-    }
+    };
 
     Object.defineProperty(instantiator, 'name', { value: 'instantiate' + targetClass.name});
     return instantiator;

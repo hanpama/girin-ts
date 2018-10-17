@@ -1,7 +1,7 @@
-import { ObjectID } from "mongodb";
+import { ObjectID } from 'mongodb';
 
-import { Model, field, one, many } from "..";
-import { prepareTestEnv, cleanUpTestEnv } from "./testenv";
+import { Model, field, one, many } from '..';
+import { prepareTestEnv, cleanUpTestEnv } from './testenv';
 
 
 describe('model', () => {

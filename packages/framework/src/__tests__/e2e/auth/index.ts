@@ -1,4 +1,4 @@
-import { testAuthClient } from "./auth-client";
+import { testAuthClient } from './auth-client';
 
 
 export function testAuth() {

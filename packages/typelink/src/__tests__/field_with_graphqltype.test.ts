@@ -5,7 +5,7 @@ import {
   graphql,
   printSchema,
   GraphQLEnumType
-} from "graphql";
+} from 'graphql';
 
 import { getType, gql, defineType } from '..';
 
@@ -27,7 +27,7 @@ const itemType = new GraphQLObjectType({
     name: {
       type: GraphQLString,
       resolve() {
-        return 'foo'
+        return 'foo';
       }
     },
     info: {
@@ -51,7 +51,7 @@ const bazEnum = new GraphQLEnumType({
   }
 `)
 class Query {
-  static item() { return {}; };
+  static item() { return {}; }
   static nonNullItem() { return {}; }
   static baz(): 'A' | 'B' | 'C' {
     return 'A';
@@ -90,7 +90,7 @@ describe('field with GraphQLType', () => {
   });
 
   test('query enum', async () => {
-    let result: any
+    let result: any;
 
     result = await graphql({ schema, source: `
       query {
@@ -104,6 +104,6 @@ describe('field with GraphQLType', () => {
         erroneousBaz
       }
     `});
-    expect(result.errors[0].message).toEqual("Expected a value of type \"Baz\" but received: \"D\"");
+    expect(result.errors[0].message).toEqual('Expected a value of type "Baz" but received: "D"');
   });
 });

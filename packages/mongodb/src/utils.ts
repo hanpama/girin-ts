@@ -13,10 +13,10 @@ export class CompositeKeySorter<T> {
 
   indexOf(key: T): number {
     const { entries } = this;
-    var l = 0;
-    var r = entries.length - 1;
-    var m: number;
-    var comp: number;
+    let l = 0;
+    let r = entries.length - 1;
+    let m: number;
+    let comp: number;
     while (l <= r) {
       m = Math.floor((l + r) / 2);
       comp = this.compareKey(entries[m][0], key);

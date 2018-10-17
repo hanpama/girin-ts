@@ -1,4 +1,4 @@
-import { Model } from "@girin/mongodb";
+import { Model } from '@girin/mongodb';
 
 
 export class Media extends Model {

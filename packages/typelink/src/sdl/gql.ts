@@ -1,8 +1,8 @@
-import { parse } from "graphql";
+import { parse } from 'graphql';
 
-import { SubstitutionMap, DefinitionParser } from "./ast";
-import { TypeExpression, TypeExpressionConstructorOptions } from "../type-expression";
-import { Entry } from "../metadata";
+import { SubstitutionMap, DefinitionParser } from './ast';
+import { TypeExpression, TypeExpressionConstructorOptions } from '../type-expression';
+import { Entry } from '../metadata';
 
 
 const SUBSTITUTION_PREFIX = '__GIRIN__SUBS__';
@@ -27,7 +27,7 @@ export function gql(strings: TemplateStringsArray, ...interpolated: Array<TypeEx
   const ast = parse(result.join(''));
 
   const entries = ast.definitions.reduce((results, rootNode) => {
-    return results.concat(new DefinitionParser(rootNode, subsMap).entries)
-  }, [] as Entry<any>[])
+    return results.concat(new DefinitionParser(rootNode, subsMap).entries);
+  }, [] as Entry<any>[]);
   return entries;
 }

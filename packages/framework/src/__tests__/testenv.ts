@@ -1,10 +1,10 @@
-import { environment } from "@girin/environment";
-import { MongoDBModule } from "@girin/mongodb";
-import { fetch } from "apollo-server-env";
+import { environment } from '@girin/environment';
+import { MongoDBModule } from '@girin/mongodb';
+import { fetch } from 'apollo-server-env';
 
-import SchemaModule from "../schema";
-import ServerModule from "../server";
-import { AuthLocalModule } from "../auth-local";
+import SchemaModule from '../schema';
+import ServerModule from '../server';
+import { AuthLocalModule } from '../auth-local';
 
 
 const host = 'localhost';
@@ -25,7 +25,7 @@ export function prepareTestEnv(User: any, Query: Function, Mutation?: Function) 
   .load(new AuthLocalModule({
     USER: User,
     JWT_SECRET_KEY: 'VERYSTRONGSECRETKEY',
-  }))
+  }));
 }
 
 export async function query(doc: string, headers = {}): Promise<{ data: any, errors: any }> {

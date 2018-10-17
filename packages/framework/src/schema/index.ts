@@ -1,8 +1,8 @@
-import { Module } from "@girin/environment";
-import { GraphQLSchemaConfig, GraphQLNamedType } from "graphql";
-import { TypeArg, getType } from "@girin/typelink";
-import { GraphQLSchema } from "graphql";
-import { GraphQLDirective } from "graphql";
+import { Module } from '@girin/environment';
+import { GraphQLSchemaConfig, GraphQLNamedType } from 'graphql';
+import { TypeArg, getType } from '@girin/typelink';
+import { GraphQLSchema } from 'graphql';
+import { GraphQLDirective } from 'graphql';
 
 
 export interface SchemaModuleConfigs {

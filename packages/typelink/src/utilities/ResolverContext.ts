@@ -1,4 +1,4 @@
-import { GraphQLResolveInfo } from "graphql";
+import { GraphQLResolveInfo } from 'graphql';
 
 
 /**
@@ -29,12 +29,12 @@ export function source(fieldName?: string) {
   return function(prototype: { $source: any }, propertyKey: string) {
     const get = function() {
       return this.$source[fieldName || propertyKey];
-    }
+    };
     const set = function(value: any) {
       this.$source[fieldName || propertyKey] = value;
-    }
+    };
     Object.defineProperty(prototype, propertyKey, { get, set });
-  }
+  };
 }
 
 /**
@@ -45,11 +45,11 @@ export function source(fieldName?: string) {
 export function lazy(fieldName?: string) {
   return function(prototype: { $fetch: () => Promise<any> }, propertyKey: string) {
     const get = function(this: any) {
-      if(!this.$__fetcher__) {
+      if (!this.$__fetcher__) {
         this.$__fetcher__ = this.$fetch();
       }
       return this.$__fetcher__.then((remoteSource: any) => remoteSource[fieldName || propertyKey]);
-    }
+    };
     Object.defineProperty(prototype, propertyKey, { get });
   };
 }

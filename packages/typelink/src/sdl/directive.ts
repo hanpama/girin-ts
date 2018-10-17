@@ -1,4 +1,4 @@
-import { DirectiveNode, ArgumentNode, ObjectFieldNode, ValueNode } from "graphql";
+import { DirectiveNode, ArgumentNode, ObjectFieldNode, ValueNode } from 'graphql';
 
 
 export type DirectiveMap = { [key: string]: any };

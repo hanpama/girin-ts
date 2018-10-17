@@ -1,12 +1,12 @@
-import { TypeExpression, TypeArg } from "./TypeExpression";
-import { GraphQLList, GraphQLType, GraphQLNonNull } from "graphql";
-import { MetadataStorage } from "../metadata";
-import { ConcreteClass } from "../types";
+import { TypeExpression, TypeArg } from './TypeExpression';
+import { GraphQLList, GraphQLType, GraphQLNonNull } from 'graphql';
+import { MetadataStorage } from '../metadata';
+import { ConcreteClass } from '../types';
 
 
 export abstract class Structure extends TypeExpression {
   public static of<T extends Structure>(this: ConcreteClass<T>, innerType: TypeExpression | TypeArg) {
-    return new this(innerType instanceof TypeExpression ? innerType: new TypeExpression(innerType));
+    return new this(innerType instanceof TypeExpression ? innerType : new TypeExpression(innerType));
   }
 
   constructor(innerType: TypeExpression) {

@@ -1,4 +1,4 @@
-import { formatObjectInfo } from "../utilities/formatObjectInfo";
+import { formatObjectInfo } from '../utilities/formatObjectInfo';
 
 test('formatObjectInfo', () => {
   class Foo {}

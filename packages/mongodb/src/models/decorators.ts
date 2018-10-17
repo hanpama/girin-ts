@@ -10,10 +10,10 @@ export function field(alias?: string) {
       } else {
         return this.$source[fieldName];
       }
-    }
-    const set = function setField(value: any) { this.$source[fieldName] = value; }
+    };
+    const set = function setField(value: any) { this.$source[fieldName] = value; };
     Object.defineProperty(prototype, propertyKey, { get, set });
-  }
+  };
 }
 
 export function one(modelClass: ModelClass<any>, alias?: string) {
@@ -29,12 +29,12 @@ export function one(modelClass: ModelClass<any>, alias?: string) {
       } else {
         return new modelClass({ _id: sourceValue });
       }
-    }
+    };
     const set = function setOne(value: Model) {
       this.$source[fieldName] = value._id;
-    }
+    };
     Object.defineProperty(prototype, propertyKey, { get, set });
-  }
+  };
 }
 
 export function many(modelClass: ModelClass<any>, alias?: string) {
@@ -52,10 +52,10 @@ export function many(modelClass: ModelClass<any>, alias?: string) {
       } else {
         return sourceValue.map((_id: any) => new modelClass({ _id }));
       }
-    }
+    };
     const set = function setOne(values: Model[]) {
       this.$source[fieldName] = values.map(value => value._id);
-    }
+    };
     Object.defineProperty(prototype, propertyKey, { get, set });
-  }
+  };
 }

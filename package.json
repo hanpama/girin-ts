@@ -11,6 +11,7 @@
     "testonly": "npm test",
     "coverage": "npm test -- --coverage",
     "coverage:upload": "codecov",
+    "lint": "tslint --project tslint.json src/**/*.ts",
     "docs": "docsify serve docs"
   },
   "devDependencies": {

@@ -11,7 +11,7 @@ describe('Environment and modules', () => {
     destroy() {
       destroyOrder.push(this.constructor);
     }
-  };
+  }
 
   class CountDownModule extends Module<number[]> {
     configure() {
@@ -19,15 +19,15 @@ describe('Environment and modules', () => {
     }
     async bootstrap() {
 
-      const number = await TwelveModule.bootstrap();
+      const num = await TwelveModule.bootstrap();
       const counts: number[] = [];
-      for (let i = number; i > 0; i--) { counts.push(i); }
+      for (let i = num; i > 0; i--) { counts.push(i); }
       return counts;
     }
     destroy() {
       destroyOrder.push(this.constructor);
     }
-  };
+  }
   const destroyOrder: any[] = [];
 
   it('can be bootstrapped with loaded modules', async () => {
@@ -35,7 +35,7 @@ describe('Environment and modules', () => {
       .load(new TwelveModule())
       .load(new CountDownModule());
 
-    const countdownResult = await CountDownModule.bootstrap()
+    const countdownResult = await CountDownModule.bootstrap();
 
     expect(countdownResult).toEqual([12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]);
   });
@@ -46,7 +46,7 @@ describe('Environment and modules', () => {
 
   it('throws an error when given label has no corresponding module', () => {
     class ModuleNotLoaded extends Module<void> {
-      bootstrap() {};
+      bootstrap() {}
     }
     expect(() => ModuleNotLoaded.object()).toThrowError(`Cannot find module in environment: ModuleNotLoaded`);
   });
@@ -65,5 +65,5 @@ describe('Environment and modules', () => {
       TwelveModule: 12,
       CountDownModule: [12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
     });
-  })
+  });
 });

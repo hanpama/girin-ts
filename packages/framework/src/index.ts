@@ -1,8 +1,8 @@
-import { environment } from "@girin/environment";
-import { MongoDBModule, MongoDBModuleConfigs } from "@girin/mongodb/module";
-import SchemaModule, { SchemaModuleConfigs } from "./schema";
-import ServerModule, { ServerModuleConfigs } from "./server";
-import { AuthLocalModule, AuthLocalModuleConfigs } from "./auth-local";
+import { environment } from '@girin/environment';
+import { MongoDBModule, MongoDBModuleConfigs } from '@girin/mongodb/module';
+import SchemaModule, { SchemaModuleConfigs } from './schema';
+import ServerModule, { ServerModuleConfigs } from './server';
+import { AuthLocalModule, AuthLocalModuleConfigs } from './auth-local';
 
 
 export type GirinAppOptions = {

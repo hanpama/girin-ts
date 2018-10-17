@@ -65,7 +65,7 @@ class EnvironmentImpl implements Environment {
   async destroy(): Promise<void> {
     const bootstrapOrder = Array.from(this.bootstrapPromiseMap.keys());
     for (let i = bootstrapOrder.length - 1; i >= 0; i--) {
-      await bootstrapOrder[i].destroy()
+      await bootstrapOrder[i].destroy();
     }
     return;
   }
@@ -78,19 +78,21 @@ class EnvironmentImpl implements Environment {
 
   get(label: string) {
     const mod = this.moduleMap.get(label);
-    if (!mod) { throw new Error(`Cannot find module in environment: ${label} should be loaded to environment`)}
+    if (!mod) {
+      throw new Error(`Cannot find module in environment: ${label} should be loaded to environment`);
+    }
     return mod;
   }
 }
 
 export type ModuleClass<TModule extends Module<U>, U> = {
   new(...args: any[]): TModule;
-}
+};
 
 export abstract class Module<U> implements EnvironmentEntry {
   public get label(): string {
     return this.constructor.name;
-  };
+  }
 
   static object<TModule extends Module<any>>(this: ModuleClass<TModule, any>): TModule {
     return environment.get(this.prototype.label) as TModule;
@@ -100,7 +102,7 @@ export abstract class Module<U> implements EnvironmentEntry {
   }
 
   public abstract bootstrap(): U | Promise<U>;
-  public destroy(): void | Promise<void> {};
+  public destroy(): void | Promise<void> {}
 }
 
 /**

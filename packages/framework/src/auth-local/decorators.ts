@@ -1,16 +1,16 @@
-import { AuthContext, AuthLocalModule } from ".";
+import { AuthContext, AuthLocalModule } from '.';
 
 
 export type Resolver = (
   ((source: any, args: any, context: AuthContext<any>, info?: any) => any) |
   ((args: any, context: AuthContext<any>, info?: any) => any)
-)
+);
 
 export type ResolverDecorator = (
   propertyOrClass: Object,
   fieldName: string,
   descriptor: TypedPropertyDescriptor<Resolver>,
-) => void
+) => void;
 
 export function loginRequired(): ResolverDecorator {
   return function loginRequiredDecorator(
@@ -29,14 +29,14 @@ export function loginRequired(): ResolverDecorator {
           throw new Error('Authentication Error: login required');
         }
         return maybeFunction.apply(this, [source, args, context, info]);
-      }
+      };
     } else { // is a prototype
       descriptor.value = function(args: any, context: AuthContext<any>, info: any) {
         if (!(context && AuthLocalModule.object().isValidUserInstance(context.user))) {
           throw new Error('Authentication Error: login required');
         }
         return maybeFunction.apply(this, [args, context, info]);
-      }
+      };
     }
-  }
+  };
 }

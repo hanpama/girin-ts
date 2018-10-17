@@ -1,6 +1,6 @@
-import { GraphQLSchema, graphql, printSchema } from "graphql";
+import { GraphQLSchema, graphql, printSchema } from 'graphql';
 
-import { getType, gql, defineType } from "..";
+import { getType, gql, defineType } from '..';
 
 
 @defineType(gql`
@@ -158,10 +158,10 @@ describe('Input type', () => {
       personNonNullInputWorks: true,
       personNonNullListInputWorks: true,
       echoPerson: {
-        address: "A",
+        address: 'A',
         name: {
-          firstName: "Foo",
-          lastName: "Bar"
+          firstName: 'Foo',
+          lastName: 'Bar'
         }
       }
     } });
@@ -179,13 +179,13 @@ describe('Input type', () => {
       }
     `, variableValues: {
       person: {
-        address: "A",
+        address: 'A',
         name: {
-          firstName: "Foo",
-          lastName: "Bar"
+          firstName: 'Foo',
+          lastName: 'Bar'
         }
       },
     }}); // giving argument as variable lets us avoid extra instantiations
     expect(instantiationCount).toBe(1);
-  })
+  });
 });

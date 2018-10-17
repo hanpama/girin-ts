@@ -7,8 +7,8 @@ describe('createFromTypeString', () => {
   const storage = getGlobalMetadataStorage();
 
   it('is created as expected', () => {
-    const boolean = new TypeExpression('Boolean');
-    const type: any = boolean.getTypeInstance(storage);
+    const bool = new TypeExpression('Boolean');
+    const type: any = bool.getTypeInstance(storage);
     expect(type.name).toBe('Boolean');
   });
 
@@ -43,5 +43,5 @@ describe('createFromTypeString', () => {
     const personOutputExp = new TypeExpression(Person, 'output');
     const personInputExp = new TypeExpression(Person, 'input');
     expect(personOutputExp.getDefinitionEntry(storage)).not.toBe(personInputExp.getDefinitionEntry(storage));
-  })
+  });
 });

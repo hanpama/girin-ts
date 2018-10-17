@@ -3,8 +3,8 @@ import { promisify } from 'util';
 
 import * as equal from 'fast-deep-equal';
 
-import { Connection, ConnectionArguments } from "@girin/relay/connection";
-import { Model, ModelClass, Document } from "../models";
+import { Connection, ConnectionArguments } from '@girin/relay/connection';
+import { Model, ModelClass, Document } from '../models';
 
 
 const gzipPromise = promisify<InputType, Buffer>(gzip);
@@ -15,7 +15,7 @@ export interface SortOption {
   order: 1 | -1;
 }
 
-export interface Selector { [fieldName: string]: any };
+export interface Selector { [fieldName: string]: any; }
 
 export interface ModelConnectionOptions<TModel extends Model> {
   sortOptions: SortOption[] & { 0: SortOption };
@@ -72,7 +72,7 @@ export class ModelConnection<
         }
         selector[fieldName] = { [equality]: item };
         return selector;
-      }, {} as any)
+      }, {} as any);
       $or.push(selector);
     }
     return { $or };
@@ -81,16 +81,16 @@ export class ModelConnection<
   resolveNode(item: TItem): TNode {
     const { modelClass } = this.options;
     return new modelClass(item) as TNode;
-  };
+  }
   resolveHasNextPage(response: ModelConnectionState): boolean | Promise<boolean> {
     return response.hasNextPage;
-  };
+  }
   resolveHasPreviousPage(response: ModelConnectionState): boolean | Promise<boolean> {
     return response.hasPreviousPage;
-  };
+  }
   getItems(response: ModelConnectionState): ArrayLike<TItem> {
     return response.docs;
-  };
+  }
 
   async query(): Promise<ModelConnectionState> {
     const { options, args } = this;
@@ -144,7 +144,7 @@ export class ModelConnection<
         hasBefore = true;
       }
       // tail trimming
-      while(docs.length > 0) {
+      while (docs.length > 0) {
         if (docs.length > limit) {
           docs.pop();
           hasAfter = true;
@@ -152,7 +152,7 @@ export class ModelConnection<
         }
         const lastDocKeys = options.sortOptions.map(({ fieldName }) => {
           return docs[docs.length - 1][fieldName];
-        })
+        });
         if (end) {
           const shouldTrim = equal(lastDocKeys, end);
           if (shouldTrim) {
@@ -172,5 +172,5 @@ export class ModelConnection<
       hasNextPage: reverse ? hasBefore : hasAfter,
       hasPreviousPage: reverse ? hasAfter : hasBefore,
     };
-  };
+  }
 }

@@ -102,7 +102,7 @@ export class DefinitionParser {
         typeName: name.value,
         description: description && description.value,
         directives: rootNode.directives && completeDirectives(rootNode.directives),
-      })
+      });
     } else {
         metadata = new ObjectType({
         typeName: name.value,
@@ -155,7 +155,7 @@ export class DefinitionParser {
     const { name, description, fields } = node;
 
     if (fields) {
-      fields.forEach(fieldNode => this.appendInputFieldMetadataConfig(fieldNode))
+      fields.forEach(fieldNode => this.appendInputFieldMetadataConfig(fieldNode));
     }
 
     this.entries.push(new DefinitionEntry({
@@ -171,7 +171,7 @@ export class DefinitionParser {
     const { name, fields } = node;
 
     if (fields) {
-      fields.forEach(fieldNode => this.appendInputFieldMetadataConfig(fieldNode, name.value))
+      fields.forEach(fieldNode => this.appendInputFieldMetadataConfig(fieldNode, name.value));
     }
   }
 
@@ -224,7 +224,7 @@ export class DefinitionParser {
     if (extendingTypeName) {
       this.entries.push(new ImplementMixinEntry({ extendingTypeName, interfaceType }));
     } else {
-      this.entries.push(new ImplementReferenceEntry({ interfaceType,}))
+      this.entries.push(new ImplementReferenceEntry({ interfaceType, }));
     }
   }
 }

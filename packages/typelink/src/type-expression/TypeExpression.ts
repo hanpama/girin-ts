@@ -1,15 +1,15 @@
-import { GraphQLType, isType } from "graphql";
+import { GraphQLType, isType } from 'graphql';
 
-import { Definition } from "../definition/Definition";
-import { MetadataStorage, DefinitionEntry } from "../metadata";
-import { isLazy, Lazy, Instantiator } from "../types";
-import { InputType } from "../definition";
+import { Definition } from '../definition/Definition';
+import { MetadataStorage, DefinitionEntry } from '../metadata';
+import { isLazy, Lazy, Instantiator } from '../types';
+import { InputType } from '../definition';
 
 
 export type TypeArg = GraphQLType | string | Function;
 
 export interface ResolvedTypeExpression extends TypeExpression {
-  typeArg: TypeArg
+  typeArg: TypeArg;
 }
 
 export type TypeExpressionConstructorOptions = TypeArg | Lazy<TypeArg> | Lazy<TypeExpression>;

@@ -1,8 +1,8 @@
-import { GraphQLEnumType, GraphQLSchema } from "graphql";
+import { GraphQLEnumType, GraphQLSchema } from 'graphql';
 
-import { getFriends, getHero, getHuman, getDroid, EpisodeValue, CharacterSource, HumanSource, DroidSource } from "./starWarsData";
+import { getFriends, getHero, getHuman, getDroid, EpisodeValue, CharacterSource, HumanSource, DroidSource } from './starWarsData';
 import { getType, defineType, gql } from '../..';
-import { ResolverContext, source } from "../../utilities/ResolverContext";
+import { ResolverContext, source } from '../../utilities/ResolverContext';
 
 
 const episodeEnum = new GraphQLEnumType({
@@ -62,7 +62,7 @@ abstract class Character<TSource extends CharacterSource> extends ResolverContex
   @source() appearsIn: EpisodeValue[];
 
   get secretBackstory(): string {
-    throw new Error('secretBackstory is secret.')
+    throw new Error('secretBackstory is secret.');
   }
 
   async friends() {

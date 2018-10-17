@@ -9,7 +9,6 @@
           true,
           "spaces"
       ],
-      "no-unused-variable": true,
       "no-duplicate-variable": true,
       "no-eval": true,
       "no-internal-module": true,
@@ -21,7 +20,7 @@
       ],
       "quotemark": [
           true,
-          "double"
+          "single"
       ],
       "semicolon": true,
       "triple-equals": [

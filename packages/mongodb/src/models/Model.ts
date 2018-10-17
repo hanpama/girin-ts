@@ -10,7 +10,7 @@ export type Document = {
 
 export type ModelClass<TModel extends Model> = typeof Model & {
   new(source: any): TModel;
-}
+};
 
 /**
  * Model object acts as a simple container of document including _id
@@ -27,7 +27,7 @@ export class Model {
    */
   static get collectionName(): string {
     return this._collectionName || this.name.toLowerCase();
-  };
+  }
   static set collectionName(value: string) {
     this._collectionName = value;
   }
@@ -108,7 +108,7 @@ export class Model {
    */
   public async $pull(): Promise<this> {
     if (!this.$source._id) {
-      throw new Error('Cannot pull the document: the model object has no _id')
+      throw new Error('Cannot pull the document: the model object has no _id');
     }
     const doc = await this.$getManager().dataloader.load(this.$source._id);
     this.$source = doc;

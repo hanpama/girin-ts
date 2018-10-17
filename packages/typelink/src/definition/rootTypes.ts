@@ -1,5 +1,5 @@
-import { MetadataStorage, DefinitionEntry } from "../metadata";
-import { ObjectType } from "./ObjectType";
+import { MetadataStorage, DefinitionEntry } from '../metadata';
+import { ObjectType } from './ObjectType';
 
 
 /**

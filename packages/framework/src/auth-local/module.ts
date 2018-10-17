@@ -17,7 +17,7 @@ export class User extends Model {
 }
 
 export interface AuthLocalModuleConfigs<TUser extends User> {
-  USER: { new(): TUser } & typeof User,
+  USER: { new(): TUser } & typeof User;
   JWT_SECRET_KEY: string;
   /**
    * Default: `true`
@@ -44,7 +44,7 @@ export class AuthLocalModule<TUser extends User> extends Module<void> {
     this.configs = Object.assign({
       PASSWORD_MIN_LENGTH: 8,
       EXTENDS_SCHEMA: true
-    }, configs)
+    }, configs);
 
     const innerFn = serverModule.context;
     serverModule.context = async (prevContext: any) => {
@@ -56,7 +56,7 @@ export class AuthLocalModule<TUser extends User> extends Module<void> {
       }
 
       return { user, ...context };
-    }
+    };
 
     if (this.configs.EXTENDS_SCHEMA) {
       defineType(gql`
@@ -71,7 +71,7 @@ export class AuthLocalModule<TUser extends User> extends Module<void> {
     await MongoDBModule.bootstrap();
     await User.getManager().collection.createIndexes([
       { key: { username: 1 }, unique: true, sparse: true },
-    ])
+    ]);
   }
 
   public static async signUp(_source: any, args: { username: string, password: string }) {
@@ -122,21 +122,21 @@ export class AuthLocalModule<TUser extends User> extends Module<void> {
 
   protected createSalt(): Promise<Buffer> {
     return new Promise((resolve, reject) => {
-      crypto.randomBytes(128, (err, buf) => err? reject(err) : resolve(buf))
+      crypto.randomBytes(128, (err, buf) => err ? reject(err) : resolve(buf));
     });
   }
 
   protected serializeUserInstance(user: TUser): { [key: string]: any } {
     return { id: String(user._id) };
-  };
+  }
 
   protected async deserializeUserInstance(serialized: any): Promise<TUser> {
-    const user = await this.configs.USER.getOne<TUser>(new ObjectID(serialized.id))
+    const user = await this.configs.USER.getOne<TUser>(new ObjectID(serialized.id));
     if (!user) {
       throw new Error('Authentication Error');
     }
     return user;
-  };
+  }
 
   public async encodeToken(user: TUser) {
     return jwt.sign(this.serializeUserInstance(user), this.configs.JWT_SECRET_KEY);

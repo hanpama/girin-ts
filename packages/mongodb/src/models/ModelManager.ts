@@ -1,9 +1,9 @@
-import { Db, Collection, ObjectID } from "mongodb";
+import { Db, Collection, ObjectID } from 'mongodb';
 import * as DataLoader from 'dataloader';
 
-import { ModelClass, Document } from "./Model";
+import { ModelClass, Document } from './Model';
 import { CompositeKeySorter } from '../utils';
-import { MongoDBModule } from "../module";
+import { MongoDBModule } from '../module';
 
 
 function compareObjectID(k1: ObjectID, k2: ObjectID) {

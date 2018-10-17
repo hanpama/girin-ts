@@ -1,4 +1,4 @@
-import { AuthLocalModule } from "../../../auth-local";
+import { AuthLocalModule } from '../../../auth-local';
 
 
 export function testAuthServerModel() {
@@ -28,7 +28,7 @@ export function testAuthServerModel() {
     await userModule.setPassword(user, 'iamchangingmypassword');
 
     // with old one
-    maybeNotAuthenticated = await userModule.authenticate(user, 'mystrongpassword')
+    maybeNotAuthenticated = await userModule.authenticate(user, 'mystrongpassword');
     expect(maybeNotAuthenticated).toBeFalsy();
 
     // with new one

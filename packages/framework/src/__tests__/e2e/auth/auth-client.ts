@@ -1,6 +1,6 @@
-import { defineType, gql } from "@girin/typelink";
+import { defineType, gql } from '@girin/typelink';
 
-import { query } from "../../testenv";
+import { query } from '../../testenv';
 
 
 class TestAuthQuery {

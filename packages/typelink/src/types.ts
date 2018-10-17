@@ -8,7 +8,7 @@ export function isLazy<T>(arg: Lazy<T> | any): arg is Lazy<T> {
 }
 
 export interface ConcreteClass<T = any> {
-  new(...args: any[]): T
+  new(...args: any[]): T;
 }
 
 export type TypedClassDecorator<T extends Function> = (cls: T) => T | void;

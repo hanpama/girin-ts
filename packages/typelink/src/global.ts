@@ -1,6 +1,6 @@
-import { TypeArg, TypeExpression, TypeExpressionKind } from "./type-expression";
+import { TypeArg, TypeExpression, TypeExpressionKind } from './type-expression';
 import { MetadataStorage, Entry } from './metadata';
-import { loadFallbackRootTypes, loadBuiltInScalar } from "./definition";
+import { loadFallbackRootTypes, loadBuiltInScalar } from './definition';
 
 
 /**
@@ -47,5 +47,5 @@ export function defineType(metadata: Entry<any>[], maybeStorage?: MetadataStorag
   const storage = maybeStorage || getGlobalMetadataStorage();
   return function defDecoratorFn(targetClass: Function): void {
     metadata.forEach(entry => storage.registerEntry(targetClass, entry));
-  }
+  };
 }

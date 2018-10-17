@@ -1,5 +1,5 @@
-import { GraphQLSchema, printSchema, graphql } from "graphql";
-import { defineType, gql, Mutation, Query, getType } from "..";
+import { GraphQLSchema, printSchema, graphql } from 'graphql';
+import { defineType, gql, Mutation, Query, getType } from '..';
 
 
 @defineType(gql`
@@ -36,7 +36,7 @@ class User {
   }
 
   // extend type Mutation
-  static createUser(_source: null, { user } : { user: User }) {
+  static createUser(_source: null, { user }: { user: User }) {
     return user;
   }
 }

@@ -1,7 +1,7 @@
-import { Model, field } from "..";
-import { prepareTestEnv, cleanUpTestEnv } from "./testenv";
-import { ConnectionArguments } from "@girin/relay/connection";
-import { ModelConnection } from "../connection";
+import { Model, field } from '..';
+import { prepareTestEnv, cleanUpTestEnv } from './testenv';
+import { ConnectionArguments } from '@girin/relay/connection';
+import { ModelConnection } from '../connection';
 
 
 describe('index connection', () => {
@@ -25,18 +25,18 @@ describe('index connection', () => {
     }
     await Promise.all(posts.map(post => Post.insertOne(post)));
   });
+
   afterAll(async () => {
     await Post.getManager().db.dropCollection(Post.collectionName);
     await cleanUpTestEnv();
   });
-
 
   function queryPostsByCreatedAt(args: ConnectionArguments = {}) {
     return new ModelConnection(args, {
       maxLimit: 10,
       modelClass: Post,
       sortOptions: [{ fieldName: 'createdAt', order: 1 }, { fieldName: 'slug', order: -1 }],
-    })
+    });
   }
 
   function queryPostsByCategoryAndCreatedAt(args: ConnectionArguments = {}, selector: any) {
@@ -58,8 +58,8 @@ describe('index connection', () => {
     let edges = await connection.edges;
     let pageInfo = await connection.pageInfo;
     expect(edges).toHaveLength(10);
-    expect(edges[0].node.slug).toBe('post1')
-    expect(edges[9].node.slug).toBe('post10')
+    expect(edges[0].node.slug).toBe('post1');
+    expect(edges[9].node.slug).toBe('post10');
     expect(pageInfo.hasPreviousPage).toBe(false);
     expect(pageInfo.hasNextPage).toBe(true);
 
@@ -71,8 +71,8 @@ describe('index connection', () => {
     edges = await connection.edges;
     pageInfo = await connection.pageInfo;
     expect(edges).toHaveLength(10);
-    expect(edges[0].node.slug).toBe('post11')
-    expect(edges[9].node.slug).toBe('post20')
+    expect(edges[0].node.slug).toBe('post11');
+    expect(edges[9].node.slug).toBe('post20');
     expect(pageInfo.hasPreviousPage).toBe(true);
     expect(pageInfo.hasNextPage).toBe(true);
 

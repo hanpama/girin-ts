@@ -1,7 +1,7 @@
-import { GraphQLScalarType, GraphQLString, GraphQLBoolean, GraphQLFloat, GraphQLInt, GraphQLID } from "graphql";
+import { GraphQLScalarType, GraphQLString, GraphQLBoolean, GraphQLFloat, GraphQLInt, GraphQLID } from 'graphql';
 
-import { Definition, DefinitionConfig } from "./Definition";
-import { MetadataStorage, DefinitionEntry } from "../metadata";
+import { Definition, DefinitionConfig } from './Definition';
+import { MetadataStorage, DefinitionEntry } from '../metadata';
 
 
 export interface ScalarTypeConfig extends DefinitionConfig {

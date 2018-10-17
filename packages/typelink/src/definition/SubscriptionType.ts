@@ -1,5 +1,5 @@
-import { ObjectType } from "./ObjectType";
-import { MetadataStorage, FieldReferenceEntry, FieldMixinEntry } from "../metadata";
+import { ObjectType } from './ObjectType';
+import { MetadataStorage, FieldReferenceEntry, FieldMixinEntry } from '../metadata';
 
 
 export class SubscriptionType extends ObjectType {

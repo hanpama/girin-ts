@@ -1,9 +1,9 @@
-import { User } from "../auth-local";
-import { testUpAndRunning } from "./e2e/up-and-running";
+import { User } from '../auth-local';
+import { testUpAndRunning } from './e2e/up-and-running';
 import { prepareTestEnv } from './testenv';
 import { testAuth } from './e2e/auth';
-import { Query, Mutation } from "@girin/typelink";
-import { MongoDBModule } from "../../../mongodb";
+import { Query, Mutation } from '@girin/typelink';
+import { MongoDBModule } from '../../../mongodb';
 
 
 

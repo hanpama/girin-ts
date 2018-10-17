@@ -1,7 +1,7 @@
-import { GraphQLFieldConfigMap, GraphQLTypeResolver, GraphQLInterfaceType, GraphQLFieldConfig } from "graphql";
+import { GraphQLFieldConfigMap, GraphQLTypeResolver, GraphQLInterfaceType, GraphQLFieldConfig } from 'graphql';
 
-import { MetadataStorage, FieldReferenceEntry, FieldMixinEntry } from "../metadata";
-import { Definition, DefinitionConfig } from "../definition/Definition";
+import { MetadataStorage, FieldReferenceEntry, FieldMixinEntry } from '../metadata';
+import { Definition, DefinitionConfig } from '../definition/Definition';
 
 
 export interface InterfaceTypeConfig extends DefinitionConfig {

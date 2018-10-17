@@ -10,7 +10,7 @@ export function formatObjectInfo(obj: any): string {
       type = obj && obj.constructor.name;
     }
     return `${name}<${type}>`;
-  } catch(e) {
+  } catch (e) {
     return String(obj);
   }
 }

@@ -1,5 +1,5 @@
-import { Module } from "@girin/environment";
-import { MongoClient, MongoClientOptions, GridFSBucket, GridFSBucketOptions } from "mongodb";
+import { Module } from '@girin/environment';
+import { MongoClient, MongoClientOptions, GridFSBucket, GridFSBucketOptions } from 'mongodb';
 
 
 export interface MongoDBModuleConfigs {

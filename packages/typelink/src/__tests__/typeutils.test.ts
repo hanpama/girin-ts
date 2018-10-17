@@ -1,4 +1,4 @@
-import { equalsOrInherits } from "../metadata";
+import { equalsOrInherits } from '../metadata';
 
 
 test('isSubClassOf', () => {

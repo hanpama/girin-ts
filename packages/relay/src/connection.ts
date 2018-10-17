@@ -1,4 +1,4 @@
-import { defineType, gql } from "@girin/typelink";
+import { defineType, gql } from '@girin/typelink';
 
 
 export interface ConnectionArguments {
@@ -32,13 +32,13 @@ export abstract class Connection<TNode, TResponse = any, TItem = any> {
         edges.push(this.resolveEdge(items[i]));
       }
       return edges;
-    })
+    });
   }
 
   get pageInfo() {
     return this.getOrCreateQueryPromise().then(res => {
       return this.resolvePageInfo(res);
-    })
+    });
   }
 
   resolveEdge(item: TItem): Edge<TNode, TResponse, TItem> {

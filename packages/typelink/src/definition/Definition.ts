@@ -1,5 +1,5 @@
-import { GraphQLNamedType } from "graphql";
-import { MetadataStorage } from "../metadata";
+import { GraphQLNamedType } from 'graphql';
+import { MetadataStorage } from '../metadata';
 
 
 export interface DefinitionConfig {
@@ -14,7 +14,7 @@ export interface DefinitionConfig {
  */
 export class Definition<TConfig extends DefinitionConfig = DefinitionConfig> {
 
-  public readonly config: TConfig
+  public readonly config: TConfig;
   public isOutputType() { return false; }
   public isInputType() { return false; }
 
@@ -25,7 +25,7 @@ export class Definition<TConfig extends DefinitionConfig = DefinitionConfig> {
   public get typeName(): string  {
     const { typeName } = this.config;
     if (!typeName) { throw new Error('Should have typeName'); }
-    return typeName
+    return typeName;
   }
 
   public get description(): string | undefined {
@@ -46,5 +46,5 @@ export class Definition<TConfig extends DefinitionConfig = DefinitionConfig> {
    */
   public buildTypeInstance(storage: MetadataStorage, targetClass: Function): GraphQLNamedType {
     throw new Error(`Should implement typeInstance getter in ${this.constructor.name}`);
-  };
+  }
 }

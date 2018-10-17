@@ -1,4 +1,4 @@
-import { Module } from "@girin/environment";
+import { Module } from '@girin/environment';
 import { ApolloServer, Config as ApolloServerConfig, CorsOptions } from 'apollo-server-express';
 import * as express from 'express';
 import { GraphQLDirective, GraphQLEnumType, GraphQLInt } from 'graphql';
@@ -45,7 +45,7 @@ export default class ServerModule extends Module<http.Server> {
       values: { PUBLIC: {}, PRIVATE: {} },
     });
 
-    schemaModule.schemaOptions.types.push(CacheControlEnum)
+    schemaModule.schemaOptions.types.push(CacheControlEnum);
     schemaModule.schemaOptions.directives.push(new GraphQLDirective({
       name: 'cacheControl',
       locations: ['FIELD_DEFINITION', 'OBJECT', 'INTERFACE'],

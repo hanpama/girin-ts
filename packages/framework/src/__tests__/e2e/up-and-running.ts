@@ -1,5 +1,5 @@
-import { defineType, gql } from "@girin/typelink";
-import { query } from "../testenv";
+import { defineType, gql } from '@girin/typelink';
+import { query } from '../testenv';
 
 
 class UpAndRunningQuery {
