@@ -31,6 +31,9 @@ export function one(modelClass: ModelClass<any>, alias?: string) {
       }
     };
     const set = function setOne(value: Model) {
+      if (!value._id) {
+        throw new Error('Cannot assign to @one field because the target model instance has no _id');
+      }
       this.$source[fieldName] = value._id;
     };
     Object.defineProperty(prototype, propertyKey, { get, set });
@@ -54,7 +57,13 @@ export function many(modelClass: ModelClass<any>, alias?: string) {
       }
     };
     const set = function setOne(values: Model[]) {
-      this.$source[fieldName] = values.map(value => value._id);
+
+      this.$source[fieldName] = values.map(value => {
+        if (!value._id) {
+          throw new Error('Cannot assign to @one field because the target model instance has no _id');
+        }
+        return value._id;
+      });
     };
     Object.defineProperty(prototype, propertyKey, { get, set });
   };

@@ -74,7 +74,6 @@ describe('model', () => {
 
   let insertedUser: User;
   it('should be able to created by inserting a document', async () => {
-    // insert a document with source
     insertedUser = await User.insertOne({ displayName: 'Baz' });
     expect(insertedUser.displayName).toBe('Baz');
     expect(insertedUser._id).toHaveLength(24); // ObjectID
@@ -82,10 +81,45 @@ describe('model', () => {
   });
 
   it('should be deleted by $delete method', async () => {
-    // delete
     const id = await insertedUser.$delete();
     expect(id).toBe(insertedUser._id);
     const maybeNull = await User.getOne(insertedUser._id!);
     expect(maybeNull).toBeNull();
+  });
+
+  it('should be able to assign a model instance to @one reference', () => {
+    const user1 = new User();
+    const user2 = new User({ _id: new ObjectID() });
+    user1.toOneReference = user2;
+
+    expect(user1.toOneReference._id).toBe(user2._id);
+  });
+
+  it('should prevent to assign a model instance without _id to @one', () => {
+    const user1 = new User();
+    const user2 = new User();
+
+    expect(() => user1.toOneReference = user2).toThrow(
+      'Cannot assign to @one field because the target model instance has no _id',
+    );
+  });
+
+  it('should be able to assign other model instances to @many refrence', () => {
+    const user1 = new User();
+    const user2 = new User({ _id: new ObjectID() });
+    const user3 = new User({ _id: new ObjectID() });
+
+    user1.toManyReferece = [user2, user3];
+    expect(user1.toManyReferece.map(user => user._id)).toEqual([user2._id, user3._id]);
+  });
+
+  it('should prevent to assign model instances any of which has no _id', () => {
+    const user1 = new User();
+    const user2 = new User({ _id: new ObjectID() });
+    const user3 = new User();
+
+    expect(() => user1.toManyReferece = [user2, user3]).toThrow(
+      'Cannot assign to @one field because the target model instance has no _id',
+    );
   });
 });
