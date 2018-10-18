@@ -32,23 +32,16 @@ describe('index connection', () => {
   });
 
   function queryPostsByCreatedAt(args: ConnectionArguments = {}) {
-    return new ModelConnection(args, {
-      maxLimit: 10,
-      modelClass: Post,
-      sortOptions: [{ fieldName: 'createdAt', order: 1 }, { fieldName: 'slug', order: -1 }],
+    return new ModelConnection(Post, args, {
+      limit: 10,
+      sortOptions: { createdAt: 1, slug: -1 },
     });
   }
 
   function queryPostsByCategoryAndCreatedAt(args: ConnectionArguments = {}, selector: any) {
-    return new ModelConnection(args, {
-      modelClass: Post,
-      maxLimit: 10,
-      selector,
-      sortOptions: [
-        { fieldName: 'category', order: 1 },
-        { fieldName: 'createdAt', order: 1 },
-        { fieldName: 'slug', order: -1 },
-      ],
+    return new ModelConnection(Post, args, {
+      limit: 10, selector,
+      sortOptions: { category: 1, createdAt: 1, slug: -1 },
     });
   }
 

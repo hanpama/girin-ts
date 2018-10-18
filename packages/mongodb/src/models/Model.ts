@@ -1,6 +1,8 @@
 import { CollectionInsertOneOptions, CommonOptions, FilterQuery, FindAndModifyWriteOpResultObject, ObjectID, ReplaceOneOptions, UpdateWriteOpResult } from 'mongodb';
 import { MongoDBModule } from '../module';
 import { ModelManager } from './ModelManager';
+import { ModelConnection, ModelConnectionOptions } from '../connection';
+import { ConnectionArguments } from '@girin/relay/connection';
 
 
 export type Document = {
@@ -70,6 +72,10 @@ export class Model {
   public static async findMany<TModel extends Model>(this: ModelClass<TModel>, query: FilterQuery<TModel>): Promise<TModel[]> {
     const docs = await this.getManager().collection.find(query).toArray();
     return docs.map(doc => this.create(doc)!);
+  }
+
+  public static findConnection<TModel extends Model>(this: ModelClass<TModel>, args: ConnectionArguments, options: ModelConnectionOptions): ModelConnection<TModel> {
+    return new ModelConnection(this, args, options);
   }
 
   public static async getOne<TModel extends Model> (this: ModelClass<TModel>, id: string | ObjectID): Promise<TModel | null> {

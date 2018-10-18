@@ -10,17 +10,16 @@ import { Model, ModelClass, Document } from '../models';
 const gzipPromise = promisify<InputType, Buffer>(gzip);
 const gunzipPromise = promisify<InputType, Buffer>(gunzip);
 
-export interface SortOption {
+export interface SortEntry {
   fieldName: string;
   order: 1 | -1;
 }
 
 export interface Selector { [fieldName: string]: any; }
 
-export interface ModelConnectionOptions<TModel extends Model> {
-  sortOptions: SortOption[] & { 0: SortOption };
-  modelClass: ModelClass<TModel>;
-  maxLimit: number;
+export interface ModelConnectionOptions {
+  sortOptions: { [fieldName: string]: 1 | -1 };
+  limit: number;
   selector?: Selector;
 }
 
@@ -35,15 +34,19 @@ export class ModelConnection<
   TItem extends Document = Document
 > extends Connection<TNode, ModelConnectionState, TItem> {
 
-  constructor(args: ConnectionArguments, public options: ModelConnectionOptions<TNode>) {
+  constructor(public modelClass: ModelClass<TNode>, args: ConnectionArguments, public options: ModelConnectionOptions) {
     super(args);
     if (args.first && args.last) {
       throw new Error('Argument "first" and "last" must not be included at the same time');
     }
+    this.sortOptions = Object.keys(options.sortOptions)
+      .map(fieldName => ({ fieldName, order: options.sortOptions[fieldName] }));
   }
 
+  public sortOptions: SortEntry[];
+
   async resolveCursor(item: TItem): Promise<string> {
-    const key = this.options.sortOptions.map(({ fieldName }) => item[fieldName as keyof TItem]);
+    const key = this.sortOptions.map(({ fieldName }) => item[fieldName as keyof TItem]);
     const val = await gzipPromise(JSON.stringify(key));
     return val.toString('base64');
   }
@@ -58,7 +61,7 @@ export class ModelConnection<
     const eq = type === 'bottom'
       ? ['$gt', '$lt', '$gte', '$lte']
       : ['$lt', '$gt', '$lte', '$gte'];
-    const { sortOptions } = this.options;
+    const { sortOptions } = this;
     const $or: any = [];
 
     for (let i = 0; i < sortOptions.length; i++) {
@@ -79,7 +82,7 @@ export class ModelConnection<
   }
 
   resolveNode(item: TItem): TNode {
-    const { modelClass } = this.options;
+    const { modelClass } = this;
     return new modelClass(item) as TNode;
   }
   resolveHasNextPage(response: ModelConnectionState): boolean | Promise<boolean> {
@@ -108,12 +111,12 @@ export class ModelConnection<
       selectors = selectors.concat(this.keyToSelector(top, 'top'));
     }
     const limit = Math.min(
-      options.maxLimit,
-      args.first || args.last || this.options.maxLimit,
+      options.limit,
+      args.first || args.last || this.options.limit,
     );
 
     const extraAdjacent = 0 + (top ? 1 : 0) + (bottom ? 1 : 0);
-    const appliedSortOrder = options.sortOptions.reduce((results, { fieldName, order }) => {
+    const appliedSortOrder = this.sortOptions.reduce((results, { fieldName, order }) => {
       results[fieldName] = order * (reverse ? -1 : 1);
       return results;
     }, {} as any);
@@ -126,7 +129,7 @@ export class ModelConnection<
       selector = { $and: selectors };
     }
 
-    let cursor = options.modelClass.getManager().collection
+    let cursor = this.modelClass.getManager().collection
       .find(selector)
       .sort(appliedSortOrder)
       .limit(limit + extraAdjacent);
@@ -150,7 +153,7 @@ export class ModelConnection<
           hasAfter = true;
           continue;
         }
-        const lastDocKeys = options.sortOptions.map(({ fieldName }) => {
+        const lastDocKeys = this.sortOptions.map(({ fieldName }) => {
           return docs[docs.length - 1][fieldName];
         });
         if (end) {
