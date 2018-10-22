@@ -1,7 +1,6 @@
 import { GraphQLScalarType, GraphQLString, GraphQLBoolean, GraphQLFloat, GraphQLInt, GraphQLID } from 'graphql';
 
-import { Definition, DefinitionConfig } from './Definition';
-import { MetadataStorage, DefinitionEntry } from '../metadata';
+import { Definition, DefinitionConfig, MetadataStorage } from '../metadata';
 
 
 export interface ScalarTypeConfig extends DefinitionConfig {
@@ -15,9 +14,6 @@ export class ScalarType<T extends ScalarTypeConfig = ScalarTypeConfig> extends D
   public isOutputType() { return true; }
   public isInputType() { return true; }
 
-  public get typeName(): string {
-    return this.config.typeInstance.name;
-  }
 
   public buildTypeInstance() {
     return this.config.typeInstance;
@@ -35,20 +31,24 @@ export class IDScalar {}
  * @param storage
  */
 export function loadBuiltInScalar(storage: MetadataStorage) {
-
-  storage.registerEntry(StringScalar, new DefinitionEntry({
-    metadata: new ScalarType({ typeInstance: GraphQLString }),
-  }));
-  storage.registerEntry(BooleanScalar, new DefinitionEntry({
-    metadata: new ScalarType({ typeInstance: GraphQLBoolean }),
-  }));
-  storage.registerEntry(FloatScalar, new DefinitionEntry({
-    metadata: new ScalarType({ typeInstance: GraphQLFloat }),
-  }));
-  storage.registerEntry(IntScalar, new DefinitionEntry({
-    metadata: new ScalarType({ typeInstance: GraphQLInt }),
-  }));
-  storage.registerEntry(IDScalar, new DefinitionEntry({
-    metadata: new ScalarType({ typeInstance: GraphQLID }),
-  }));
+  storage.register(StringScalar, () => [ new ScalarType({
+    definitionName: 'String',
+    typeInstance: GraphQLString,
+  }) ]);
+  storage.register(BooleanScalar, () => [ new ScalarType({
+    definitionName: 'Boolean',
+    typeInstance: GraphQLBoolean,
+  }) ]);
+  storage.register(FloatScalar, () => [ new ScalarType({
+    definitionName: 'Float',
+    typeInstance: GraphQLFloat,
+  }) ]);
+  storage.register(IntScalar, () => [ new ScalarType({
+    definitionName: 'Int',
+    typeInstance: GraphQLInt,
+  }) ]);
+  storage.register(IDScalar, () => [ new ScalarType({
+    definitionName: 'ID',
+    typeInstance: GraphQLID,
+  }) ]);
 }

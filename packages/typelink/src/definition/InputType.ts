@@ -1,6 +1,7 @@
-import { GraphQLInputObjectType, GraphQLInputFieldConfigMap, GraphQLInputFieldConfig } from 'graphql';
-import { MetadataStorage, InputFieldReferenceEntry, InputFieldMixinEntry } from '../metadata';
-import { Definition, DefinitionConfig } from '../definition/Definition';
+import { GraphQLInputFieldConfig, GraphQLInputFieldConfigMap, GraphQLInputObjectType } from 'graphql';
+
+import { Definition, DefinitionConfig, MetadataStorage } from '../metadata';
+import { InputField } from '../reference';
 
 
 export interface InputTypeConfig extends DefinitionConfig {}
@@ -12,42 +13,42 @@ export class InputType<T extends InputTypeConfig = InputTypeConfig> extends Defi
   public isOutputType() { return false; }
   public isInputType() { return true; }
 
-  public buildInputFieldConfig(storage: MetadataStorage, entry: InputFieldReferenceEntry | InputFieldMixinEntry): GraphQLInputFieldConfig {
+  public buildInputFieldConfig(storage: MetadataStorage, field: InputField): GraphQLInputFieldConfig {
     return {
-      type: entry.field.buildType(storage, entry.definitionClass),
-      defaultValue: entry.field.defaultValue,
-      description: entry.field.description,
+      type: field.buildType(storage, field.definitionClass),
+      defaultValue: field.defaultValue,
+      description: field.description,
     };
   }
 
   public buildInputFieldConfigMap(storage: MetadataStorage, targetClass: Function): GraphQLInputFieldConfigMap {
-    const entries = [
-      ...storage.findMixinEntries(InputFieldMixinEntry, this.typeName),
-      ...storage.findReferenceEntries(InputFieldReferenceEntry, targetClass),
+    const fields = [
+      ...storage.findExtendReferences(InputField, this.typeName()),
+      ...storage.findDirectReferences(InputField, targetClass),
     ];
-    return entries.reduce((results, entry) => {
-      results[entry.field.defaultName] = this.buildInputFieldConfig(storage, entry);
+    return fields.reduce((results, field) => {
+      results[field.fieldName] = this.buildInputFieldConfig(storage, field);
       return results;
     }, {} as GraphQLInputFieldConfigMap);
   }
 
   public buildTypeInstance(storage: MetadataStorage, targetClass: Function) {
-    const name = this.typeName;
+    const name = this.typeName();
+    const description = this.description();
     const fields = this.buildInputFieldConfigMap.bind(this, storage, targetClass);
-    const description = this.description;
     return new GraphQLInputObjectType({ name, fields, description });
   }
 
   protected instantiationCache = new WeakMap();
 
   public buildInstantiator(storage: MetadataStorage, targetClass: Function) {
-    const entries = [
-      ...storage.findMixinEntries(InputFieldMixinEntry, this.typeName),
-      ...storage.findReferenceEntries(InputFieldReferenceEntry, targetClass),
+    const fields = [
+      ...storage.findExtendReferences(InputField, this.typeName()),
+      ...storage.findDirectReferences(InputField, targetClass),
     ];
 
-    const fieldInstantiators = entries.reduce((res, entry) => {
-      res[entry.field.defaultName] = entry.field.buildInstantiator(storage, targetClass);
+    const fieldInstantiators = fields.reduce((res, field) => {
+      res[field.fieldName] = field.buildInstantiator(storage, targetClass);
       return res;
     }, {} as any);
 

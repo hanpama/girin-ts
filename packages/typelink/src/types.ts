@@ -1,12 +1,6 @@
 export type ResolvedValue<T> = T | Promise<T>;
 export type ResolvedList<T> = T[] | Promise<T[]> | Promise<T>[];
 
-export type Lazy<T> = (...args: any[]) => T;
-
-export function isLazy<T>(arg: Lazy<T> | any): arg is Lazy<T> {
-  return (arg instanceof Function) && (arg.name === '');
-}
-
 export interface ConcreteClass<T = any> {
   new(...args: any[]): T;
 }

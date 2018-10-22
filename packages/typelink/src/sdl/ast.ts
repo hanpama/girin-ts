@@ -13,22 +13,21 @@ import {
   InputObjectTypeExtensionNode,
 } from 'graphql';
 
-import { TypeArg, TypeExpression, TypeExpressionKind, TypeExpressionConstructorOptions, List, NonNull } from '../type-expression';
-import { Entry, DefinitionEntry, ImplementReferenceEntry, FieldReferenceEntry, FieldMixinEntry, InputFieldMixinEntry, InputFieldReferenceEntry, ImplementMixinEntry } from '../metadata';
+import { TypeExpression, TypeExpressionKind, TypeArg, List, NonNull } from '../type-expression';
 import { completeDirectives, completeValueNode } from './directive';
 import { ObjectType, InterfaceType, InputType } from '../definition';
-import { Lazy } from '../types';
-import { Field, InputField } from '../field';
+import { Field, InputField, Implement } from '../reference';
 import { SubscriptionType } from '../definition/SubscriptionType';
+import { Metadata } from '../metadata';
 
 
 export interface SubstitutionMap {
-  [tempName: string]: TypeExpressionConstructorOptions | TypeExpression;
+  [tempName: string]: TypeArg | TypeExpression;
 }
 
 export class DefinitionParser {
 
-  public entries: Entry<any>[];
+  public metadata: Metadata[];
   public extendingTypeName?: string;
 
 
@@ -41,7 +40,7 @@ export class DefinitionParser {
 
   protected createMetadataFromAST(): void {
     const { rootNode } = this;
-    this.entries = [];
+    this.metadata = [];
 
     if (rootNode.kind === 'ObjectTypeDefinition') {
       this.handleObjectTypeDefinition(rootNode);
@@ -82,7 +81,7 @@ export class DefinitionParser {
       else if (sub instanceof TypeExpression) {
         return sub;
       }
-      return new TypeExpression(sub as TypeArg | Lazy<TypeArg>, asKind);
+      return new TypeExpression(sub, asKind);
     }
   }
 
@@ -99,21 +98,19 @@ export class DefinitionParser {
     let metadata;
     if (name.value === 'Subscription') {
       metadata = new SubscriptionType({
-        typeName: name.value,
+        definitionName: name.value,
         description: description && description.value,
         directives: rootNode.directives && completeDirectives(rootNode.directives),
       });
     } else {
-        metadata = new ObjectType({
-        typeName: name.value,
+      metadata = new ObjectType({
+        definitionName: name.value,
         description: description && description.value,
         directives: rootNode.directives && completeDirectives(rootNode.directives),
       });
     }
 
-    this.entries.push(new DefinitionEntry({
-      metadata,
-    }));
+    this.metadata.push(metadata);
   }
 
   protected handleObjectTypeExtension(rootNode: ObjectTypeExtensionNode): void {
@@ -134,12 +131,10 @@ export class DefinitionParser {
       fields.forEach(fieldNode => this.appendFieldMetadataConfig(fieldNode));
     }
 
-    this.entries.push(new DefinitionEntry({
-      metadata: new InterfaceType({
-        typeName: name.value,
-        description: description && description.value,
-        directives: rootNode.directives && completeDirectives(rootNode.directives),
-      }),
+    this.metadata.push(new InterfaceType({
+      definitionName: name.value,
+      description: description && description.value,
+      directives: rootNode.directives && completeDirectives(rootNode.directives),
     }));
   }
 
@@ -158,12 +153,10 @@ export class DefinitionParser {
       fields.forEach(fieldNode => this.appendInputFieldMetadataConfig(fieldNode));
     }
 
-    this.entries.push(new DefinitionEntry({
-      metadata: new InputType({
-        typeName: name.value,
-        description: description && description.value,
-        directives: node.directives && completeDirectives(node.directives),
-      }),
+    this.metadata.push(new InputType({
+      definitionName: name.value,
+      description: description && description.value,
+      directives: node.directives && completeDirectives(node.directives),
     }));
   }
 
@@ -182,49 +175,36 @@ export class DefinitionParser {
       this.createInputField(argumentNode)
     ));
 
-    const field = new Field({
-      defaultName: name.value,
+    this.metadata.push(new Field({
+      fieldName: name.value,
       type: this.completeTypeExpression(type, 'output'),
       args: argumentRefs || [],
       description: description && description.value,
       directives: directives && completeDirectives(directives),
-    });
-
-    if (extendingTypeName) {
-      this.entries.push(new FieldMixinEntry({ field, extendingTypeName }));
-    } else {
-      this.entries.push(new FieldReferenceEntry({ field }));
-    }
+      extendingTypeName,
+    }));
   }
 
-  protected createInputField(node: InputValueDefinitionNode): InputField {
+  protected createInputField(node: InputValueDefinitionNode, extendingTypeName?: string): InputField {
     const { name, type, description, defaultValue, directives } = node;
 
     return new InputField({
-      defaultName: name.value,
+      fieldName: name.value,
       type: this.completeTypeExpression(type, 'input'),
       directives: directives && completeDirectives(directives),
       defaultValue: defaultValue && completeValueNode(defaultValue),
       description: description && description.value,
+      extendingTypeName,
     });
   }
 
   protected appendInputFieldMetadataConfig(node: InputValueDefinitionNode, extendingTypeName?: string): void {
-    const field = this.createInputField(node);
-    if (extendingTypeName) {
-      this.entries.push(new InputFieldMixinEntry({ field, extendingTypeName }));
-    } else {
-      this.entries.push(new InputFieldReferenceEntry({ field }));
-    }
+    const field = this.createInputField(node, extendingTypeName);
+    this.metadata.push(field);
   }
 
   protected appendImplementTypeExpression(node: NamedTypeNode, extendingTypeName?: string): void {
     const interfaceType = this.completeTypeExpression(node, 'output');
-
-    if (extendingTypeName) {
-      this.entries.push(new ImplementMixinEntry({ extendingTypeName, interfaceType }));
-    } else {
-      this.entries.push(new ImplementReferenceEntry({ interfaceType, }));
-    }
+    this.metadata.push(new Implement({ interfaceType, extendingTypeName }));
   }
 }

@@ -1,8 +1,7 @@
 import { GraphQLType, isType } from 'graphql';
 
-import { Definition } from '../definition/Definition';
-import { MetadataStorage, DefinitionEntry } from '../metadata';
-import { isLazy, Lazy, Instantiator } from '../types';
+import { MetadataStorage, Definition } from '../metadata';
+import { Instantiator } from '../types';
 import { InputType } from '../definition';
 
 
@@ -12,7 +11,7 @@ export interface ResolvedTypeExpression extends TypeExpression {
   typeArg: TypeArg;
 }
 
-export type TypeExpressionConstructorOptions = TypeArg | Lazy<TypeArg> | Lazy<TypeExpression>;
+export type TypeExpressionConstructorOptions = TypeArg;
 
 export type TypeExpressionKind = 'any' | 'input' | 'output';
 
@@ -24,39 +23,26 @@ export class TypeExpression {
   constructor(
     public typeArg: TypeExpressionConstructorOptions,
     public kind: TypeExpressionKind = 'any',
+    public generic?: GenericContext,
   ) { }
 
-  public resolveLazy(): ResolvedTypeExpression {
-    const { typeArg } = this;
-    let resolvedLazy = isLazy(typeArg) ? typeArg() : typeArg;
-    if (resolvedLazy instanceof TypeExpression) {
-      return resolvedLazy as ResolvedTypeExpression;
-    }
-    return new TypeExpression(resolvedLazy, this.kind) as ResolvedTypeExpression;
-  }
-
-  public getDefinitionEntry(storage: MetadataStorage): DefinitionEntry<any, any> {
-    const { typeArg } = this.resolveLazy();
-    return storage.getDefinition(Definition, typeArg as string | Function, this.kind);
+  public getDefinitionEntry(storage: MetadataStorage): Definition<any> {
+    return storage.getDefinition(Definition, this.typeArg as string | Function, this.kind);
   }
 
   public getTypeInstance(storage: MetadataStorage): GraphQLType {
-    const exp = this.resolveLazy();
 
-    if (isType(exp.typeArg)) {
-      return exp.typeArg;
-    }
-    let { definitionClass, metadata } = exp.getDefinitionEntry(storage);
-    return metadata.getOrCreateTypeInstance(storage, definitionClass);
+    if (isType(this.typeArg)) { return this.typeArg; }
+
+    const metadata = this.getDefinitionEntry(storage);
+    return metadata.getOrCreateTypeInstance(storage, metadata.definitionClass, this.generic);
   }
 
   public getInstantiator(storage: MetadataStorage): Instantiator {
-    const exp = this.resolveLazy();
-
-    if (isType(exp.typeArg)) {
+    if (isType(this.typeArg)) {
       return defaultInputFieldInstantiator;
     }
-    const { metadata, definitionClass } = exp.getDefinitionEntry(storage);
+    const { metadata, definitionClass } = this.getDefinitionEntry(storage);
     if (metadata instanceof InputType) {
       return metadata.buildInstantiator(storage, definitionClass);
     } else {
@@ -67,4 +53,9 @@ export class TypeExpression {
 
 function defaultInputFieldInstantiator(value: any) {
   return value;
+}
+
+export interface GenericContext {
+  typeName: string;
+  args: TypeExpression[];
 }

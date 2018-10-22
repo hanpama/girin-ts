@@ -1,39 +1,53 @@
 import { GraphQLNamedType } from 'graphql';
 
-import { Definition } from '../definition/Definition';
+import { Definition } from './Definition';
+import { Reference } from './Reference';
 import { formatObjectInfo } from '../utilities/formatObjectInfo';
-import { TypeExpressionKind } from '../type-expression';
-import { DefinitionEntry, Entry, ReferenceEntry, MixinEntry } from './storageEntries';
+import { TypeExpressionKind, TypeExpression } from '../type-expression';
 
+
+export type MetadataFn = (...genericArgs: TypeExpression[]) => Metadata[];
+
+export type Metadata = Reference<any> | Definition<any>;
 
 /**
  * Keep all [[Definition]] and references.
  * Provide methods to query metadata with its associated class or graphql type name.
  */
 export class MetadataStorage {
-  public readonly memoizedTypeInstanceMap: Map<DefinitionEntry<any, any>, GraphQLNamedType> = new Map();
-  public readonly typeEntriesMap: Map<Function, Entry<any>[]> = new Map();
+  protected readonly deferredMetadataFnQueue: Array<{ definitionClass: Function, metadataFn: MetadataFn }> = [];
+  protected deferredResolved = false;
+  protected readonly metadataArray: Metadata[] = [];
+  protected readonly memoizedTypeInstanceMap: Map<Definition, GraphQLNamedType> = new Map();
 
-  registerEntry(definitionClass: Function, entry: Entry<any>) {
-    let entries = this.typeEntriesMap.get(entry.constructor);
-    if (!entries) {
-      entries = [];
-      this.typeEntriesMap.set(entry.constructor, entries);
+  register(definitionClass: Function, metadataFn: MetadataFn) {
+    this.deferredMetadataFnQueue.unshift({ definitionClass, metadataFn });
+  }
+
+  resolveDeferred() {
+    while (this.deferredMetadataFnQueue.length > 0) {
+      if (this.deferredResolved) { throw new Error('Something went wrong'); }
+
+      const { definitionClass, metadataFn } = this.deferredMetadataFnQueue.pop()!;
+      const metadata = metadataFn();
+      metadata.map(item => {
+        item.definitionClass = definitionClass;
+        this.metadataArray.push(item);
+      });
     }
-    entry.definitionClass = definitionClass;
-    entries.push(entry);
+    this.deferredResolved = true;
   }
 
-  findEntries<T extends Entry<any>>(entryClass: { new (...args: any[]): T }): T[] {
-    return (this.typeEntriesMap.get(entryClass) || []) as T[];
+  findMetadata<T extends Metadata>(entryClass: { new (...args: any[]): T }): T[] {
+    return (this.metadataArray.filter(item => item instanceof entryClass) || []) as T[];
   }
 
-  findReferenceEntries<TEntry extends ReferenceEntry>(entryClass: { new(v: any): TEntry }, targetClass: Function): TEntry[] {
-    return this.findEntries(entryClass).filter(entry => equalsOrInherits(targetClass, entry.definitionClass));
+  findDirectReferences<T extends Reference>(entryClass: { new(v: any): T }, targetClass: Function): T[] {
+    return this.findMetadata(entryClass).filter(entry => equalsOrInherits(targetClass, entry.definitionClass));
   }
 
-  findMixinEntries<TEntry extends MixinEntry>(entryClass: { new(v: any): TEntry}, extendingTypeName: string): TEntry[] {
-    return this.findEntries(entryClass).filter(entry => entry.extendingTypeName === extendingTypeName);
+  findExtendReferences<T extends Reference>(entryClass: { new(v: any): T}, extendingTypeName: string): T[] {
+    return this.findMetadata(entryClass).filter(entry => entry.extendingTypeName === extendingTypeName);
   }
 
   /**
@@ -43,15 +57,13 @@ export class MetadataStorage {
    * @param targetClassOrName A class associated with metadata to query
    * @param asKind
    */
-  getDefinition<T extends Definition<U>, U>(metadataClass: { new (...args: any[]): T; }, targetClassOrName: Function | string, asKind: TypeExpressionKind) {
-    const entry = this.findEntries(DefinitionEntry).find(entry => {
-      const { metadata, definitionClass } = entry;
-
+  getDefinition<T extends Definition>(metadataClass: { new (...args: any[]): T; }, targetClassOrName: Function | string, asKind: TypeExpressionKind) {
+    const entry = this.findMetadata(Definition).find(metadata => {
       let classOrNameMatched: boolean;
       if (typeof targetClassOrName === 'string') {
-        classOrNameMatched = metadata.typeName === targetClassOrName;
+        classOrNameMatched = metadata.definitionName === targetClassOrName;
       } else {
-        classOrNameMatched = definitionClass === targetClassOrName;
+        classOrNameMatched = metadata.definitionClass === targetClassOrName;
       }
 
       let typeMatched: boolean;
@@ -68,7 +80,7 @@ export class MetadataStorage {
     if (!entry) {
       throw new Error(`Cannot get ${metadataClass.name} of ${formatObjectInfo(targetClassOrName)} from MetadataStorage`);
     }
-    return entry as DefinitionEntry<T, U>;
+    return entry as T;
   }
 }
 

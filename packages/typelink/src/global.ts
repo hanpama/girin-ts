@@ -1,5 +1,5 @@
 import { TypeArg, TypeExpression, TypeExpressionKind } from './type-expression';
-import { MetadataStorage, Entry } from './metadata';
+import { MetadataStorage, Metadata, MetadataFn } from './metadata';
 import { loadFallbackRootTypes, loadBuiltInScalar } from './definition';
 
 
@@ -31,8 +31,8 @@ export function getGlobalMetadataStorage() {
  * @param typeArg
  * @param storage
  */
-export function getType(typeArg: TypeArg, as: TypeExpressionKind = 'any', maybeStorage?: MetadataStorage): any {
-  const storage = maybeStorage || getGlobalMetadataStorage();
+export function getType(typeArg: TypeArg, as: TypeExpressionKind = 'any'): any {
+  const storage = getGlobalMetadataStorage();
   const typeExpression = new TypeExpression(typeArg, as);
   return typeExpression.getTypeInstance(storage!);
 }
@@ -40,12 +40,12 @@ export function getType(typeArg: TypeArg, as: TypeExpressionKind = 'any', maybeS
 /**
  * Define a type linked to decorated class and add it to the given
  * storage or default global metadata storage.
- * @param metadata
- * @param maybeStorage
+ * @param metadataOrFn
  */
-export function defineType(metadata: Entry<any>[], maybeStorage?: MetadataStorage) {
-  const storage = maybeStorage || getGlobalMetadataStorage();
+export function defineType(metadataOrFn: (Metadata[] | MetadataFn)) {
+  const storage = getGlobalMetadataStorage();
   return function defDecoratorFn(targetClass: Function): void {
-    metadata.forEach(entry => storage.registerEntry(targetClass, entry));
+    const metadataFn: MetadataFn = Array.isArray(metadataOrFn) ? () => metadataOrFn : metadataOrFn;
+    storage.register(targetClass, metadataFn);
   };
 }
