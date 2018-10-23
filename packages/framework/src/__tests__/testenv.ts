@@ -20,7 +20,7 @@ export function prepareTestEnv(User: any, Query: Function, Mutation?: Function) 
   }))
   .load(new SchemaModule({ Query, Mutation }))
   .load(new ServerModule({
-    SERVER_LISTEN: { host, port }
+    LISTEN: { host, port }
   }))
   .load(new AuthLocalModule({
     USER: User,

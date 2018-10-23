@@ -66,7 +66,7 @@ describe('model', () => {
     expect(await User.getOne(generatedId1)).toBe(null);
     const manyDocs = await User.getMany([
       generatedId1,
-      savedUser._id!,
+      savedUser._id,
       generatedId2,
     ]);
     expect(manyDocs.map(i => i && i._id)).toEqual([null, savedUser._id, null]);
@@ -76,14 +76,14 @@ describe('model', () => {
   it('should be able to created by inserting a document', async () => {
     insertedUser = await User.insertOne({ displayName: 'Baz' });
     expect(insertedUser.displayName).toBe('Baz');
-    expect(insertedUser._id).toHaveLength(24); // ObjectID
+    expect(insertedUser._id).toBeInstanceOf(ObjectID); // ObjectID
     expect(insertedUser).toBeInstanceOf(User);
   });
 
   it('should be deleted by $delete method', async () => {
     const id = await insertedUser.$delete();
-    expect(id).toBe(insertedUser._id);
-    const maybeNull = await User.getOne(insertedUser._id!);
+    expect(id).toBe(insertedUser._id.toHexString());
+    const maybeNull = await User.getOne(insertedUser._id);
     expect(maybeNull).toBeNull();
   });
 
@@ -92,7 +92,7 @@ describe('model', () => {
     const user2 = new User({ _id: new ObjectID() });
     user1.toOneReference = user2;
 
-    expect(user1.toOneReference._id).toBe(user2._id);
+    expect(user1.toOneReference._id.toHexString()).toBe(user2._id.toHexString());
   });
 
   it('should prevent to assign a model instance without _id to @one', () => {
@@ -110,7 +110,9 @@ describe('model', () => {
     const user3 = new User({ _id: new ObjectID() });
 
     user1.toManyReferece = [user2, user3];
-    expect(user1.toManyReferece.map(user => user._id)).toEqual([user2._id, user3._id]);
+    expect(
+      user1.toManyReferece.map(user => user._id.toHexString())
+    ).toEqual([user2._id.toHexString(), user3._id.toHexString()]);
   });
 
   it('should prevent to assign model instances any of which has no _id', () => {

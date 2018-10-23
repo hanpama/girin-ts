@@ -7,7 +7,7 @@ import { ConnectionArguments } from '@girin/relay/connection';
 
 export type Document = {
   [key: string]: any,
-  _id?: ObjectID;
+  // _id: ObjectID;
 };
 
 export type ModelClass<TModel extends Model> = typeof Model & {
@@ -19,7 +19,7 @@ export type ModelClass<TModel extends Model> = typeof Model & {
  * with useful static and prototype methods for dealing with data.
  *
  * The prototype methods has names starting with dollar sign($) to
- * avoid name collision in GraphQL type.
+ * avoid name collision with custom field names.
  */
 export class Model {
   static limit: number = 50;
@@ -89,14 +89,22 @@ export class Model {
     return docs.map(doc => this.create(doc));
   }
 
-  public set _id(value: string | undefined) {
-    this.$source._id = typeof value === 'string' ? new ObjectID(value) : value;
+
+  public set _id(value: ObjectID) {
+    this.$source._id = value;
   }
-  public get _id() { return this.$source._id && String(this.$source._id); }
+  public get _id(): ObjectID { return this.$source._id; }
+
   /**
-   * proxy getter for the document's _id
+   * Primary key of this model instance.
+   * it return a string automatically converted from document's _id.
    */
-  public get id() { return this._id; }
+  public get id(): string {
+    return this.$source._id.toHexString();
+  }
+  public set id(value: string) {
+    this.$source._id = new ObjectID(value);
+  }
 
   /**
    * state object of the model object
@@ -129,7 +137,7 @@ export class Model {
     const { collection } = this.$getManager();
     const { $source } = this;
 
-    if (!this._id) {
+    if (!this.$source._id) {
       const res = await collection.insertOne($source);
       this.$source._id = res.insertedId;
     } else {

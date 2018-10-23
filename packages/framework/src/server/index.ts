@@ -9,7 +9,7 @@ import SchemaModule from '../schema';
 
 
 export interface ServerModuleConfigs {
-  SERVER_APOLLO?: Pick<ApolloServerConfig,
+  APOLLO?: Pick<ApolloServerConfig,
     'schemaDirectives' |
     'introspection' |
     'mocks' |
@@ -21,8 +21,8 @@ export interface ServerModuleConfigs {
     'uploads' |
     'playground'
   >;
-  SERVER_LISTEN?: net.ListenOptions;
-  SERVER_CORS?: CorsOptions;
+  LISTEN?: net.ListenOptions;
+  CORS?: CorsOptions;
 }
 
 export default class ServerModule extends Module<http.Server> {
@@ -59,14 +59,14 @@ export default class ServerModule extends Module<http.Server> {
   async bootstrap() {
     const { configs, context } = this;
     const schema = await SchemaModule.bootstrap();
-    const apolloServerConfig = this.configs.SERVER_APOLLO || {};
+    const apolloServerConfig = this.configs.APOLLO || {};
 
     this.apolloServer = new ApolloServer({ ...apolloServerConfig, schema, context });
     this.apolloServer.applyMiddleware({
       app: this.app,
       path: '/',
       bodyParserConfig: { limit: '50mb' },
-      cors: typeof configs.SERVER_CORS !== 'undefined' ? configs.SERVER_CORS : { origin: '*' },
+      cors: typeof configs.CORS !== 'undefined' ? configs.CORS : { origin: '*' },
     });
     this.httpServer = http.createServer(this.app);
 
@@ -77,7 +77,7 @@ export default class ServerModule extends Module<http.Server> {
     return new Promise<http.Server>((resolve, reject) => {
       this.httpServer.once('listening', () => resolve(this.httpServer));
       this.httpServer.on('error', err => reject(err));
-      this.httpServer.listen(configs.SERVER_LISTEN);
+      this.httpServer.listen(configs.LISTEN);
     });
   }
 

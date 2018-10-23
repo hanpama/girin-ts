@@ -7,7 +7,7 @@
   "scripts": {
     "prepublish": "npm run build",
     "build": "npm run compile",
-    "compile": "tsc"
+    "compile": "tsc -p tsconfig.package.json"
   },
   "keywords": [
     "graphql"
