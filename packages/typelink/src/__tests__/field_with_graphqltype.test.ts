@@ -23,18 +23,20 @@ class ItemInfo {
 
 const itemType = new GraphQLObjectType({
   name: 'Item',
-  fields: {
-    name: {
-      type: GraphQLString,
-      resolve() {
-        return 'foo';
+  fields() {
+    return {
+      name: {
+        type: GraphQLString,
+        resolve() {
+          return 'foo';
+        }
+      },
+      info: {
+        type: getType(ItemInfo),
+        resolve() { return new ItemInfo(); }
       }
-    },
-    info: {
-      type: getType(ItemInfo),
-      resolve() { return new ItemInfo(); }
-    }
-  }
+    };
+  },
 });
 
 const bazEnum = new GraphQLEnumType({

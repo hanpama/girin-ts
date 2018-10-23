@@ -1,5 +1,4 @@
-import { TypeArg, TypeExpression, TypeExpressionKind } from './type-expression';
-import { MetadataStorage, Metadata, MetadataFn } from './metadata';
+import { MetadataStorage, Metadata, MetadataFn, TypeArg, TypeExpression, DefinitionKind } from './metadata';
 import { loadFallbackRootTypes, loadBuiltInScalar } from './definition';
 
 
@@ -31,10 +30,9 @@ export function getGlobalMetadataStorage() {
  * @param typeArg
  * @param storage
  */
-export function getType(typeArg: TypeArg, as: TypeExpressionKind = 'any'): any {
+export function getType(typeArg: TypeArg, as: DefinitionKind = 'any'): any {
   const storage = getGlobalMetadataStorage();
-  const typeExpression = new TypeExpression(typeArg, as);
-  return typeExpression.getTypeInstance(storage!);
+  return TypeExpression.coerce(typeArg).getType(storage, as);
 }
 
 /**

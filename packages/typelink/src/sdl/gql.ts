@@ -1,8 +1,7 @@
 import { parse } from 'graphql';
 
 import { SubstitutionMap, DefinitionParser } from './ast';
-import { TypeExpression, TypeArg } from '../type-expression';
-import { Metadata } from '../metadata';
+import { Metadata, TypeExpression, TypeArg } from '../metadata';
 
 
 const SUBSTITUTION_PREFIX = '__GIRIN__SUBS__';

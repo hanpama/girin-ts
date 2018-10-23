@@ -1,6 +1,7 @@
 import { GraphQLSchema, graphql, printSchema } from 'graphql';
 
 import { getType, gql, defineType } from '..';
+import { getGlobalMetadataStorage } from '../../global';
 
 
 @defineType(gql`
@@ -96,6 +97,8 @@ class Query {
 const schema = new GraphQLSchema({
   query: getType(Query),
 });
+
+console.log(getGlobalMetadataStorage());
 
 describe('Input type', () => {
   it('generates schema and works as expected', async () => {

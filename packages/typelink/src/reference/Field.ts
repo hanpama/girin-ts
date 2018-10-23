@@ -1,18 +1,15 @@
-import { GraphQLFieldConfigArgumentMap, GraphQLOutputType, GraphQLFieldResolver, defaultFieldResolver } from 'graphql';
+import { GraphQLFieldConfigArgumentMap, GraphQLInputType, GraphQLFieldResolver, defaultFieldResolver } from 'graphql';
 
-import { TypeExpression } from '../type-expression';
 import { InputField } from './InputField';
-import { MetadataStorage, Reference } from '../metadata';
+import { MetadataStorage, Reference, ReferenceConfig } from '../metadata';
 
 
-export interface FieldConfig {
+export interface FieldConfig extends ReferenceConfig {
   fieldName: string;
-  type: TypeExpression;
   args: InputField[];
   description?: string;
   deprecationReason?: string;
   directives?: any;
-  extendingTypeName?: string;
 }
 
 export class Field<TConfig extends FieldConfig = FieldConfig> extends Reference<TConfig> {
@@ -22,11 +19,16 @@ export class Field<TConfig extends FieldConfig = FieldConfig> extends Reference<
   public get deprecationReason() { return this.config.deprecationReason; }
   public get extendingTypeName() { return this.config.extendingTypeName; }
 
-  public buildArgs(storage: MetadataStorage, definitionClass: Function): GraphQLFieldConfigArgumentMap {
+  // override
+  public resolveType(storage: MetadataStorage) {
+    return this.targetType.getType(storage, 'output');
+  }
+
+  public buildArgs(storage: MetadataStorage): GraphQLFieldConfigArgumentMap {
     const { args } = this.config;
     return args.reduce((args, ref) => {
       args[ref.fieldName] = {
-        type: ref.buildType(storage, definitionClass),
+        type: ref.resolveType(storage) as GraphQLInputType,
         defaultValue: ref.defaultValue,
         description: ref.description,
       };
@@ -34,12 +36,9 @@ export class Field<TConfig extends FieldConfig = FieldConfig> extends Reference<
     }, {} as GraphQLFieldConfigArgumentMap);
   }
 
-  public buildType(storage: MetadataStorage, definitionClass: Function): GraphQLOutputType {
-    return this.config.type.getTypeInstance(storage) as GraphQLOutputType;
-  }
-
-  public buildResolver(storage: MetadataStorage, definitionClass: Function): GraphQLFieldResolver<any, any> {
+  public buildResolver(storage: MetadataStorage): GraphQLFieldResolver<any, any> {
     const { args } = this.config;
+    const { definitionClass } = this;
 
     const maybeStaticResolver = (definitionClass as any)[this.fieldName];
     const innerResolver = maybeStaticResolver instanceof Function

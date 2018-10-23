@@ -1,12 +1,11 @@
-import { TypeExpression } from '../type-expression';
-import { Reference } from '../metadata';
+import { Reference, ReferenceConfig, MetadataStorage } from '../metadata';
 
 
-export interface ImplementConfig {
-  interfaceType: TypeExpression;
-  extendingTypeName?: string;
-}
+export interface ImplementConfig extends ReferenceConfig {}
 
 export class Implement<TConfig extends ImplementConfig = ImplementConfig> extends Reference<TConfig> {
-  get interfaceType() { return this.config.interfaceType; }
+  // override
+  public resolveType(storage: MetadataStorage) {
+    return this.targetType.getType(storage, 'output');
+  }
 }

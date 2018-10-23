@@ -13,16 +13,14 @@ import {
   InputObjectTypeExtensionNode,
 } from 'graphql';
 
-import { TypeExpression, TypeExpressionKind, TypeArg, List, NonNull } from '../type-expression';
+import { TypeExpression, Structure, List, NonNull, Metadata, TypeArg } from '../metadata';
 import { completeDirectives, completeValueNode } from './directive';
-import { ObjectType, InterfaceType, InputType } from '../definition';
+import { ObjectType, InterfaceType, InputType, SubscriptionType } from '../definition';
 import { Field, InputField, Implement } from '../reference';
-import { SubscriptionType } from '../definition/SubscriptionType';
-import { Metadata } from '../metadata';
 
 
 export interface SubstitutionMap {
-  [tempName: string]: TypeArg | TypeExpression;
+  [tempName: string]: TypeExpression | TypeArg;
 }
 
 export class DefinitionParser {
@@ -63,25 +61,24 @@ export class DefinitionParser {
   }
 
   protected completeTypeExpression(
-    type: NamedTypeNode | ListTypeNode | NonNullTypeNode,
-    asKind: TypeExpressionKind,
-  ): TypeExpression {
+    typeNode: NamedTypeNode | ListTypeNode | NonNullTypeNode,
+  ): TypeExpression | Structure {
     const { subsMap } = this;
 
-    if (type.kind === 'ListType') {
-      return List.of(this.completeTypeExpression(type.type, asKind));
-    } else if (type.kind === 'NonNullType') {
-      return NonNull.of(this.completeTypeExpression(type.type, asKind));
-    } else {
-      const sub = subsMap[type.name.value];
+    if (typeNode.kind === 'ListType') {
+      return List.of(this.completeTypeExpression(typeNode.type));
+    } else if (typeNode.kind === 'NonNullType') {
+      return NonNull.of(this.completeTypeExpression(typeNode.type));
+    }
 
-      if (!sub) {
-        return new TypeExpression(type.name.value, asKind);
-      }
-      else if (sub instanceof TypeExpression) {
-        return sub;
-      }
-      return new TypeExpression(sub, asKind);
+    const subType = subsMap[typeNode.name.value];
+
+    if (subType instanceof TypeExpression) {
+      return subType;
+    } else if (subType) {
+      return new TypeExpression(subType, null);
+    } else {
+      return new TypeExpression(typeNode.name.value, null);
     }
   }
 
@@ -177,7 +174,7 @@ export class DefinitionParser {
 
     this.metadata.push(new Field({
       fieldName: name.value,
-      type: this.completeTypeExpression(type, 'output'),
+      targetType: this.completeTypeExpression(type),
       args: argumentRefs || [],
       description: description && description.value,
       directives: directives && completeDirectives(directives),
@@ -190,7 +187,7 @@ export class DefinitionParser {
 
     return new InputField({
       fieldName: name.value,
-      type: this.completeTypeExpression(type, 'input'),
+      targetType: this.completeTypeExpression(type),
       directives: directives && completeDirectives(directives),
       defaultValue: defaultValue && completeValueNode(defaultValue),
       description: description && description.value,
@@ -204,7 +201,7 @@ export class DefinitionParser {
   }
 
   protected appendImplementTypeExpression(node: NamedTypeNode, extendingTypeName?: string): void {
-    const interfaceType = this.completeTypeExpression(node, 'output');
-    this.metadata.push(new Implement({ interfaceType, extendingTypeName }));
+    const targetType = this.completeTypeExpression(node);
+    this.metadata.push(new Implement({ targetType, extendingTypeName }));
   }
 }

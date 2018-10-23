@@ -12,3 +12,7 @@ export function isPromise<T = any>(value: T | Promise<T>): value is Promise<T> {
 }
 
 export type Instantiator<TClass = any> = (value: { [key: string]: any }) => TClass;
+
+export function defaultInputFieldInstantiator(value: any) {
+  return value;
+}
