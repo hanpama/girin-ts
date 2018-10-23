@@ -10,10 +10,15 @@ export interface ConnectionArguments {
 
 @defineType(TNode => gql`
   type Connection {
-    edges: ${List.of(Edge.of(TNode, 'fefe'))}
+    edges: ${List.of(Edge.of(TNode))}
   }
 `)
 export abstract class Connection<TNode, TResponse = any, TItem = any> {
+
+  static of(inner: TypeArg | TypeExpression | GenericParameter) {
+    return new TypeExpression(Connection, [TypeExpression.coerce(inner)]);
+  }
+
   constructor(protected args: ConnectionArguments) {
     if (args.first && args.first < 0) {
       throw new Error('Argument "first" must be a non-negative integer');
@@ -98,12 +103,8 @@ export class PageInfo<TNode, TResponse = any, TItem = any> {
 `)
 export class Edge<TNode, TResponse = any, TItem = any> {
 
-  static of(inner: TypeArg | TypeExpression | GenericParameter, asTypeName: string) {
-    const innerExp = TypeExpression.coerce(inner);
-    return new TypeExpression(Edge, {
-      typeName: asTypeName,
-      args: [innerExp]
-    });
+  static of(inner: TypeArg | TypeExpression | GenericParameter) {
+    return new TypeExpression(Edge, [TypeExpression.coerce(inner)]);
   }
 
   constructor(
