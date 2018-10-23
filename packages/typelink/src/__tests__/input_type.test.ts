@@ -1,7 +1,7 @@
 import { GraphQLSchema, graphql, printSchema } from 'graphql';
 
 import { getType, gql, defineType } from '..';
-import { getGlobalMetadataStorage } from '../../global';
+import { getGlobalMetadataStorage } from '../global';
 
 
 @defineType(gql`

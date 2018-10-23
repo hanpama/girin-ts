@@ -30,7 +30,7 @@ class Person {
   }
 `)
 class Book {
-
+  constructor(public title: string) {}
 }
 
 describe('generics', () => {
