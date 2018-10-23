@@ -1,7 +1,8 @@
 import { GraphQLInputFieldConfig, GraphQLInputFieldConfigMap, GraphQLInputObjectType, GraphQLInputType } from 'graphql';
 
-import { Definition, DefinitionConfig, MetadataStorage, GenericContext, DefinitionKind } from '../metadata';
+import { Definition, DefinitionConfig, MetadataStorage, DefinitionKind } from '../metadata';
 import { InputField } from '../reference';
+import { GraphQLNamedType } from 'graphql/type/definition';
 
 
 export interface InputTypeConfig extends DefinitionConfig {}
@@ -31,10 +32,10 @@ export class InputType<T extends InputTypeConfig = InputTypeConfig> extends Defi
     }, {} as GraphQLInputFieldConfigMap);
   }
 
-  public buildTypeInstance(storage: MetadataStorage, generic: GenericContext | null) {
-    const name = this.typeName(generic);
-    const description = this.description(generic);
-    const fields = this.buildInputFieldConfigMap.bind(this, storage, generic);
+  public buildTypeInstance(storage: MetadataStorage, genericTypes: GraphQLNamedType[]) {
+    const name = this.typeName(genericTypes);
+    const description = this.description(genericTypes);
+    const fields = this.buildInputFieldConfigMap.bind(this, storage);
     return new GraphQLInputObjectType({ name, fields, description });
   }
 

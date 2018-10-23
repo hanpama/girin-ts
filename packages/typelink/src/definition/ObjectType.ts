@@ -1,7 +1,8 @@
 import { GraphQLFieldConfig, GraphQLFieldConfigMap, GraphQLInterfaceType, GraphQLObjectType, GraphQLOutputType } from 'graphql';
 
-import { Definition, DefinitionConfig, MetadataStorage, GenericContext, DefinitionKind } from '../metadata';
+import { Definition, DefinitionConfig, MetadataStorage, DefinitionKind } from '../metadata';
 import { Field, Implement } from '../reference';
+import { GraphQLNamedType } from 'graphql/type/definition';
 
 
 export interface ObjectTypeConfig extends DefinitionConfig {
@@ -43,9 +44,9 @@ export class ObjectType<TConfig extends ObjectTypeConfig = ObjectTypeConfig> ext
   /**
    * Build GraphQLObjectType instance from metadata.
    */
-  public buildTypeInstance(storage: MetadataStorage, generic: GenericContext | null): GraphQLObjectType {
-    const name = this.typeName(generic);
-    const description = this.description(generic);
+  public buildTypeInstance(storage: MetadataStorage, genericTypes: GraphQLNamedType[]): GraphQLObjectType {
+    const name = this.typeName(genericTypes);
+    const description = this.description(genericTypes);
     const fields = this.buildFieldConfigMap.bind(this, storage);
     const interfaces = this.findInterfaces(storage);
     const isTypeOf = this.buildIsTypeOf(storage);

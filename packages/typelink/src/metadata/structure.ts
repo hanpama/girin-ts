@@ -7,14 +7,14 @@ import { DefinitionKind } from './Definition';
 
 
 export abstract class Structure {
-  static of<T extends Structure>(
-    this: { new(...args: any[]): T },
-    inner: Structure | TypeArg | TypeExpression | GraphQLType,
-  ): T {
+  static of<T extends Structure>(this: { new(...args: any[]): T }, inner: TypeArg | TypeExpression | Structure): T {
     return new this(inner instanceof Structure ? inner : TypeExpression.coerce(inner));
   }
 
-  constructor(public inner: TypeExpression | Structure | GraphQLType) {}
+  constructor(inner: TypeArg | TypeExpression | Structure) {
+    this.inner = inner instanceof Structure ? inner : TypeExpression.coerce(inner);
+  }
+  protected inner: TypeExpression | Structure;
 
   abstract getType(storage: MetadataStorage, kind: DefinitionKind): GraphQLType;
   abstract getInstantiator(storage: MetadataStorage, kind: DefinitionKind): Instantiator;
@@ -22,7 +22,7 @@ export abstract class Structure {
 
 export class List extends Structure {
   public getType(storage: MetadataStorage, kind: DefinitionKind) {
-    const innerType = isType(this.inner) ? this.inner : this.inner.getType(storage, kind);
+    const innerType = this.inner.getType(storage, kind);
     return new GraphQLList(innerType);
   }
 
@@ -36,7 +36,7 @@ export class List extends Structure {
 
 export class NonNull extends Structure {
   public getType(storage: MetadataStorage, kind: DefinitionKind) {
-    const innerType = isType(this.inner) ? this.inner : this.inner.getType(storage, kind);
+    const innerType = this.inner.getType(storage, kind);
     return new GraphQLNonNull(innerType);
   }
 

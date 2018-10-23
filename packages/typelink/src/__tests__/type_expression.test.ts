@@ -7,7 +7,7 @@ describe('createFromTypeString', () => {
   const storage = getGlobalMetadataStorage();
 
   it('is created as expected', () => {
-    const bool = new TypeExpression('Boolean', null);
+    const bool = new TypeExpression('Boolean', []);
     const type: any = bool.getType(storage, 'any');
     expect(type.name).toBe('Boolean');
   });
@@ -40,8 +40,8 @@ describe('createFromTypeString', () => {
       email?: string;
     }
 
-    const personOutput = new TypeExpression(Person, null).getType(storage, 'output') as GraphQLNamedType;
-    const personInput = new TypeExpression(Person, null).getType(storage, 'input') as GraphQLNamedType;
+    const personOutput = new TypeExpression(Person, []).getType(storage, 'output') as GraphQLNamedType;
+    const personInput = new TypeExpression(Person, []).getType(storage, 'input') as GraphQLNamedType;
     expect(personOutput.name).toBe('Person');
     expect(personInput.name).toBe('PersonInput');
   });

@@ -20,7 +20,7 @@ import { Field, InputField, Implement } from '../reference';
 
 
 export interface SubstitutionMap {
-  [tempName: string]: TypeExpression | TypeArg;
+  [tempName: string]: TypeExpression | TypeArg | Structure;
 }
 
 export class DefinitionParser {
@@ -75,10 +75,13 @@ export class DefinitionParser {
 
     if (subType instanceof TypeExpression) {
       return subType;
-    } else if (subType) {
-      return new TypeExpression(subType, null);
+    } if (subType instanceof Structure) {
+      return subType;
+    }
+    else if (subType) {
+      return new TypeExpression(subType, []);
     } else {
-      return new TypeExpression(typeNode.name.value, null);
+      return new TypeExpression(typeNode.name.value, []);
     }
   }
 

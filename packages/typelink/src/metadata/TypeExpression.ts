@@ -1,6 +1,6 @@
 import { GraphQLType, isType } from 'graphql';
 
-import { MetadataStorage, Definition, GenericContext } from '.';
+import { MetadataStorage, Definition, GenericArguments } from '.';
 import { GenericParameter } from './generic';
 import { defaultInputFieldInstantiator } from '../types';
 import { DefinitionKind } from './Definition';
@@ -26,7 +26,7 @@ export class TypeExpression {
 
   constructor(
     public typeArg: TypeArg,
-    public generic: GenericContext | null,
+    public generic: GenericArguments,
   ) { }
 
   static coerce(typeArgOrExp: TypeExpression | TypeArg): TypeExpression {
@@ -34,7 +34,7 @@ export class TypeExpression {
       return typeArgOrExp;
     }
     else if (isTypeArg(typeArgOrExp)) {
-      return new TypeExpression(typeArgOrExp, null);
+      return new TypeExpression(typeArgOrExp, []);
     }
     throw new Error(`Given argument cannot be resolved to a type: ${typeArgOrExp}`);
   }
@@ -51,7 +51,7 @@ export class TypeExpression {
       if (typeArg instanceof GenericParameter) {
         if (!generic) { throw new Error('Generic context is missing'); }
 
-        const genericTypeExp = generic.args[typeArg.order];
+        const genericTypeExp = generic[typeArg.order];
         if (!genericTypeExp) { throw new Error('Generic type not provided'); }
 
         return genericTypeExp.getDefinition(storage, kind);

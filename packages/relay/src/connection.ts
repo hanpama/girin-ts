@@ -1,4 +1,4 @@
-import { defineType, gql } from '@girin/typelink';
+import { defineType, gql, TypeArg, TypeExpression, GenericParameter, List } from '@girin/typelink';
 
 
 export interface ConnectionArguments {
@@ -8,6 +8,11 @@ export interface ConnectionArguments {
   before?: string | null;
 }
 
+@defineType(TNode => gql`
+  type Connection {
+    edges: ${List.of(Edge.of(TNode, 'fefe'))}
+  }
+`)
 export abstract class Connection<TNode, TResponse = any, TItem = any> {
   constructor(protected args: ConnectionArguments) {
     if (args.first && args.first < 0) {
@@ -85,7 +90,22 @@ export class PageInfo<TNode, TResponse = any, TItem = any> {
   }
 }
 
+@defineType(TNode => gql`
+  type Edge {
+    node: ${TNode}
+    cursor: String
+  }
+`)
 export class Edge<TNode, TResponse = any, TItem = any> {
+
+  static of(inner: TypeArg | TypeExpression | GenericParameter, asTypeName: string) {
+    const innerExp = TypeExpression.coerce(inner);
+    return new TypeExpression(Edge, {
+      typeName: asTypeName,
+      args: [innerExp]
+    });
+  }
+
   constructor(
     protected connection: Connection<TNode, TResponse, TItem>,
     protected item: TItem,

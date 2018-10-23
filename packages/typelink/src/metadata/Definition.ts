@@ -1,7 +1,8 @@
 import { GraphQLNamedType } from 'graphql';
 import { MetadataStorage } from './MetadataStorage';
-import { GenericContext } from './generic';
+import { GenericArguments } from './generic';
 import { defaultInputFieldInstantiator, Instantiator } from '../types';
+import { PathMap } from '../utilities/PathMap';
 
 
 export type DefinitionKind = 'any' | 'input' | 'output';
@@ -11,8 +12,6 @@ export interface DefinitionConfig {
   description?: string;
   directives?: any;
 }
-
-// const leaf = Symbol();
 
 /**
  * Contain configs required to build named GraphQL types.
@@ -30,26 +29,24 @@ export class Definition<TConfig extends DefinitionConfig = DefinitionConfig> {
     this.config = config;
   }
 
-  public typeName(generic: GenericContext | null): string  {
+  public typeName(genericTypes: GraphQLNamedType[]): string  {
     const { definitionName } = this.config;
-    return generic ? generic.typeName : definitionName;
+    return genericTypes.map(t => t.name) + definitionName;
   }
 
-  public description(generic: GenericContext | null): string | undefined {
+  public description(genericTypes: GraphQLNamedType[]): string | undefined {
     return this.config.description;
   }
 
-  protected graphqlType: Map<string | null, GraphQLNamedType> = new Map();
+  protected graphqlType: PathMap<GraphQLNamedType, GraphQLNamedType> = new PathMap();
 
-  public getOrCreateTypeInstance(storage: MetadataStorage, generic: GenericContext | null): GraphQLNamedType {
-    if (generic) {
-      generic.args.map(exp => exp.getType(storage, this.kind));
-    }
-    const genericKey = generic ? generic.typeName : null;
-    let typeInstance = this.graphqlType.get(genericKey);
+  public getOrCreateTypeInstance(storage: MetadataStorage, genericExps: GenericArguments): GraphQLNamedType {
+    const resolvedGenericTypes = genericExps.map(exp => exp.getType(storage, this.kind) as GraphQLNamedType);
+
+    let typeInstance = this.graphqlType.get(resolvedGenericTypes);
     if (!typeInstance) {
-      typeInstance = this.buildTypeInstance(storage, generic);
-      this.graphqlType.set(genericKey, typeInstance);
+      typeInstance = this.buildTypeInstance(storage, resolvedGenericTypes);
+      this.graphqlType.set(resolvedGenericTypes, typeInstance);
     }
     return typeInstance;
   }
@@ -57,7 +54,7 @@ export class Definition<TConfig extends DefinitionConfig = DefinitionConfig> {
   /**
    * Build GraphQLType instance from metadata.
    */
-  public buildTypeInstance(storage: MetadataStorage, generic: GenericContext | null): GraphQLNamedType {
+  public buildTypeInstance(storage: MetadataStorage, genericTypes: GraphQLNamedType[]): GraphQLNamedType {
     throw new Error(`Should implement typeInstance getter in ${this.constructor.name}`);
   }
 

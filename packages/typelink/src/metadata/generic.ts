@@ -1,10 +1,7 @@
 import { TypeExpression } from './TypeExpression';
 
 
-export interface GenericContext {
-  typeName: string;
-  args: TypeExpression[];
-}
+export type GenericArguments = TypeExpression[];
 
 export class GenericParameter {
   constructor(public order: number) {}
