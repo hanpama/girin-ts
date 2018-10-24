@@ -1,12 +1,11 @@
 import { GraphQLType } from 'graphql';
 
 import { TypeExpression } from './TypeExpression';
-import { MetadataStorage } from '.';
-import { Structure } from './structure';
+import { MetadataStorage } from './MetadataStorage';
 
 
 export interface ReferenceConfig {
-  targetType: TypeExpression | Structure;
+  targetType: TypeExpression;
   extendingTypeName?: string;
 }
 

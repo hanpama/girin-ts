@@ -6,13 +6,23 @@ import { getGlobalMetadataStorage } from '../global';
 
 
 @defineType(T => gql`
-  type Container {
+  type Inner {
     item: ${T}
   }
 `)
-class Container<T> {
+class Inner<T> {
   constructor(public item: T) {}
 }
+
+@defineType(T => gql`
+  type Outer {
+    item: ${T}
+  }
+`)
+class Outer<T> {
+  constructor(public item: T) {}
+}
+
 
 @defineType(gql`
   type Person {
@@ -34,15 +44,31 @@ class Book {
 }
 
 describe('generics', () => {
+  const storage = getGlobalMetadataStorage();
   it('should build multiple type instances for each generic context', () => {
-    const storage = getGlobalMetadataStorage();
-    const bookContainerExp = new TypeExpression(Container, [new TypeExpression(Book, [])]);
-    const bookContainerType = bookContainerExp.getType(storage, 'any') as GraphQLObjectType;
-    expect(bookContainerType.name).toBe('BookContainer');
+    const bookInnerExp = new TypeExpression(Inner, [new TypeExpression(Book, [])]);
+    const bookInnerType = bookInnerExp.getType(storage, 'any') as GraphQLObjectType;
+    expect(bookInnerType.name).toBe('BookInner');
 
-    const personContainerExp = new TypeExpression(Container, [new TypeExpression(Person, [])]);
-    const personContainerType = personContainerExp.getType(storage, 'any') as GraphQLObjectType;
-    expect(personContainerType.name).toBe('PersonContainer');
+    const personInnerExp = new TypeExpression(Inner, [new TypeExpression(Person, [])]);
+    const personInnerType = personInnerExp.getType(storage, 'any') as GraphQLObjectType;
+    expect(personInnerType.name).toBe('PersonInner');
+  });
+
+  it('should resolve nested generic expressions', () => {
+    const bookInnerOuterExp = new TypeExpression(
+      Outer, [
+        new TypeExpression(
+          Inner, [
+            new TypeExpression(
+              Book, []
+            )
+          ]
+        )
+      ]
+    );
+    const bookInnerOuterType = bookInnerOuterExp.getType(storage, 'any') as GraphQLObjectType;
+    expect(bookInnerOuterType.name).toBe('BookInnerOuter');
   });
 
   it('should throw an error when being built without generic context', () => {

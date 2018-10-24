@@ -125,17 +125,23 @@ class Droid extends Character<DroidSource> {
 @defineType(gql`
   type Query {
     hero(
-      """If omitted, returns the hero of the whole saga. If provided, returns the hero of that particular episode."""
+      """
+      If omitted, returns the hero of the whole saga. If provided, returns the hero of that particular episode.
+      """
       episode: ${episodeEnum}
     ): ${Character}
 
     human(
-      """id of the human"""
+      """
+      id of the human
+      """
       id: String!
     ): ${Human}
 
     droid(
-      """id of the droid"""
+      """
+      id of the droid
+      """
       id: String!
     ): ${Droid}
   }

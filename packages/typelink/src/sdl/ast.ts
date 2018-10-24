@@ -13,14 +13,14 @@ import {
   InputObjectTypeExtensionNode,
 } from 'graphql';
 
-import { TypeExpression, Structure, List, NonNull, Metadata, TypeArg } from '../metadata';
+import { TypeExpression, List, NonNull, Metadata, TypeArg } from '../metadata';
 import { completeDirectives, completeValueNode } from './directive';
 import { ObjectType, InterfaceType, InputType, SubscriptionType } from '../definition';
 import { Field, InputField, Implement } from '../reference';
 
 
 export interface SubstitutionMap {
-  [tempName: string]: TypeExpression | TypeArg | Structure;
+  [tempName: string]: TypeExpression | TypeArg;
 }
 
 export class DefinitionParser {
@@ -62,7 +62,7 @@ export class DefinitionParser {
 
   protected completeTypeExpression(
     typeNode: NamedTypeNode | ListTypeNode | NonNullTypeNode,
-  ): TypeExpression | Structure {
+  ): TypeExpression {
     const { subsMap } = this;
 
     if (typeNode.kind === 'ListType') {
@@ -75,10 +75,7 @@ export class DefinitionParser {
 
     if (subType instanceof TypeExpression) {
       return subType;
-    } if (subType instanceof Structure) {
-      return subType;
-    }
-    else if (subType) {
+    } else if (subType) {
       return new TypeExpression(subType, []);
     } else {
       return new TypeExpression(typeNode.name.value, []);

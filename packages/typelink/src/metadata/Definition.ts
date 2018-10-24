@@ -1,6 +1,5 @@
 import { GraphQLNamedType } from 'graphql';
 import { MetadataStorage } from './MetadataStorage';
-import { GenericArguments } from './generic';
 import { defaultInputFieldInstantiator, Instantiator } from '../types';
 import { PathMap } from '../utilities/PathMap';
 
@@ -40,13 +39,13 @@ export class Definition<TConfig extends DefinitionConfig = DefinitionConfig> {
 
   protected graphqlType: PathMap<GraphQLNamedType, GraphQLNamedType> = new PathMap();
 
-  public getOrCreateTypeInstance(storage: MetadataStorage, genericExps: GenericArguments): GraphQLNamedType {
-    const resolvedGenericTypes = genericExps.map(exp => exp.getType(storage, this.kind) as GraphQLNamedType);
+  public getOrCreateTypeInstance(storage: MetadataStorage, genericTypes: GraphQLNamedType[]): GraphQLNamedType {
 
-    let typeInstance = this.graphqlType.get(resolvedGenericTypes);
+
+    let typeInstance = this.graphqlType.get(genericTypes);
     if (!typeInstance) {
-      typeInstance = this.buildTypeInstance(storage, resolvedGenericTypes);
-      this.graphqlType.set(resolvedGenericTypes, typeInstance);
+      typeInstance = this.buildTypeInstance(storage, genericTypes);
+      this.graphqlType.set(genericTypes, typeInstance);
     }
     return typeInstance;
   }

@@ -1,19 +1,12 @@
-import { GraphQLType, isType } from 'graphql';
+import { GraphQLType, isType, GraphQLNamedType, GraphQLList, GraphQLNonNull } from 'graphql';
 
-import { MetadataStorage, Definition, GenericArguments } from '.';
-import { GenericParameter } from './generic';
-import { defaultInputFieldInstantiator } from '../types';
-import { DefinitionKind } from './Definition';
+import { MetadataStorage } from './MetadataStorage';
+import { Definition, DefinitionKind } from './Definition';
+import { defaultInputFieldInstantiator, Instantiator } from '../types';
+import { formatObjectInfo } from '../utilities/formatObjectInfo';
 
 
 export type TypeArg = string | Function | GenericParameter | GraphQLType;
-
-export function isTypeArg(maybeTypeArg: any): maybeTypeArg is TypeArg {
-  return typeof maybeTypeArg === 'string'
-    || maybeTypeArg instanceof Function
-    || maybeTypeArg instanceof GenericParameter
-    || isType(maybeTypeArg);
-}
 
 export interface ResolvedTypeExpression extends TypeExpression {
   typeArg: TypeArg;
@@ -34,46 +27,94 @@ export class TypeExpression {
       return typeArgOrExp;
     }
     else if (isTypeArg(typeArgOrExp)) {
-      return new TypeExpression(typeArgOrExp, []);
+      return new this(typeArgOrExp, []);
     }
     throw new Error(`Given argument cannot be resolved to a type: ${typeArgOrExp}`);
   }
 
-  protected definitionEntry: Definition<any> | null | undefined;
-
-  protected getDefinition(storage: MetadataStorage, kind: DefinitionKind): Definition<any> {
+  public getType(storage: MetadataStorage, kind: DefinitionKind): GraphQLType {
     const { typeArg, generic } = this;
     if (isType(typeArg)) {
-      throw new Error('GraphQLType object has no definition');
+      return typeArg;
+    }
+    const resolvedGenericTypes = generic.map(exp => exp.getType(storage, kind));
+
+    if (typeArg instanceof GenericParameter) {
+      return resolvedGenericTypes[typeArg.order];
+    }
+    if (typeArg === List) {
+      return new GraphQLList(resolvedGenericTypes[0]);
+    }
+    if (typeArg === NonNull) {
+      return new GraphQLNonNull(resolvedGenericTypes[0]);
     }
 
-    if (this.definitionEntry === undefined) {
-      if (typeArg instanceof GenericParameter) {
-        if (!generic) { throw new Error('Generic context is missing'); }
-
-        const genericTypeExp = generic[typeArg.order];
-        if (!genericTypeExp) { throw new Error('Generic type not provided'); }
-
-        return genericTypeExp.getDefinition(storage, kind);
-      }
-      this.definitionEntry = storage.getDefinition(Definition, typeArg as string | Function, kind);
+    const definition = storage.getDefinition(Definition, typeArg as string | Function, kind);
+    if (!definition) {
+      throw new Error(
+        `Cannot get Definition of ${formatObjectInfo(typeArg)} from MetadataStorage`);
     }
-
-    if (!this.definitionEntry) {
-      throw new Error('Cannot find matched definition');
-    }
-
-    return this.definitionEntry;
+    return definition.getOrCreateTypeInstance(storage, resolvedGenericTypes as GraphQLNamedType[]);
   }
 
-  public getType(storage: MetadataStorage, kind: DefinitionKind) {
-    if (isType(this.typeArg)) { return this.typeArg; }
-    const def = this.getDefinition(storage, kind);
-    return def.getOrCreateTypeInstance(storage, this.generic);
-  }
+  public getInstantiator(storage: MetadataStorage, kind: DefinitionKind): Instantiator {
+    const { typeArg, generic } = this;
 
-  public getInstantiator(storage: MetadataStorage, kind: DefinitionKind) {
-    if (isType(this.typeArg)) { return defaultInputFieldInstantiator; }
-    return this.getDefinition(storage, kind).buildInstantiator(storage);
+    if (isType(typeArg)) {
+      return defaultInputFieldInstantiator;
+    }
+
+    const genericInstantiators = generic.map(exp => exp.getInstantiator(storage, kind));
+
+    if (typeArg instanceof GenericParameter) {
+      return genericInstantiators[typeArg.order];
+    }
+    if (typeArg === List) {
+      return (values: any[]) => values.map(genericInstantiators[0]);
+    }
+    if (typeArg === NonNull) {
+      return genericInstantiators[0];
+    }
+
+    const definition = storage.getDefinition(Definition, typeArg as string | Function, kind);
+    return definition ? definition.buildInstantiator(storage) : defaultInputFieldInstantiator;
   }
 }
+
+export class List {
+  static of(inner: TypeArg | TypeExpression) {
+    return new TypeExpression(this, [TypeExpression.coerce(inner)]);
+  }
+}
+
+export class NonNull {
+  static of(inner: TypeArg | TypeExpression) {
+    return new TypeExpression(this, [TypeExpression.coerce(inner)]);
+  }
+}
+
+function isTypeArg(maybeTypeArg: any): maybeTypeArg is TypeArg {
+  return typeof maybeTypeArg === 'string'
+    || maybeTypeArg instanceof Function
+    || maybeTypeArg instanceof GenericParameter
+    || isType(maybeTypeArg);
+}
+
+export type GenericArguments = TypeExpression[];
+
+export class GenericParameter {
+  constructor(public order: number) {}
+}
+
+export const genericParameters = [
+  new GenericParameter(0),
+  new GenericParameter(1),
+  new GenericParameter(2),
+  new GenericParameter(3),
+  new GenericParameter(4),
+  new GenericParameter(5),
+  new GenericParameter(6),
+  new GenericParameter(7),
+  new GenericParameter(8),
+  new GenericParameter(9),
+];

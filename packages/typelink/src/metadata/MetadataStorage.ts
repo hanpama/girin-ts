@@ -1,7 +1,6 @@
 import { Definition, DefinitionKind } from './Definition';
 import { Reference } from './Reference';
-import { GenericParameter, genericParameters } from './generic';
-import { formatObjectInfo } from '../utilities/formatObjectInfo';
+import { GenericParameter, genericParameters } from './TypeExpression';
 
 
 export type MetadataFn = (...genericArgs: Array<GenericParameter>) => Metadata[];
@@ -58,7 +57,7 @@ export class MetadataStorage {
    * @param targetClassOrName A class associated with metadata to query
    * @param asKind
    */
-  getDefinition<T extends Definition>(metadataClass: { new (...args: any[]): T; }, targetClassOrName: Function | string, asKind: DefinitionKind) {
+  getDefinition<T extends Definition>(metadataClass: { new (...args: any[]): T; }, targetClassOrName: Function | string, asKind: DefinitionKind): T | undefined {
     this.resolveDeferred();
 
     const entry = this.findMetadata(Definition).find(metadata => {
@@ -71,9 +70,7 @@ export class MetadataStorage {
       const typeMatched = asKind === 'any' || metadata.kind === 'any' || metadata.kind === asKind;
       return classOrNameMatched && (metadata instanceof metadataClass) && typeMatched;
     });
-    if (!entry) {
-      throw new Error(`Cannot get ${metadataClass.name} of ${formatObjectInfo(targetClassOrName)} from MetadataStorage`);
-    }
+
     return entry as T;
   }
 }

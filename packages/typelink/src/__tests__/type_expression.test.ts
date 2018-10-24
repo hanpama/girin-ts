@@ -12,18 +12,6 @@ describe('createFromTypeString', () => {
     expect(type.name).toBe('Boolean');
   });
 
-  // it('resolves nested expression', () => {
-  //   const complexExpression = new TypeExpression(() => List.of(new TypeExpression('String')));
-  //   const resolved = complexExpression.resolveLazy() as List;
-
-  //   expect(resolved).toBeInstanceOf(List);
-  //   expect(resolved.innerType).toBeInstanceOf(TypeExpression);
-  //   expect(resolved.innerType.typeArg).toBe('String');
-
-  //   const built = resolved.getTypeInstance(storage) as GraphQLList<GraphQLScalarType>;
-  //   expect(built).toBeInstanceOf(GraphQLList);
-  // });
-
   it('resolves explicit output/input type expression', () => {
     @defineType(gql`
       type Person {
@@ -44,5 +32,9 @@ describe('createFromTypeString', () => {
     const personInput = new TypeExpression(Person, []).getType(storage, 'input') as GraphQLNamedType;
     expect(personOutput.name).toBe('Person');
     expect(personInput.name).toBe('PersonInput');
+  });
+
+  it('coerces', () => {
+
   });
 });
