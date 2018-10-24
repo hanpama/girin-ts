@@ -1,9 +1,9 @@
 import { Definition, DefinitionKind } from './Definition';
 import { Reference } from './Reference';
-import { GenericParameter, genericParameters } from './TypeExpression';
+import { GenericSymbol, genericParameters } from '../type-expression';
 
 
-export type MetadataFn = (...genericArgs: Array<GenericParameter>) => Metadata[];
+export type MetadataFn = (...genericArgs: Array<GenericSymbol>) => Metadata[];
 
 export type Metadata = Reference<any> | Definition<any>;
 

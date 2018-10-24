@@ -1,26 +1,26 @@
 import { GraphQLObjectType } from 'graphql';
 
 import { defineType, gql } from '..';
-import { TypeExpression } from '../metadata';
-import { getGlobalMetadataStorage } from '../global';
+import { DefinitionTypeExpression, List, TypeResolvingContext } from '../type-expression';
+import { getGlobalMetadataStorage, getType } from '../global';
 
 
 @defineType(T => gql`
-  type Inner {
+  type One {
     item: ${T}
   }
 `)
-class Inner<T> {
+class One<T> {
   constructor(public item: T) {}
 }
 
 @defineType(T => gql`
-  type Outer {
-    item: ${T}
+  type Many {
+    items: ${List.of(T)}
   }
 `)
-class Outer<T> {
-  constructor(public item: T) {}
+class Many<T> {
+  constructor(public items: T[]) {}
 }
 
 
@@ -45,33 +45,55 @@ class Book {
 
 describe('generics', () => {
   const storage = getGlobalMetadataStorage();
-  it('should build multiple type instances for each generic context', () => {
-    const bookInnerExp = new TypeExpression(Inner, [new TypeExpression(Book, [])]);
-    const bookInnerType = bookInnerExp.getType(storage, 'any') as GraphQLObjectType;
-    expect(bookInnerType.name).toBe('BookInner');
+  const context: TypeResolvingContext = {
+    storage, kind: 'any', generic: [],
+  };
 
-    const personInnerExp = new TypeExpression(Inner, [new TypeExpression(Person, [])]);
-    const personInnerType = personInnerExp.getType(storage, 'any') as GraphQLObjectType;
-    expect(personInnerType.name).toBe('PersonInner');
+  it('should build multiple type instances for each generic context', () => {
+
+    const bookOneExp = new DefinitionTypeExpression(One, [new DefinitionTypeExpression(Book, [])]);
+    const bookOneType = bookOneExp.getType(context) as GraphQLObjectType;
+    expect(bookOneType.name).toBe('BookOne');
+    expect(bookOneType.getFields().item.type).toBe(getType(Book));
+
+    const personOneExp = new DefinitionTypeExpression(One, [new DefinitionTypeExpression(Person, [])]);
+    const personOneType = personOneExp.getType(context) as GraphQLObjectType;
+    expect(personOneType.name).toBe('PersonOne');
+    expect(personOneType.getFields().item.type).toBe(getType(Person));
   });
 
   it('should resolve nested generic expressions', () => {
-    const bookInnerOuterExp = new TypeExpression(
-      Outer, [
-        new TypeExpression(
-          Inner, [
-            new TypeExpression(
+    const bookOneManyExp = new DefinitionTypeExpression(
+      Many, [
+        new DefinitionTypeExpression(
+          One, [
+            new DefinitionTypeExpression(
               Book, []
             )
           ]
         )
       ]
     );
-    const bookInnerOuterType = bookInnerOuterExp.getType(storage, 'any') as GraphQLObjectType;
-    expect(bookInnerOuterType.name).toBe('BookInnerOuter');
+    const bookOneManyType = bookOneManyExp.getType(context) as GraphQLObjectType;
+    expect(bookOneManyType.name).toBe('BookOneMany');
   });
 
-  it('should throw an error when being built without generic context', () => {
+  // it('should resolve nested generic expressions', () => {
+  //   const GenericManyOne = new DefinitionTypeExpression(Many, [
+  //     new DefinitionTypeExpression(One, [
+  //       genericParameters[0]
+  //     ]),
+  //     genericParameters[1]
+  //   ]);
 
-  });
+  //   GenericManyOne.getType(storage, 'any', [Book]);
+
+  //   new TypeExpression(GenericManyOne, [Book])
+  //   const bookOneManyType = bookOneManyExp.getType(storage, 'any') as GraphQLObjectType;
+  //   expect(bookOneManyType.name).toBe('BookOneMany');
+  // });
+
+  // it('should throw an error when being built without generic context', () => {
+
+  // });
 });

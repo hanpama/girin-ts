@@ -1,8 +1,8 @@
 import { GraphQLFieldConfig, GraphQLFieldConfigMap, GraphQLInterfaceType, GraphQLObjectType, GraphQLOutputType } from 'graphql';
 
-import { Definition, DefinitionConfig, MetadataStorage, DefinitionKind } from '../metadata';
+import { Definition, DefinitionConfig, DefinitionKind } from '../metadata';
 import { Field, Implement } from '../reference';
-import { GraphQLNamedType } from 'graphql/type/definition';
+import { TypeResolvingContext } from '../type-expression';
 
 
 export interface ObjectTypeConfig extends DefinitionConfig {
@@ -15,53 +15,54 @@ export interface ObjectTypeConfig extends DefinitionConfig {
 export class ObjectType<TConfig extends ObjectTypeConfig = ObjectTypeConfig> extends Definition<TConfig> {
   public get kind(): DefinitionKind { return 'output'; }
 
-  public buildFieldConfig(storage: MetadataStorage, field: Field): GraphQLFieldConfig<any, any> {
-    const { description, deprecationReason } = field;
-
-    return {
-      type: field.resolveType(storage) as GraphQLOutputType,
-      args: field.buildArgs(storage),
-      resolve: field.buildResolver(storage),
-      description,
-      deprecationReason,
-    };
+  /**
+   * Build GraphQLObjectType instance from metadata.
+   */
+  public buildTypeInstance(context: TypeResolvingContext): GraphQLObjectType {
+    const name = this.typeName(context);
+    const description = this.description(context);
+    const fields = this.buildFieldConfigMap.bind(this, context);
+    const interfaces = this.findInterfaces(context);
+    const isTypeOf = this.buildIsTypeOf(context);
+    return new GraphQLObjectType({ name, fields, interfaces, description, isTypeOf });
   }
 
-  public buildFieldConfigMap(storage: MetadataStorage): GraphQLFieldConfigMap<any, any> {
+  public buildFieldConfigMap(context: TypeResolvingContext): GraphQLFieldConfigMap<any, any> {
+
     const fields = [
-      ...storage.findExtendReferences(Field, this.definitionName),
-      ...storage.findDirectReferences(Field, this.definitionClass),
+      ...context.storage.findExtendReferences(Field, this.definitionName),
+      ...context.storage.findDirectReferences(Field, this.definitionClass),
     ];
     return (
       fields.reduce((results, field) => {
         const name = field.fieldName;
-        results[name] = this.buildFieldConfig(storage, field);
+        results[name] = this.buildFieldConfig(context, field);
         return results;
       }, {} as GraphQLFieldConfigMap<any, any>)
     );
   }
 
-  /**
-   * Build GraphQLObjectType instance from metadata.
-   */
-  public buildTypeInstance(storage: MetadataStorage, genericTypes: GraphQLNamedType[]): GraphQLObjectType {
-    const name = this.typeName(genericTypes);
-    const description = this.description(genericTypes);
-    const fields = this.buildFieldConfigMap.bind(this, storage);
-    const interfaces = this.findInterfaces(storage);
-    const isTypeOf = this.buildIsTypeOf(storage);
-    return new GraphQLObjectType({ name, fields, interfaces, description, isTypeOf });
+  public buildFieldConfig(context: TypeResolvingContext, field: Field): GraphQLFieldConfig<any, any> {
+    const { description, deprecationReason } = field;
+
+    return {
+      type: field.resolveType(context) as GraphQLOutputType,
+      args: field.buildArgumentMap(context),
+      resolve: field.buildResolver(context),
+      description,
+      deprecationReason,
+    };
   }
 
-  public findInterfaces(storage: MetadataStorage): GraphQLInterfaceType[] {
+  public findInterfaces(context: TypeResolvingContext): GraphQLInterfaceType[] {
     const impls = [
-      ...storage.findExtendReferences(Implement, this.definitionName),
-      ...storage.findDirectReferences(Implement, this.definitionClass),
+      ...context.storage.findExtendReferences(Implement, this.definitionName),
+      ...context.storage.findDirectReferences(Implement, this.definitionClass),
     ];
-    return impls.map(impl => impl.resolveType(storage) as GraphQLInterfaceType);
+    return impls.map(impl => impl.resolveType(context) as GraphQLInterfaceType);
   }
 
-  public buildIsTypeOf(storage: MetadataStorage) {
+  public buildIsTypeOf(context: TypeResolvingContext) {
     return (source: any) => (source instanceof this.definitionClass);
   }
 }

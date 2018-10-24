@@ -1,8 +1,8 @@
 import { GraphQLInputFieldConfig, GraphQLInputFieldConfigMap, GraphQLInputObjectType, GraphQLInputType } from 'graphql';
 
-import { Definition, DefinitionConfig, MetadataStorage, DefinitionKind } from '../metadata';
+import { Definition, DefinitionConfig, DefinitionKind } from '../metadata';
 import { InputField } from '../reference';
-import { GraphQLNamedType } from 'graphql/type/definition';
+import { TypeResolvingContext } from '../type-expression';
 
 
 export interface InputTypeConfig extends DefinitionConfig {}
@@ -13,42 +13,42 @@ export interface InputTypeConfig extends DefinitionConfig {}
 export class InputType<T extends InputTypeConfig = InputTypeConfig> extends Definition<T> {
   public get kind(): DefinitionKind { return 'input'; }
 
-  public buildInputFieldConfig(storage: MetadataStorage, field: InputField): GraphQLInputFieldConfig {
+  public buildTypeInstance(context: TypeResolvingContext) {
+    const name = this.typeName(context);
+    const description = this.description(context);
+    const fields = this.buildInputFieldConfigMap.bind(this, context);
+    return new GraphQLInputObjectType({ name, fields, description });
+  }
+
+  public buildInputFieldConfigMap(context: TypeResolvingContext): GraphQLInputFieldConfigMap {
+    const fields = [
+      ...context.storage.findExtendReferences(InputField, this.definitionName),
+      ...context.storage.findDirectReferences(InputField, this.definitionClass),
+    ];
+    return fields.reduce((results, field) => {
+      results[field.fieldName] = this.buildInputFieldConfig(context, field);
+      return results;
+    }, {} as GraphQLInputFieldConfigMap);
+  }
+
+  public buildInputFieldConfig(context: TypeResolvingContext, field: InputField): GraphQLInputFieldConfig {
     return {
-      type: field.resolveType(storage) as GraphQLInputType,
+      type: field.resolveType(context) as GraphQLInputType,
       defaultValue: field.defaultValue,
       description: field.description,
     };
   }
 
-  public buildInputFieldConfigMap(storage: MetadataStorage): GraphQLInputFieldConfigMap {
-    const fields = [
-      ...storage.findExtendReferences(InputField, this.definitionName),
-      ...storage.findDirectReferences(InputField, this.definitionClass),
-    ];
-    return fields.reduce((results, field) => {
-      results[field.fieldName] = this.buildInputFieldConfig(storage, field);
-      return results;
-    }, {} as GraphQLInputFieldConfigMap);
-  }
-
-  public buildTypeInstance(storage: MetadataStorage, genericTypes: GraphQLNamedType[]) {
-    const name = this.typeName(genericTypes);
-    const description = this.description(genericTypes);
-    const fields = this.buildInputFieldConfigMap.bind(this, storage);
-    return new GraphQLInputObjectType({ name, fields, description });
-  }
-
   protected instantiationCache = new WeakMap();
 
-  public buildInstantiator(storage: MetadataStorage) {
+  public buildInstantiator(context: TypeResolvingContext) {
     const fields = [
-      ...storage.findExtendReferences(InputField, this.definitionName),
-      ...storage.findDirectReferences(InputField, this.definitionClass),
+      ...context.storage.findExtendReferences(InputField, this.definitionName),
+      ...context.storage.findDirectReferences(InputField, this.definitionClass),
     ];
 
     const fieldInstantiators = fields.reduce((res, field) => {
-      res[field.fieldName] = field.buildInstantiator(storage);
+      res[field.fieldName] = field.buildInstantiator(context);
       return res;
     }, {} as any);
 

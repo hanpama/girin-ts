@@ -1,7 +1,8 @@
 import { GraphQLFieldConfigArgumentMap, GraphQLInputType, GraphQLFieldResolver, defaultFieldResolver } from 'graphql';
 
 import { InputField } from './InputField';
-import { MetadataStorage, Reference, ReferenceConfig } from '../metadata';
+import { Reference, ReferenceConfig } from '../metadata';
+import { TypeResolvingContext } from '../type-expression';
 
 
 export interface FieldConfig extends ReferenceConfig {
@@ -13,22 +14,18 @@ export interface FieldConfig extends ReferenceConfig {
 }
 
 export class Field<TConfig extends FieldConfig = FieldConfig> extends Reference<TConfig> {
+  get kind(): 'output' { return 'output'; }
 
   public get fieldName() { return this.config.fieldName; }
   public get description() { return this.config.description; }
   public get deprecationReason() { return this.config.deprecationReason; }
   public get extendingTypeName() { return this.config.extendingTypeName; }
 
-  // override
-  public resolveType(storage: MetadataStorage) {
-    return this.targetType.getType(storage, 'output');
-  }
-
-  public buildArgs(storage: MetadataStorage): GraphQLFieldConfigArgumentMap {
+  public buildArgumentMap(context: TypeResolvingContext): GraphQLFieldConfigArgumentMap {
     const { args } = this.config;
     return args.reduce((args, ref) => {
       args[ref.fieldName] = {
-        type: ref.resolveType(storage) as GraphQLInputType,
+        type: ref.resolveType(context) as GraphQLInputType,
         defaultValue: ref.defaultValue,
         description: ref.description,
       };
@@ -36,7 +33,7 @@ export class Field<TConfig extends FieldConfig = FieldConfig> extends Reference<
     }, {} as GraphQLFieldConfigArgumentMap);
   }
 
-  public buildResolver(storage: MetadataStorage): GraphQLFieldResolver<any, any> {
+  public buildResolver(context: TypeResolvingContext): GraphQLFieldResolver<any, any> {
     const { args } = this.config;
     const { definitionClass } = this;
 
@@ -46,7 +43,7 @@ export class Field<TConfig extends FieldConfig = FieldConfig> extends Reference<
       : defaultFieldResolver;
 
     const instantiators = args.reduce((res, meta) => {
-      res[meta.fieldName] = meta.buildInstantiator(storage);
+      res[meta.fieldName] = meta.buildInstantiator(context);
       return res;
     }, {} as any);
 

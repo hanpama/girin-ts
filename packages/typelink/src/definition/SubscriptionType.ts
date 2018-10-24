@@ -1,11 +1,11 @@
 import { ObjectType } from './ObjectType';
-import { MetadataStorage } from '../metadata';
 import { Field } from '../reference';
+import { TypeResolvingContext } from '../type-expression';
 
 
 export class SubscriptionType extends ObjectType {
-  buildFieldConfig(storage: MetadataStorage, entry: Field) {
-    const { resolve, ...rest } = super.buildFieldConfig(storage, entry);
+  buildFieldConfig(context: TypeResolvingContext, field: Field) {
+    const { resolve, ...rest } = super.buildFieldConfig(context, field);
     // it constrains the given async iterator directly returns an object with the expected type
     return { ...rest, subscribe: resolve, resolve: (v: any) => v };
   }

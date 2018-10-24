@@ -1,7 +1,7 @@
 import { GraphQLNamedType } from 'graphql';
-import { MetadataStorage } from './MetadataStorage';
 import { defaultInputFieldInstantiator, Instantiator } from '../types';
 import { PathMap } from '../utilities/PathMap';
+import { TypeResolvingContext } from '../type-expression';
 
 
 export type DefinitionKind = 'any' | 'input' | 'output';
@@ -28,23 +28,28 @@ export class Definition<TConfig extends DefinitionConfig = DefinitionConfig> {
     this.config = config;
   }
 
-  public typeName(genericTypes: GraphQLNamedType[]): string  {
+  public typeName(context: TypeResolvingContext): string  {
     const { definitionName } = this.config;
+
+    const genericTypes = context.generic.map(exp => exp.getType(context)) as GraphQLNamedType[];
+
     return genericTypes.map(t => t.name) + definitionName;
   }
 
-  public description(genericTypes: GraphQLNamedType[]): string | undefined {
+  public description(context: TypeResolvingContext): string | undefined {
     return this.config.description;
   }
 
   protected graphqlType: PathMap<GraphQLNamedType, GraphQLNamedType> = new PathMap();
 
-  public getOrCreateTypeInstance(storage: MetadataStorage, genericTypes: GraphQLNamedType[]): GraphQLNamedType {
+  public getOrCreateTypeInstance(context: TypeResolvingContext): GraphQLNamedType {
+    const { generic } = context;
 
+    const genericTypes = generic.map(exp => exp.getType(context)) as GraphQLNamedType[];
 
     let typeInstance = this.graphqlType.get(genericTypes);
     if (!typeInstance) {
-      typeInstance = this.buildTypeInstance(storage, genericTypes);
+      typeInstance = this.buildTypeInstance(context);
       this.graphqlType.set(genericTypes, typeInstance);
     }
     return typeInstance;
@@ -53,11 +58,11 @@ export class Definition<TConfig extends DefinitionConfig = DefinitionConfig> {
   /**
    * Build GraphQLType instance from metadata.
    */
-  public buildTypeInstance(storage: MetadataStorage, genericTypes: GraphQLNamedType[]): GraphQLNamedType {
+  public buildTypeInstance(context: TypeResolvingContext): GraphQLNamedType {
     throw new Error(`Should implement typeInstance getter in ${this.constructor.name}`);
   }
 
-  public buildInstantiator(storage: MetadataStorage): Instantiator {
+  public buildInstantiator(context: TypeResolvingContext): Instantiator {
     return defaultInputFieldInstantiator;
   }
 }

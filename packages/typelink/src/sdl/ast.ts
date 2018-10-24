@@ -13,10 +13,11 @@ import {
   InputObjectTypeExtensionNode,
 } from 'graphql';
 
-import { TypeExpression, List, NonNull, Metadata, TypeArg } from '../metadata';
+import { Metadata } from '../metadata';
 import { completeDirectives, completeValueNode } from './directive';
 import { ObjectType, InterfaceType, InputType, SubscriptionType } from '../definition';
 import { Field, InputField, Implement } from '../reference';
+import { TypeExpression, TypeArg, List, NonNull, type } from '../type-expression';
 
 
 export interface SubstitutionMap {
@@ -66,20 +67,12 @@ export class DefinitionParser {
     const { subsMap } = this;
 
     if (typeNode.kind === 'ListType') {
-      return List.of(this.completeTypeExpression(typeNode.type));
+      return new List(this.completeTypeExpression(typeNode.type));
     } else if (typeNode.kind === 'NonNullType') {
-      return NonNull.of(this.completeTypeExpression(typeNode.type));
+      return new NonNull(this.completeTypeExpression(typeNode.type));
     }
-
     const subType = subsMap[typeNode.name.value];
-
-    if (subType instanceof TypeExpression) {
-      return subType;
-    } else if (subType) {
-      return new TypeExpression(subType, []);
-    } else {
-      return new TypeExpression(typeNode.name.value, []);
-    }
+    return type(subType || typeNode.name.value);
   }
 
   protected handleObjectTypeDefinition(rootNode: ObjectTypeDefinitionNode): void {
