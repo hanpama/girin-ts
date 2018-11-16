@@ -3,6 +3,7 @@ import { GraphQLInputFieldConfig, GraphQLInputFieldConfigMap, GraphQLInputObject
 import { Definition, DefinitionConfig, DefinitionKind } from '../metadata';
 import { InputField } from '../reference';
 import { TypeResolvingContext } from '../type-expression';
+import { defaultInputFieldInstantiator } from '../types';
 
 
 export interface InputTypeConfig extends DefinitionConfig {}
@@ -14,26 +15,24 @@ export class InputType<T extends InputTypeConfig = InputTypeConfig> extends Defi
   public get kind(): DefinitionKind { return 'input'; }
 
   public buildTypeInstance(context: TypeResolvingContext) {
-    const name = this.typeName(context);
-    const description = this.description(context);
+    const name = this.definitionName;
+    const description = this.description;
     const fields = this.buildInputFieldConfigMap.bind(this, context);
     return new GraphQLInputObjectType({ name, fields, description });
   }
 
-  public buildInputFieldConfigMap(context: TypeResolvingContext): GraphQLInputFieldConfigMap {
-    const fields = [
-      ...context.storage.findExtendReferences(InputField, this.definitionName),
-      ...context.storage.findDirectReferences(InputField, this.definitionClass),
-    ];
+  protected buildInputFieldConfigMap(context: TypeResolvingContext): GraphQLInputFieldConfigMap {
+    const fields = this.findReference(context, InputField);
+
     return fields.reduce((results, field) => {
       results[field.fieldName] = this.buildInputFieldConfig(context, field);
       return results;
     }, {} as GraphQLInputFieldConfigMap);
   }
 
-  public buildInputFieldConfig(context: TypeResolvingContext, field: InputField): GraphQLInputFieldConfig {
+  protected buildInputFieldConfig(context: TypeResolvingContext, field: InputField): GraphQLInputFieldConfig {
     return {
-      type: field.resolveType(context) as GraphQLInputType,
+      type: field.resolveType(context.storage) as GraphQLInputType,
       defaultValue: field.defaultValue,
       description: field.description,
     };
@@ -42,13 +41,14 @@ export class InputType<T extends InputTypeConfig = InputTypeConfig> extends Defi
   protected instantiationCache = new WeakMap();
 
   public buildInstantiator(context: TypeResolvingContext) {
-    const fields = [
-      ...context.storage.findExtendReferences(InputField, this.definitionName),
-      ...context.storage.findDirectReferences(InputField, this.definitionClass),
-    ];
+    if (!this.definitionClass) {
+      return defaultInputFieldInstantiator;
+    }
+
+    const fields = this.findReference(context, InputField);
 
     const fieldInstantiators = fields.reduce((res, field) => {
-      res[field.fieldName] = field.buildInstantiator(context);
+      res[field.fieldName] = field.buildInstantiator(context.storage);
       return res;
     }, {} as any);
 

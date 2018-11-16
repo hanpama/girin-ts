@@ -1,9 +1,6 @@
 import { Definition, DefinitionKind } from './Definition';
 import { Reference } from './Reference';
-import { GenericSymbol, genericParameters } from '../type-expression';
 
-
-export type MetadataFn = (...genericArgs: Array<GenericSymbol>) => Metadata[];
 
 export type Metadata = Reference<any> | Definition<any>;
 
@@ -12,66 +9,70 @@ export type Metadata = Reference<any> | Definition<any>;
  * Provide methods to query metadata with its associated class or graphql type name.
  */
 export class MetadataStorage {
-  protected readonly deferredMetadataFnQueue: Array<{ definitionClass: Function, metadataFn: MetadataFn }> = [];
+  protected readonly deferredRegister: Array<() => void> = [];
   protected deferredResolved = false;
-  protected readonly metadataArray: Metadata[] = [];
 
-  register(definitionClass: Function, metadataFn: MetadataFn) {
-    this.deferredMetadataFnQueue.unshift({ definitionClass, metadataFn });
+  public readonly definitions: Definition[] = [];
+  public readonly references: Reference[] = [];
+
+  public deferRegister(metadataFn: () => void) {
+    this.deferredRegister.unshift(metadataFn);
   }
 
-  resolveDeferred() {
-    while (this.deferredMetadataFnQueue.length > 0) {
-      // if (this.deferredResolved) {
-      //   throw new Error('Types should be all defined before calling getType()');
-      // }
-
-      const { definitionClass, metadataFn } = this.deferredMetadataFnQueue.pop()!;
-      const metadata = metadataFn(...genericParameters);
-      metadata.map(item => {
-        item.definitionClass = definitionClass;
-        this.metadataArray.push(item);
-      });
+  protected resolveDeferred() {
+    while (this.deferredRegister.length > 0) {
+      this.deferredRegister.pop()!();
     }
-    // this.deferredResolved = true;
   }
 
-  findMetadata<T extends Metadata>(entryClass: { new (...args: any[]): T }): T[] {
-    return (this.metadataArray.filter(item => item instanceof entryClass) || []) as T[];
-  }
-
-  findDirectReferences<T extends Reference>(entryClass: { new(v: any): T }, targetClass: Function): T[] {
-    return this.findMetadata(entryClass).filter(entry => (
-      equalsOrInherits(targetClass, entry.definitionClass) && entry.extendingTypeName === undefined
-    ));
-  }
-
-  findExtendReferences<T extends Reference>(entryClass: { new(v: any): T}, extendingTypeName: string): T[] {
-    return this.findMetadata(entryClass).filter(entry => entry.extendingTypeName === extendingTypeName);
+  public registerMetadata(metadata: Metadata[]) {
+    metadata.map(entry => {
+      if (entry instanceof Definition) {
+        this.definitions.push(entry);
+      } else if (entry instanceof Reference) {
+        this.references.push(entry);
+      }
+    });
   }
 
   /**
    *
    * Get a [[Definition]] object which is instance of the `metadataClass` and associated to `linkedClass`
    * @param metadataClass A [[Definition]] subclass to query
-   * @param targetClassOrName A class associated with metadata to query
+   * @param classOrName A class associated with metadata to query
    * @param asKind
    */
-  getDefinition<T extends Definition>(metadataClass: { new (...args: any[]): T; }, targetClassOrName: Function | string, asKind: DefinitionKind): T | undefined {
+  public getDefinition<T extends Definition>(metadataClass: { new (...args: any[]): T; }, classOrName: Function | string, asKind: DefinitionKind): T | undefined {
     this.resolveDeferred();
 
-    const entry = this.findMetadata(Definition).find(metadata => {
+    const entry = this.definitions.find(metadata => {
       let classOrNameMatched: boolean;
-      if (typeof targetClassOrName === 'string') {
-        classOrNameMatched = metadata.definitionName === targetClassOrName;
+      if (typeof classOrName === 'string') {
+        classOrNameMatched = metadata.definitionName === classOrName;
       } else {
-        classOrNameMatched = metadata.definitionClass === targetClassOrName;
+        classOrNameMatched = metadata.definitionClass === classOrName;
       }
       const typeMatched = asKind === 'any' || metadata.kind === 'any' || metadata.kind === asKind;
       return classOrNameMatched && (metadata instanceof metadataClass) && typeMatched;
     });
 
     return entry as T;
+  }
+
+  public findReference<T extends Reference>(metadataClass: { new (...args: any[]): T }, classOrName: Function | string): T[] {
+    this.resolveDeferred();
+
+    const entries = this.references.filter(metadata => {
+      let classOrNameMatched: boolean;
+      if (typeof classOrName === 'string') {
+        classOrNameMatched = metadata.source === classOrName;
+      } else {
+        classOrNameMatched = metadata.source instanceof Function && equalsOrInherits(classOrName, metadata.source);
+      }
+      // const typeMatched = metadata.kind === asKind;
+      return classOrNameMatched && (metadata instanceof metadataClass);
+    });
+    return entries as T[];
   }
 }
 

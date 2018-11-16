@@ -3,48 +3,57 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "postinstall": "lerna run prepare",
-    "bootstrap": "npm i && lerna bootstrap",
-    "compile": "lerna run compile",
+    "bootstrap": "npm i && lerna bootstrap --ignore-scripts && npm run build",
     "test": "jest --verbose",
-    "test:ci": "npm run coverage -- --ci --runInBand",
+    "test:ci": "npm run coverage -- --ci",
     "testonly": "npm test",
     "coverage": "npm test -- --coverage",
     "coverage:upload": "codecov",
-    "lint": "tslint --project tslint.json src/**/*.ts",
-    "docs": "docsify serve docs"
+    "lint": "tslint --project tslint.json packages/*/src/**/*.ts",
+    "clean": "git clean -Xdf packages/",
+    "docs": "docsify serve docs",
+    "build": "tsc --build packages",
+    "watch": "tsc --build --watch packages",
+    "update:tsconfig": "ts-node scripts/update-package-tsconfig.ts"
   },
   "devDependencies": {
-    "@types/graphql": "^14.0.1",
-    "@types/graphql-relay": "^0.4.7",
-    "@types/jest": "^23.3.2",
-    "@types/mongodb": "^3.1.9",
-    "@types/node": "^10.11.1",
+    "@types/form-data": "^2.2.1",
+    "@types/graphql": "^14.0.3",
+    "@types/graphql-relay": "^0.4.8",
+    "@types/jest": "^23.3.9",
+    "@types/mongodb": "^3.1.14",
+    "@types/express": "^4.16.0",
+    "@types/nedb": "^1.8.6",
+    "@types/node": "^10.12.7",
+    "@types/graphql-iso-date": "^3.3.1",
+    "@types/uuid": "^3.4.4",
     "codecov": "^3.1.0",
     "graphql": "^14.0.2",
     "graphql-relay": "^0.5.5",
     "jest": "^23.6.0",
-    "lerna": "^3.4.0",
-    "mongodb": "^3.1.6",
-    "ts-jest": "^23.10.2",
+    "lerna": "^3.4.3",
+    "mongodb": "^3.1.9",
+    "mysql": "^2.16.0",
+    "pg": "^7.6.1",
+    "sqlite3": "^4.0.4",
+    "ts-jest": "^23.10.4",
     "tslint": "^5.11.0",
-    "typedoc": "^0.12.0",
-    "typescript": "3.1.1"
+    "typedoc": "^0.13.0",
+    "typeorm": "^0.2.9",
+    "typescript": "^3.1.6"
   },
   "jest": {
     "testEnvironment": "node",
     "transform": {
       "^.+\\.ts$": "ts-jest"
     },
-    "testRegex": "/__tests__/.*\\.test\\.ts$",
+    "testRegex": "/.*\\.test\\.ts$",
     "moduleFileExtensions": [
       "ts",
       "js"
     ],
     "testPathIgnorePatterns": [
-      "/node_modules/",
-      "/dist/"
-    ],
-    "clearMocks": true
+      "/node_modules/"
+    ]
   }
 }

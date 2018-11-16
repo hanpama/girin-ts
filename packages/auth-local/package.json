@@ -1,0 +1,39 @@
+{
+  "name": "@girin/auth-local",
+  "version": "0.5.0-alpha.4",
+  "description": "GraphQL bootstrapper up and running",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "keywords": [
+    "graphql"
+  ],
+  "license": "MIT",
+  "author": "Max Choi <hanpama@gmail.com>",
+  "tags": [
+    "graphql"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hanpama/girin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hanpama/girin/issues"
+  },
+  "homepage": "https://github.com/hanpama/girin",
+  "dependencies": {
+    "@girin/environment": "^0.5.0-alpha.4",
+    "@girin/framework": "^0.5.0-alpha.4",
+    "@girin/typelink": "^0.5.0-alpha.4",
+    "@types/jsonwebtoken": "^7.2.8",
+    "argon2": "^0.19.3",
+    "jsonwebtoken": "^8.3.0"
+  },
+  "gitHead": "7f87fc9641454bbe0e6367e5b1f15eea4a6fa956",
+  "files": [
+    "./lib"
+  ],
+  "scripts": {
+    "build": "tsc -b .",
+    "prepublish": "npm run build"
+  }
+}

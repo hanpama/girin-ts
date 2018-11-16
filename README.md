@@ -1,4 +1,4 @@
-# Girin: GraphQL server framework
+# Girin: Server-side GraphQL Component 🦒
 
 Build better GraphQL schema with less code
 * defining schema, not generating it
@@ -50,3 +50,28 @@ npm install girin graphql
 
 `@girin/typelink` package provides decorator and `gql` template tag,
 a SDL parser for linking class to GraphQL type. -->
+
+
+## Development
+
+### Initialization
+
+```sh
+# 1. clone the repository
+git clone https://github.com/hanpama/girin
+
+# 2. cd into it
+cd girin
+
+# 3. install dependency and link packages
+npm run bootstrap
+
+# 4. run typescript compiler server
+npm run watch
+```
+
+### Testing and Debugging
+
+```
+npm test
+```

@@ -16,11 +16,11 @@ export interface InterfaceTypeConfig extends DefinitionConfig {
 export class InterfaceType<T extends InterfaceTypeConfig = InterfaceTypeConfig> extends Definition<T> {
   public get kind(): DefinitionKind { return 'output'; }
 
-  public buildFieldConfig(context: TypeResolvingContext, field: Field): GraphQLFieldConfig<any, any> {
+  protected buildFieldConfig(context: TypeResolvingContext, field: Field): GraphQLFieldConfig<any, any> {
     const { description, deprecationReason } = field;
 
     return {
-      type: field.resolveType(context) as GraphQLOutputType,
+      type: field.resolveType(context.storage) as GraphQLOutputType,
       args: field.buildArgumentMap(context),
       resolve: field.buildResolver(context),
       description,
@@ -28,11 +28,8 @@ export class InterfaceType<T extends InterfaceTypeConfig = InterfaceTypeConfig> 
     };
   }
 
-  public buildFieldConfigMap(context: TypeResolvingContext): GraphQLFieldConfigMap<any, any> {
-    const fields = [
-      ...context.storage.findExtendReferences(Field, this.definitionName),
-      ...context.storage.findDirectReferences(Field, this.definitionClass),
-    ];
+  protected buildFieldConfigMap(context: TypeResolvingContext): GraphQLFieldConfigMap<any, any> {
+    const fields = this.findReference(context, Field);
     return (
       fields.reduce((results, field) => {
         const name = field.fieldName;
@@ -44,8 +41,8 @@ export class InterfaceType<T extends InterfaceTypeConfig = InterfaceTypeConfig> 
   }
 
   public buildTypeInstance(context: TypeResolvingContext): GraphQLInterfaceType {
-    const name = this.typeName(context);
-    const description = this.description(context);
+    const name = this.definitionName;
+    const description = this.description;
     const fields = this.buildFieldConfigMap.bind(this, context);
 
     return new GraphQLInterfaceType({ name, fields, description });

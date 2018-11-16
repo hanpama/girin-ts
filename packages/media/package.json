@@ -1,0 +1,37 @@
+{
+  "name": "@girin/media",
+  "version": "0.5.0-alpha.4",
+  "description": "",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "keywords": [
+    "graphql"
+  ],
+  "license": "MIT",
+  "author": "Max Choi <hanpama@gmail.com>",
+  "tags": [
+    "graphql"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hanpama/girin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hanpama/girin/issues"
+  },
+  "homepage": "https://github.com/hanpama/girin",
+  "dependencies": {
+    "@girin/typelink": "^0.5.0-alpha.4",
+    "@girin/environment": "^0.5.0-alpha.4",
+    "@girin/framework": "^0.5.0-alpha.4",
+    "graphql-iso-date": "^3.6.1"
+  },
+  "gitHead": "7f87fc9641454bbe0e6367e5b1f15eea4a6fa956",
+  "files": [
+    "./lib"
+  ],
+  "scripts": {
+    "build": "tsc -b .",
+    "prepublish": "npm run build"
+  }
+}

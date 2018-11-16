@@ -2,13 +2,8 @@
   "name": "girin",
   "version": "0.5.0-alpha.4",
   "description": "GraphQL Server Framework: Build better GraphQL schema with less code",
-  "main": "dist",
-  "types": "dist/index.d.ts",
-  "scripts": {
-    "prepublish": "npm run build",
-    "build": "npm run compile",
-    "compile": "tsc"
-  },
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "keywords": [
     "graphql"
   ],
@@ -28,5 +23,12 @@
   "dependencies": {
     "@girin/framework": "^0.5.0-alpha.4"
   },
-  "gitHead": "7f87fc9641454bbe0e6367e5b1f15eea4a6fa956"
+  "gitHead": "7f87fc9641454bbe0e6367e5b1f15eea4a6fa956",
+  "files": [
+    "./lib"
+  ],
+  "scripts": {
+    "build": "tsc -b .",
+    "prepublish": "npm run build"
+  }
 }

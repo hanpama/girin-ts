@@ -1,0 +1,35 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./environment/tsconfig.json"
+    },
+    {
+      "path": "./typelink/tsconfig.json"
+    },
+    {
+      "path": "./framework/tsconfig.json"
+    },
+    {
+      "path": "./connection/tsconfig.json"
+    },
+    {
+      "path": "./auth-local/tsconfig.json"
+    },
+    {
+      "path": "./media/tsconfig.json"
+    },
+    {
+      "path": "./objectstorage-fs/tsconfig.json"
+    },
+    {
+      "path": "./girin/tsconfig.json"
+    },
+    {
+      "path": "./girin-typeorm/tsconfig.json"
+    },
+    {
+      "path": "./objectstorage-gridfs/tsconfig.json"
+    }
+  ]
+}

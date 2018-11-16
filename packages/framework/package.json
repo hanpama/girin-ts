@@ -2,13 +2,8 @@
   "name": "@girin/framework",
   "version": "0.5.0-alpha.4",
   "description": "GraphQL bootstrapper up and running",
-  "main": "index.js",
-  "types": "index.d.ts",
-  "scripts": {
-    "prepublish": "npm run build",
-    "build": "npm run compile",
-    "compile": "tsc -p tsconfig.package.json"
-  },
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "keywords": [
     "graphql"
   ],
@@ -28,16 +23,19 @@
   "dependencies": {
     "@apollographql/apollo-upload-server": "^5.0.3",
     "@girin/environment": "^0.5.0-alpha.4",
-    "@girin/mongodb": "^0.5.0-alpha.4",
     "@girin/typelink": "^0.5.0-alpha.4",
     "@types/express": "^4.16.0",
-    "@types/graphql-relay": "^0.4.7",
-    "@types/jsonwebtoken": "^7.2.8",
     "apollo-server-express": "^2.1.0",
     "apollo-upload-server": "^7.1.0",
-    "argon2": "^0.19.3",
     "express": "^4.16.4",
-    "jsonwebtoken": "^8.3.0"
+    "nedb": "^1.8.0"
   },
-  "gitHead": "7f87fc9641454bbe0e6367e5b1f15eea4a6fa956"
+  "gitHead": "7f87fc9641454bbe0e6367e5b1f15eea4a6fa956",
+  "files": [
+    "./lib"
+  ],
+  "scripts": {
+    "build": "tsc -b .",
+    "prepublish": "npm run build"
+  }
 }

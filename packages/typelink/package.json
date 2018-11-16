@@ -1,15 +1,10 @@
 {
   "name": "@girin/typelink",
   "version": "0.5.0-alpha.4",
-  "description": "Define GraphQL types linked to class",
+  "description": "Define GraphQL types linked to classes",
   "author": "Max Choi <hanpama@gmail.com>",
-  "main": "./index.js",
-  "types": "./index.d.ts",
-  "scripts": {
-    "prepublish": "npm run build",
-    "build": "npm run compile",
-    "compile": "tsc -p tsconfig.package.json"
-  },
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "tags": [
     "graphql"
   ],
@@ -25,5 +20,12 @@
   "peerDependencies": {
     "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0"
   },
-  "gitHead": "7f87fc9641454bbe0e6367e5b1f15eea4a6fa956"
+  "gitHead": "7f87fc9641454bbe0e6367e5b1f15eea4a6fa956",
+  "files": [
+    "./lib"
+  ],
+  "scripts": {
+    "build": "tsc -b .",
+    "prepublish": "npm run build"
+  }
 }

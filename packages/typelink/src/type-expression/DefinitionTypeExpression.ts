@@ -8,31 +8,29 @@ import { Definition } from '../metadata';
 /**
  * Contain an argument which can be resolved to GraphQLType instance.
  */
-export class DefinitionTypeExpression {
+export class DefinitionTypeExpression extends TypeExpression {
 
-  constructor(
-    protected typeArg: string | Function,
-    protected genericArgs: Array<TypeExpression>,
-  ) { }
+  constructor(protected typeArg: string | Function) { super(); }
+
+  getTypeName(context: TypeResolvingContext): string {
+    return this.resolveDefinition(context).definitionName;
+  }
 
   public getType(context: TypeResolvingContext): GraphQLType {
-    const def = this.resolveDefinition(context);
-    if (!def) {
-      throw new Error(`Cannot resolve type: ${this.typeArg}`);
-    }
-    const nextContext: TypeResolvingContext = {
-      ...context,
-      generic: this.genericArgs,
-    };
-    return def.getOrCreateTypeInstance(nextContext);
+    return this.resolveDefinition(context).getOrCreateTypeInstance(context);
   }
 
   public getInstantiator(context: TypeResolvingContext): Instantiator {
-    const def = this.resolveDefinition(context);
+    let def;
+    try { def = this.resolveDefinition(context); } catch {}
     return def ? def.buildInstantiator(context) : defaultInputFieldInstantiator;
   }
 
   protected resolveDefinition(context: TypeResolvingContext) {
-    return context.storage.getDefinition(Definition, this.typeArg, context.kind);
+    const def = context.storage.getDefinition(Definition, this.typeArg, context.kind);
+    if (!def) {
+      throw new Error(`Cannot resolve type: ${this.typeArg}`);
+    }
+    return def;
   }
 }

@@ -1,22 +1,42 @@
 import { MetadataStorage } from '../metadata';
 import { ObjectType } from './ObjectType';
+import { SubscriptionType } from '../definition';
 
 
 /**
  * Fallback class for Query type.
  *
- * It can be overridden by defining custom Query class with `typedef()` decorator
+ * It can be overridden by defining custom Query class with [defineType] decorator
  */
 export class Query {}
 
 /**
  * Fallback class for Mutation type.
  *
- * It can be overridden by defining custom Mutation class with `typedef()` decorator
+ * It can be overridden by defining custom Mutation class with [defineType] decorator
  */
 export class Mutation {}
 
+/**
+ * Fallback class for Subscription type.
+ *
+ * It can be overridden by defining custom Mutation class with [defineType] decorator
+ */
+export class Subscription {}
+
 export function loadFallbackRootTypes(storage: MetadataStorage) {
-  storage.register(Query, () => [ new ObjectType({ definitionName: 'Query' }) ]);
-  storage.register(Mutation, () => [ new ObjectType({ definitionName: 'Mutation' }) ]);
+  storage.registerMetadata([
+    new ObjectType({
+      definitionClass: Query,
+      definitionName: 'Query'
+    }),
+    new ObjectType({
+      definitionClass: Mutation,
+      definitionName: 'Mutation'
+    }),
+    new SubscriptionType({
+      definitionClass: Subscription,
+      definitionName: 'Subscription',
+    })
+  ]);
 }

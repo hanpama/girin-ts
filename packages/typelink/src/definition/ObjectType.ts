@@ -19,20 +19,17 @@ export class ObjectType<TConfig extends ObjectTypeConfig = ObjectTypeConfig> ext
    * Build GraphQLObjectType instance from metadata.
    */
   public buildTypeInstance(context: TypeResolvingContext): GraphQLObjectType {
-    const name = this.typeName(context);
-    const description = this.description(context);
+    const name = this.definitionName;
+    const description = this.description;
     const fields = this.buildFieldConfigMap.bind(this, context);
     const interfaces = this.findInterfaces(context);
     const isTypeOf = this.buildIsTypeOf(context);
     return new GraphQLObjectType({ name, fields, interfaces, description, isTypeOf });
   }
 
-  public buildFieldConfigMap(context: TypeResolvingContext): GraphQLFieldConfigMap<any, any> {
+  protected buildFieldConfigMap(context: TypeResolvingContext): GraphQLFieldConfigMap<any, any> {
 
-    const fields = [
-      ...context.storage.findExtendReferences(Field, this.definitionName),
-      ...context.storage.findDirectReferences(Field, this.definitionClass),
-    ];
+    const fields = this.findReference(context, Field);
     return (
       fields.reduce((results, field) => {
         const name = field.fieldName;
@@ -42,11 +39,11 @@ export class ObjectType<TConfig extends ObjectTypeConfig = ObjectTypeConfig> ext
     );
   }
 
-  public buildFieldConfig(context: TypeResolvingContext, field: Field): GraphQLFieldConfig<any, any> {
+  protected buildFieldConfig(context: TypeResolvingContext, field: Field): GraphQLFieldConfig<any, any> {
     const { description, deprecationReason } = field;
 
     return {
-      type: field.resolveType(context) as GraphQLOutputType,
+      type: field.resolveType(context.storage) as GraphQLOutputType,
       args: field.buildArgumentMap(context),
       resolve: field.buildResolver(context),
       description,
@@ -54,15 +51,17 @@ export class ObjectType<TConfig extends ObjectTypeConfig = ObjectTypeConfig> ext
     };
   }
 
-  public findInterfaces(context: TypeResolvingContext): GraphQLInterfaceType[] {
-    const impls = [
-      ...context.storage.findExtendReferences(Implement, this.definitionName),
-      ...context.storage.findDirectReferences(Implement, this.definitionClass),
-    ];
-    return impls.map(impl => impl.resolveType(context) as GraphQLInterfaceType);
+  protected findInterfaces(context: TypeResolvingContext): GraphQLInterfaceType[] {
+    const impls = this.findReference(context, Implement);
+    return impls.map(impl => impl.resolveType(context.storage) as GraphQLInterfaceType);
   }
 
-  public buildIsTypeOf(context: TypeResolvingContext) {
-    return (source: any) => (source instanceof this.definitionClass);
+  protected buildIsTypeOf(context: TypeResolvingContext) {
+    const { definitionClass } = this;
+    if (definitionClass instanceof Function) {
+      return (source: any) => (source instanceof definitionClass);
+    } else {
+      return () => true;
+    }
   }
 }

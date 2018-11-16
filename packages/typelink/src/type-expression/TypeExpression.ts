@@ -5,6 +5,7 @@ import { Instantiator } from '../types';
 
 
 export abstract class TypeExpression {
+  abstract getTypeName(context: TypeResolvingContext): string;
   abstract getType(context: TypeResolvingContext): GraphQLType;
   abstract getInstantiator(context: TypeResolvingContext): Instantiator;
 }
@@ -12,5 +13,4 @@ export abstract class TypeExpression {
 export interface TypeResolvingContext {
   storage: MetadataStorage;
   kind: DefinitionKind;
-  generic: TypeExpression[];
 }

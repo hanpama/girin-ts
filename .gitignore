@@ -1,5 +1,6 @@
 node_modules/
 .DS_Store
+/temp/
 
 # Coverage
 coverage/
@@ -15,9 +16,11 @@ yarn-debug.log*
 yarn-error.log*
 
 /packages/**/*.d.ts
+/packages/**/*.d.ts.map
 /packages/**/*.js
 /packages/**/*.js.map
 
 /examples/**/*.d.ts
+/examples/**/*.d.ts.map
 /examples/**/*.js
 /examples/**/*.js.map

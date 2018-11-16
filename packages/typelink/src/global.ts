@@ -1,6 +1,8 @@
-import { MetadataStorage, Metadata, MetadataFn, DefinitionKind } from './metadata';
-import { TypeArg, type } from './type-expression';
+import { MetadataStorage, DefinitionKind } from './metadata';
+import { TypeArg, type, TypeExpression } from './type-expression';
 import { loadFallbackRootTypes, loadBuiltInScalar } from './definition';
+import { Thunk } from './types';
+import { DefinitionParser } from './sdl/ast';
 
 
 /**
@@ -31,20 +33,30 @@ export function getGlobalMetadataStorage() {
  * @param typeArg
  * @param storage
  */
-export function getType(typeArg: TypeArg, kind: DefinitionKind = 'any'): any {
+export function getType(typeArg: TypeExpression | TypeArg, kind: DefinitionKind = 'any'): any {
   const storage = getGlobalMetadataStorage();
-  return type(typeArg).getType({ kind, storage, generic: [] });
+  return type(typeArg).getType({ kind, storage });
 }
 
 /**
  * Define a type linked to decorated class and add it to the given
  * storage or default global metadata storage.
- * @param metadataOrFn
+ * @param metadataOrThunk
  */
-export function defineType(metadataOrFn: (Metadata[] | MetadataFn)) {
+export function defineType(parsersOrThunk: DefinitionParser[] | Thunk<DefinitionParser[]>) {
   const storage = getGlobalMetadataStorage();
-  return function defDecoratorFn(targetClass: Function): void {
-    const metadataFn: MetadataFn = Array.isArray(metadataOrFn) ? () => metadataOrFn : metadataOrFn;
-    storage.register(targetClass, metadataFn);
+  return function defDecoratorFn<T extends Function>(definitionClass: T) {
+    if (Array.isArray(parsersOrThunk)) {
+      parsersOrThunk.forEach(parser => {
+        storage.registerMetadata(parser.parse(definitionClass));
+      });
+    } else {
+      storage.deferRegister(() => {
+        parsersOrThunk().forEach(parser => {
+          storage.registerMetadata(parser.parse(definitionClass));
+        });
+      });
+    }
+    return definitionClass;
   };
 }

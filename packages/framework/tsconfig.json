@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./lib",
+    "rootDir": "./src",
+    "composite": true
+  },
+  "references": [
+    {
+      "path": "../environment/tsconfig.json"
+    },
+    {
+      "path": "../typelink/tsconfig.json"
+    }
+  ],
+  "include": [
+    "src"
+  ]
+}

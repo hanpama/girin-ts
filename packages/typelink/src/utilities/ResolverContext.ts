@@ -27,10 +27,10 @@ export class ResolverContext<TSource = undefined, TContext = any> {
  */
 export function source(fieldName?: string) {
   return function(prototype: { $source: any }, propertyKey: string) {
-    const get = function() {
+    const get = function(this: any) {
       return this.$source[fieldName || propertyKey];
     };
-    const set = function(value: any) {
+    const set = function(this: any, value: any) {
       this.$source[fieldName || propertyKey] = value;
     };
     Object.defineProperty(prototype, propertyKey, { get, set });

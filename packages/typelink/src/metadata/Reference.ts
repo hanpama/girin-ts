@@ -1,35 +1,30 @@
 import { GraphQLType } from 'graphql';
 
-import { TypeExpression, TypeResolvingContext } from '../type-expression';
+import { TypeExpression } from '../type-expression';
 import { Instantiator } from '../types';
+import { MetadataStorage } from './MetadataStorage';
 
 
 export interface ReferenceConfig {
-  targetType: TypeExpression;
-  extendingTypeName?: string;
+  source: Function | string;
+  target: TypeExpression;
 }
 
 export type ReferenceKind = 'input' | 'output';
 
 export abstract class Reference<TConfig extends ReferenceConfig = ReferenceConfig> {
-  abstract kind: ReferenceKind;
+  protected abstract kind: ReferenceKind;
   public constructor(protected config: TConfig) { }
 
-  public definitionClass: Function;
-  protected get targetType() { return this.config.targetType; }
-  public get extendingTypeName() { return this.config.extendingTypeName; }
+  public get source() { return this.config.source; }
+  public get target() { return this.config.target; }
+  // public get extendingTypeName() { return this.config.extendingTypeName; }
 
-  public resolveType(context: TypeResolvingContext): GraphQLType {
-    return this.targetType.getType({
-      ...context,
-      kind: this.kind
-    });
+  public resolveType(storage: MetadataStorage): GraphQLType {
+    return this.target.getType({ storage, kind: this.kind });
   }
 
-  public buildInstantiator(context: TypeResolvingContext): Instantiator {
-    return this.targetType.getInstantiator({
-      ...context,
-      kind: this.kind
-    });
+  public buildInstantiator(storage: MetadataStorage): Instantiator {
+    return this.target.getInstantiator({ storage, kind: this.kind });
   }
 }

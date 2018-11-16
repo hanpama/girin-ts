@@ -11,13 +11,18 @@ import {
   ObjectTypeExtensionNode,
   InterfaceTypeExtensionNode,
   InputObjectTypeExtensionNode,
+  DirectiveNode,
+  ArgumentNode,
+  ObjectFieldNode,
+  ValueNode,
+  defaultFieldResolver,
 } from 'graphql';
 
 import { Metadata } from '../metadata';
-import { completeDirectives, completeValueNode } from './directive';
 import { ObjectType, InterfaceType, InputType, SubscriptionType } from '../definition';
 import { Field, InputField, Implement } from '../reference';
 import { TypeExpression, TypeArg, List, NonNull, type } from '../type-expression';
+import { GraphQLFieldResolver } from 'graphql/type/definition';
 
 
 export interface SubstitutionMap {
@@ -26,39 +31,39 @@ export interface SubstitutionMap {
 
 export class DefinitionParser {
 
-  public metadata: Metadata[];
-  public extendingTypeName?: string;
-
+  private metadata: Metadata[];
 
   constructor(
-    public rootNode: DefinitionNode,
-    public subsMap: SubstitutionMap,
-  ) {
-    this.createMetadataFromAST();
-  }
+    protected rootNode: DefinitionNode,
+    protected subsMap: SubstitutionMap,
+  ) {}
 
-  protected createMetadataFromAST(): void {
+  public parse(definitionClass: Function): Metadata[] {
     const { rootNode } = this;
     this.metadata = [];
 
     if (rootNode.kind === 'ObjectTypeDefinition') {
-      this.handleObjectTypeDefinition(rootNode);
+      this.handleObjectTypeDefinition(rootNode, definitionClass);
     }
     else if (rootNode.kind === 'ObjectTypeExtension') {
-      this.handleObjectTypeExtension(rootNode);
+      this.handleObjectTypeExtension(rootNode, definitionClass);
     }
     else if (rootNode.kind === 'InterfaceTypeDefinition') {
-      this.handleInterfaceTypeDefinition(rootNode);
+      this.handleInterfaceTypeDefinition(rootNode, definitionClass);
     }
     else if (rootNode.kind === 'InterfaceTypeExtension') {
-      this.handleInterfaceTypeExtension(rootNode);
+      this.handleInterfaceTypeExtension(rootNode, definitionClass);
     }
     else if (rootNode.kind === 'InputObjectTypeDefinition') {
-      this.handleInputObjectTypeDefinition(rootNode);
+      this.handleInputObjectTypeDefinition(rootNode, definitionClass);
+    }
+    else if (rootNode.kind === 'InputObjectTypeExtension') {
+      this.handleInputObjectExtension(rootNode, definitionClass);
     }
     else {
       throw new Error(`Node type not supported: ${rootNode.kind}`);
     }
+    return this.metadata;
   }
 
   protected completeTypeExpression(
@@ -75,126 +80,179 @@ export class DefinitionParser {
     return type(subType || typeNode.name.value);
   }
 
-  protected handleObjectTypeDefinition(rootNode: ObjectTypeDefinitionNode): void {
+  protected handleObjectTypeDefinition(rootNode: ObjectTypeDefinitionNode, definitionClass: Function): void {
     const { name, interfaces, fields, description } = rootNode;
 
     if (fields) {
-      fields.forEach(fieldNode => this.appendFieldMetadataConfig(fieldNode));
+      fields.forEach(fieldNode => this.appendFieldMetadataConfig(fieldNode, definitionClass));
     }
     if (interfaces) {
-      interfaces.forEach(interfaceNode => this.appendImplementTypeExpression(interfaceNode));
+      interfaces.forEach(interfaceNode => this.appendImplementTypeExpression(interfaceNode, definitionClass));
     }
 
     let metadata;
     if (name.value === 'Subscription') {
       metadata = new SubscriptionType({
+        definitionClass,
         definitionName: name.value,
         description: description && description.value,
-        directives: rootNode.directives && completeDirectives(rootNode.directives),
+        directives: rootNode.directives && this.completeDirectives(rootNode.directives),
       });
     } else {
       metadata = new ObjectType({
+        definitionClass,
         definitionName: name.value,
         description: description && description.value,
-        directives: rootNode.directives && completeDirectives(rootNode.directives),
+        directives: rootNode.directives && this.completeDirectives(rootNode.directives),
       });
     }
 
     this.metadata.push(metadata);
   }
 
-  protected handleObjectTypeExtension(rootNode: ObjectTypeExtensionNode): void {
+  protected handleObjectTypeExtension(rootNode: ObjectTypeExtensionNode, definitionClass: Function): void {
     const { name, interfaces, fields } = rootNode;
 
     if (fields) {
-      fields.forEach(fieldNode => this.appendFieldMetadataConfig(fieldNode, name.value));
+      fields.forEach(fieldNode => this.appendFieldMetadataConfig(fieldNode, definitionClass, name.value));
     }
     if (interfaces) {
-      interfaces.forEach(interfaceNode => this.appendImplementTypeExpression(interfaceNode, name.value));
+      interfaces.forEach(interfaceNode => this.appendImplementTypeExpression(interfaceNode, definitionClass, name.value));
     }
   }
 
-  protected handleInterfaceTypeDefinition(rootNode: InterfaceTypeDefinitionNode): void {
+  protected handleInterfaceTypeDefinition(rootNode: InterfaceTypeDefinitionNode, definitionClass: Function): void {
     const { name, description, fields } = rootNode;
 
     if (fields) {
-      fields.forEach(fieldNode => this.appendFieldMetadataConfig(fieldNode));
+      fields.forEach(fieldNode => this.appendFieldMetadataConfig(fieldNode, definitionClass));
     }
 
     this.metadata.push(new InterfaceType({
+      definitionClass,
       definitionName: name.value,
       description: description && description.value,
-      directives: rootNode.directives && completeDirectives(rootNode.directives),
+      directives: rootNode.directives && this.completeDirectives(rootNode.directives),
     }));
   }
 
-  protected handleInterfaceTypeExtension(rootNode: InterfaceTypeExtensionNode): void {
+  protected handleInterfaceTypeExtension(rootNode: InterfaceTypeExtensionNode, definitionClass: Function): void {
     const { name, fields } = rootNode;
 
     if (fields) {
-      fields.forEach(fieldNode => this.appendFieldMetadataConfig(fieldNode, name.value));
+      fields.forEach(fieldNode => this.appendFieldMetadataConfig(fieldNode, definitionClass, name.value));
     }
   }
 
-  protected handleInputObjectTypeDefinition(node: InputObjectTypeDefinitionNode): void {
+  protected handleInputObjectTypeDefinition(node: InputObjectTypeDefinitionNode, definitionClass: Function): void {
     const { name, description, fields } = node;
 
     if (fields) {
-      fields.forEach(fieldNode => this.appendInputFieldMetadataConfig(fieldNode));
+      fields.forEach(fieldNode => this.appendInputFieldMetadataConfig(fieldNode, definitionClass));
     }
 
     this.metadata.push(new InputType({
+      definitionClass,
       definitionName: name.value,
       description: description && description.value,
-      directives: node.directives && completeDirectives(node.directives),
+      directives: node.directives && this.completeDirectives(node.directives),
     }));
   }
 
-  protected handleInputObjectExtension(node: InputObjectTypeExtensionNode): void {
+  protected handleInputObjectExtension(node: InputObjectTypeExtensionNode, definitionClass: Function): void {
     const { name, fields } = node;
 
     if (fields) {
-      fields.forEach(fieldNode => this.appendInputFieldMetadataConfig(fieldNode, name.value));
+      fields.forEach(fieldNode => this.appendInputFieldMetadataConfig(fieldNode, definitionClass, name.value));
     }
   }
 
-  protected appendFieldMetadataConfig(node: FieldDefinitionNode, extendingTypeName?: string): void {
+  protected appendFieldMetadataConfig(node: FieldDefinitionNode, definitionClass: Function, extendingTypeName?: string): void {
     const { name, type, description, directives, arguments: args } = node;
 
     const argumentRefs = args && args.map(argumentNode => (
-      this.createInputField(argumentNode)
+      this.createInputField(argumentNode, definitionClass)
     ));
 
+    const resolver = bindStaticResolver(definitionClass, name.value) || defaultFieldResolver;
+
     this.metadata.push(new Field({
+      source: extendingTypeName || definitionClass,
+      target: this.completeTypeExpression(type),
       fieldName: name.value,
-      targetType: this.completeTypeExpression(type),
       args: argumentRefs || [],
       description: description && description.value,
-      directives: directives && completeDirectives(directives),
+      directives: directives && this.completeDirectives(directives),
       extendingTypeName,
+      resolver,
     }));
   }
 
-  protected createInputField(node: InputValueDefinitionNode, extendingTypeName?: string): InputField {
+  protected createInputField(node: InputValueDefinitionNode, definitionClass: Function, extendingTypeName?: string): InputField {
     const { name, type, description, defaultValue, directives } = node;
 
     return new InputField({
+      source: extendingTypeName || definitionClass,
+      target: this.completeTypeExpression(type),
       fieldName: name.value,
-      targetType: this.completeTypeExpression(type),
-      directives: directives && completeDirectives(directives),
-      defaultValue: defaultValue && completeValueNode(defaultValue),
+      directives: directives && this.completeDirectives(directives),
+      defaultValue: defaultValue && this.completeValueNode(defaultValue),
       description: description && description.value,
       extendingTypeName,
     });
   }
 
-  protected appendInputFieldMetadataConfig(node: InputValueDefinitionNode, extendingTypeName?: string): void {
-    const field = this.createInputField(node, extendingTypeName);
+  protected appendInputFieldMetadataConfig(node: InputValueDefinitionNode, definitionClass: Function, extendingTypeName?: string): void {
+    const field = this.createInputField(node, definitionClass, extendingTypeName);
     this.metadata.push(field);
   }
 
-  protected appendImplementTypeExpression(node: NamedTypeNode, extendingTypeName?: string): void {
-    const targetType = this.completeTypeExpression(node);
-    this.metadata.push(new Implement({ targetType, extendingTypeName }));
+  protected appendImplementTypeExpression(node: NamedTypeNode, definitionClass: Function, extendingTypeName?: string): void {
+    this.metadata.push(new Implement({
+      source: extendingTypeName || definitionClass,
+      target: this.completeTypeExpression(node),
+    }));
   }
+
+  protected completeDirectives(directiveNodes: ReadonlyArray<DirectiveNode>): DirectiveMap {
+    return directiveNodes.reduce((results, node) => {
+      if (node.arguments instanceof Array) {
+        results[node.name.value] = this.completeArgumentsOrObjectFields(node.arguments);
+      } else {
+        results[node.name.value] = {};
+      }
+      return results;
+    }, {} as {[key: string]: any});
+  }
+
+  protected completeArgumentsOrObjectFields(nodes: ReadonlyArray<ArgumentNode | ObjectFieldNode>): any {
+    return nodes.reduce((results, node) => {
+      results[node.name.value] = this.completeValueNode(node.value);
+      return results;
+    }, {} as any);
+  }
+
+  protected completeValueNode(node: ValueNode): any {
+    if (node.kind === 'ObjectValue') {
+      return this.completeArgumentsOrObjectFields(node.fields);
+    } else if (node.kind === 'NullValue') {
+      return null;
+    } else if (node.kind === 'ListValue') {
+      return node.values.map(this.completeValueNode.bind(this));
+    } else if (node.kind === 'Variable') {
+      throw new Error(`Cannot use variable in schema directives: ${node.name}`);
+    } else if (node.kind === 'IntValue' || node.kind === 'FloatValue') {
+      return Number(node.value);
+    }
+    return node.value;
+  }
+}
+
+export type DirectiveMap = { [key: string]: any };
+
+export function bindStaticResolver(definitionClass: Function, fieldName: string): GraphQLFieldResolver<any, any> | null {
+  const maybeStaticResolver = (definitionClass as any)[fieldName];
+  return maybeStaticResolver instanceof Function
+    ? maybeStaticResolver.bind(definitionClass)
+    : null;
 }

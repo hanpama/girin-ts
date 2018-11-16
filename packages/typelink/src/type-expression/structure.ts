@@ -3,7 +3,7 @@ import { GraphQLType } from 'graphql';
 import { TypeExpression, TypeResolvingContext } from './TypeExpression';
 import { Instantiator } from '../types';
 import { GraphQLList, GraphQLNonNull } from 'graphql/type/definition';
-import { TypeArg, type } from './coerce';
+import { TypeArg, type } from './type';
 
 
 export class List extends TypeExpression {
@@ -13,6 +13,10 @@ export class List extends TypeExpression {
 
   constructor(protected innerExp: TypeExpression) {
     super();
+  }
+
+  getTypeName(): string {
+    throw new Error(`Cannot resolve name: List is not a GraphQLNamedType`);
   }
 
   getType(context: TypeResolvingContext): GraphQLType {
@@ -31,6 +35,9 @@ export class NonNull extends TypeExpression {
 
   constructor(protected innerExp: TypeExpression) { super(); }
 
+  getTypeName(): string {
+    throw new Error(`Cannot resolve name: NonNull is not a GraphQLNamedType`);
+  }
   getType(context: TypeResolvingContext): GraphQLType {
     return new GraphQLNonNull(this.innerExp.getType(context));
   }

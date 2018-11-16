@@ -9,7 +9,7 @@
       "request": "launch",
       "name": "Girin Tests",
       "program": "${workspaceRoot}/node_modules/jest/bin/jest.js",
-      "cwd": "${workspaceRoot}/packages/girin",
+      "cwd": "${workspaceRoot}",
       "args": [
         "-i",
         "${relativeFile}",

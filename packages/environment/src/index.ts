@@ -1,41 +1,10 @@
-export interface Environment {
-  /**
-   * Bootstraps the module instance which is instance of the given moduleClass.
-   * If it is already bootstrapped, returns the memoized promise.
-   * @param moduleClass module class to bootstrap
-   */
-  bootstrap(label: string): any;
-  /**
-   * Bootstraps all modules in this environment in reverse of loaded order.
-   */
-  run(): Promise<{ [label: string]: any }>;
-  /**
-   * Destroy all modules in this environment in reverse of bootstrapped order.
-   */
-  destroy(): Promise<void>;
-  /**
-   * Load a module instance
-   */
-  load(mod: EnvironmentEntry): this;
-  /**
-   * Get a module object which is an instance of given moduleClass
-   * @param moduleClass
-   */
-  get(label: string): EnvironmentEntry;
-}
-
-export interface EnvironmentEntry {
-  label: string;
-  bootstrap: () => any;
-  destroy: () => any;
-}
-
-class EnvironmentImpl implements Environment {
-  private moduleMap: Map<string, EnvironmentEntry>;
-  private bootstrapPromiseMap: Map<EnvironmentEntry, Promise<any>>;
+export class Environment {
+  private moduleMap: Map<string, Module>;
+  private bootstrapPromiseMap: Map<Module, Promise<void>>;
 
   constructor() {
-    this.initialize();
+    this.moduleMap = new Map();
+    this.bootstrapPromiseMap = new Map();
   }
 
   initialize() {
@@ -43,69 +12,127 @@ class EnvironmentImpl implements Environment {
     this.bootstrapPromiseMap = new Map();
   }
 
-  bootstrap(label: string) {
-    const mod = this.get(label);
+  /**
+   * Bootstraps the module instance which is instance of the given label.
+   * If it is already bootstrapped, returns the memoized promise.
+   * @param label label of the module to bootstrap
+   */
+  public async getOrCreateReadyPromise(label: string): Promise<Module> {
+    const mod = this.moduleMap.get(label)!;
     let bootstrapPromise = this.bootstrapPromiseMap.get(mod);
     if (!bootstrapPromise) {
-      bootstrapPromise = Promise.resolve(mod.bootstrap());
+      bootstrapPromise = Promise.resolve(mod.onBootstrap(this));
       this.bootstrapPromiseMap.set(mod, bootstrapPromise);
     }
-    return bootstrapPromise;
+    await bootstrapPromise;
+    return mod;
   }
 
+  /**
+   * Bootstraps all modules in this environment in reverse of loaded order.
+   */
   async run(): Promise<{ [label: string]: any }> {
-    const addedOrder = Array.from(this.moduleMap.keys()).reverse();
+    const addedOrder = Array.from(this.moduleMap.keys());
     const reducedResultMap: { [label: string]: any } = {};
-    for (let i = addedOrder.length - 1; i >= 0; i--) {
-      reducedResultMap[addedOrder[i]] = await this.bootstrap(addedOrder[i]);
+    try {
+      for (let i = addedOrder.length - 1; i >= 0; i--) {
+        reducedResultMap[addedOrder[i]] = await this.getOrCreateReadyPromise(addedOrder[i]);
+      }
+    } catch (e) {
+      await this.destroy();
+      throw e;
     }
+
     return reducedResultMap;
   }
 
+  /**
+   * Destroy all modules in this environment in reverse of bootstrapped order.
+   */
   async destroy(): Promise<void> {
     const bootstrapOrder = Array.from(this.bootstrapPromiseMap.keys());
     for (let i = bootstrapOrder.length - 1; i >= 0; i--) {
-      await bootstrapOrder[i].destroy();
+      await bootstrapOrder[i].onDestroy(this);
     }
+    this.initialize();
     return;
   }
 
-  load(mod: EnvironmentEntry): this {
+  /**
+   * Load a module instance to this environment
+   */
+  load(mod: Module): this {
     const { label } = mod;
+    mod.onLoad(this);
     this.moduleMap.set(label, mod);
     return this;
   }
 
+  /**
+   * Get a module object which is an instance of given moduleClass
+   * @param moduleClass
+   */
   get(label: string) {
     const mod = this.moduleMap.get(label);
     if (!mod) {
-      throw new Error(`Cannot find module in environment: ${label} should be loaded to environment`);
+      const availableModuleLabels = Array.from(this.moduleMap.keys());
+      throw new ModuleNotLoadedError(label, availableModuleLabels);
     }
     return mod;
   }
 }
 
-export type ModuleClass<TModule extends Module<U>, U> = {
-  new(...args: any[]): TModule;
+export class ModuleNotLoadedError extends Error {
+  constructor(label: string, avaliableModuleLabels: string[]) {
+    super();
+    this.message = `Cannot find module in environment`
+    + `: ${label} is not loaded to environment(${avaliableModuleLabels.join(', ')})`;
+  }
+}
+
+export type ModuleClass<TModule extends Module> = {
+  prototype: TModule;
 };
 
-export abstract class Module<U> implements EnvironmentEntry {
+export abstract class Module {
+  /**
+   * Unique identifier for modules in environment
+   */
   public get label(): string {
     return this.constructor.name;
   }
 
-  static object<TModule extends Module<any>>(this: ModuleClass<TModule, any>): TModule {
-    return environment.get(this.prototype.label) as TModule;
-  }
-  static bootstrap<U>(this: ModuleClass<Module<U>, U>): Promise<U> {
-    return environment.bootstrap(this.prototype.label);
+  /**
+   * Get module object from environment.
+   */
+  static object<TModule extends Module>(this: ModuleClass<TModule>, context = environment): TModule {
+    return context.get(this.prototype.label) as TModule;
   }
 
-  public abstract bootstrap(): U | Promise<U>;
-  public destroy(): void | Promise<void> {}
+  /**
+   * Get promise of bootstrapping this module from environment
+   */
+  static bootstrap<TModule extends Module>(this: ModuleClass<TModule>, context = environment): Promise<TModule> {
+    return context.getOrCreateReadyPromise(this.prototype.label) as Promise<TModule>;
+  }
+
+  /**
+   * Called when module is loaded to environment
+   */
+  public onLoad(context: Environment = environment): void { return; }
+
+  /**
+   * Called when environment is being bootstrapped
+   */
+  public onBootstrap(context: Environment = environment): void | Promise<void> { return; }
+
+  /**
+   * Called when environment is being destroyed
+   */
+  public onDestroy(context: Environment = environment): void | Promise<void> {}
 }
 
 /**
  * global environment
  */
-export const environment: Environment = new EnvironmentImpl();
+export const environment: Environment = new Environment();
