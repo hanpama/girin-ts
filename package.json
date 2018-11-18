@@ -43,11 +43,14 @@
     "typescript": "^3.1.6"
   },
   "jest": {
+    "collectCoverageFrom": [
+      "packages/*/src/**/*.ts"
+    ],
     "testEnvironment": "node",
     "transform": {
       "^.+\\.ts$": "ts-jest"
     },
-    "testRegex": "/.*\\.test\\.ts$",
+    "testRegex": "packages/.*\\.test\\.ts$",
     "moduleFileExtensions": [
       "ts",
       "js"

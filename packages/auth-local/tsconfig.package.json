@@ -1,0 +1,28 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./lib",
+    "rootDir": "./src",
+    "composite": true
+  },
+  "references": [
+    {
+      "path": "../connection/tsconfig.package.json"
+    },
+    {
+      "path": "../environment/tsconfig.package.json"
+    },
+    {
+      "path": "../typelink/tsconfig.package.json"
+    },
+    {
+      "path": "../framework/tsconfig.package.json"
+    }
+  ],
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "tests"
+  ]
+}

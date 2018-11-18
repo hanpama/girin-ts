@@ -2,6 +2,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 
+const PACKAGE_TSCONFIG = 'tsconfig.package.json';
+const PROJECT_TSCONFIG = 'tsconfig.project.json';
+
+
 const internalDependencyMap: Map<string, string[]> = new Map();
 const packageDirnameMap: Map<string, string> = new Map();
 
@@ -45,7 +49,7 @@ function resolveInternalDependencies(dependencies: string[]): string[] {
 
 packagesNames.forEach(packageName => {
   const packageDirname = packageDirnameMap.get(packageName)!;
-  const tsconfigPath = path.join(packagesRoot, packageDirname, 'tsconfig.json');
+  const tsconfigPath = path.join(packagesRoot, packageDirname, PACKAGE_TSCONFIG);
 
   const internalDependencies = resolveInternalDependencies(
     internalDependencyMap.get(packageName)!
@@ -60,22 +64,34 @@ packagesNames.forEach(packageName => {
     },
     references: internalDependencies.map(dep => {
       const packageForderName = dep.split('/')[1];
-      return { path: `../${packageForderName}/tsconfig.json` };
+      return { path: `../${packageForderName}/${PACKAGE_TSCONFIG}` };
     }),
     include: ['src'],
+    exclude: ['tests'],
   };
   fs.writeFileSync(tsconfigPath, JSON.stringify(tsconfigData, null, '  '));
 });
 
-const projectLevelTsconfigPath = path.join(packagesRoot, 'tsconfig.json');
+const projectLevelTsconfigPath = path.join(packagesRoot, PROJECT_TSCONFIG);
 
 const projectLevelTsconfigData = {
   files: [],
-  references:
-    resolveInternalDependencies(packagesNames).map(
-      packageName => ({ path: `./${packageDirnameMap.get(packageName)}/tsconfig.json` })
-    )
+  references: resolveInternalDependencies(packagesNames).map(
+    packageName => ({ path: `./${packageDirnameMap.get(packageName)}/${PACKAGE_TSCONFIG}` })
+  ),
 };
 
 console.log(projectLevelTsconfigPath, JSON.stringify(projectLevelTsconfigData, null, '  '));
 fs.writeFileSync(projectLevelTsconfigPath, JSON.stringify(projectLevelTsconfigData, null, '  '));
+
+
+// const testsTsconfigPath = path.join('tests', 'tsconfig.json');
+// const testsTsconfigData = {
+//   files: [],
+//   extends: '../tsconfig.base.json',
+//   references: resolveInternalDependencies(packagesNames).map(
+//     packageName => ({ path: `../packages/${packageDirnameMap.get(packageName)}/tsconfig.json` })
+//   ),
+// };
+
+// fs.writeFileSync(testsTsconfigPath, JSON.stringify(testsTsconfigData, null, '  '));
