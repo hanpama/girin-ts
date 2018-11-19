@@ -1,8 +1,8 @@
-# Girin: Server-side GraphQL Component 🦒
+# Girin: Server-side GraphQL Framework 🦒
 
 Build better GraphQL schema with less code
 * defining schema, not generating it
-* modularizing your GraphQL server
+* modularizing your GraphQL schema into components
 
 [![npm version](https://badge.fury.io/js/girin.svg)](https://badge.fury.io/js/girin)
 [![Build Status](https://travis-ci.org/hanpama/girin.svg?branch=master)](https://travis-ci.org/hanpama/girin)
@@ -14,10 +14,8 @@ Build better GraphQL schema with less code
 ## Features
 
 * Use GraphQL Schema Definition Language to expose classes to API
-* Lightweight MongoDB model and relay compliant pagination implementation
+* TypeORM support with relay compliant cursor connections
 * Password authentication based on JWT
-* Built in GraphQL MongoDB subscriptions (WIP)
-* Cache control and file upload powered by apollo-server
 
 
 ## How it looks like
