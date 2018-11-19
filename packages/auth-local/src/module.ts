@@ -78,7 +78,7 @@ export class LocalAuth<TUser extends User> extends Module {
     return user;
   }
 
-  public async encodeToken(user: TUser) {
+  public async encodeToken(user: TUser): Promise<string> {
     return jwt.sign(this.serializeUserInstance(user), this.configs.jwtSecretKey);
   }
 
