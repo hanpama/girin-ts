@@ -1,0 +1,19 @@
+{
+  "groups": {
+    "default": {
+      "packages": [
+        "package.json",
+        "packages/auth-local/package.json",
+        "packages/connection/package.json",
+        "packages/environment/package.json",
+        "packages/framework/package.json",
+        "packages/girin-typeorm/package.json",
+        "packages/girin/package.json",
+        "packages/media/package.json",
+        "packages/objectstorage-fs/package.json",
+        "packages/objectstorage-gridfs/package.json",
+        "packages/typelink/package.json"
+      ]
+    }
+  }
+}
