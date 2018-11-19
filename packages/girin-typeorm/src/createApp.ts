@@ -19,7 +19,7 @@ export function createApp(configs: GirinTypeORMAppConfigs): Environment {
   environment
   .load(new SchemaBuilder(configs.schema))
   .load(new HttpServer(configs.server || {}))
-  .load(new TypeORMFrameworkDatastore());
+  .load(new TypeORMFrameworkDatastore({}));
 
   if (configs.auth) {
     environment.load(new LocalAuth(configs.auth));

@@ -48,7 +48,7 @@ export async function testFrameworkDatastoreSpec(
     throw new Error('Object returned by `get()` method should be an instance of its first argument');
   }
 
-  let shouldBeNull = await datastore.find(TypeA, { bar: 'bar' });
+  let shouldBeNull = await datastore.find(TypeA, { foo: 'bar' });
   if (shouldBeNull !== null) {
     throw new Error(`Datastore should return null when no record matched: but got ${shouldBeNull}`);
   }
