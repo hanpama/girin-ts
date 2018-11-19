@@ -1,4 +1,4 @@
-import { NeDBModel, field } from '@girin/framework/lib/test';
+import { NeDBModel, field } from '@girin/framework';
 import { User } from '../src';
 
 
