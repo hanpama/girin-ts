@@ -52,7 +52,6 @@ export class LocalAuth<TUser extends User> extends Module {
     }
   }
 
-
   public persistUserInstance(user: TUser): Promise<any> {
     return FrameworkDatastore.object().save(user);
   }
