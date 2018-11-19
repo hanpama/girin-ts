@@ -7,7 +7,7 @@ Build better GraphQL schema with less code
 [![npm version](https://badge.fury.io/js/girin.svg)](https://badge.fury.io/js/girin)
 [![Build Status](https://travis-ci.org/hanpama/girin.svg?branch=master)](https://travis-ci.org/hanpama/girin)
 [![codecov](https://codecov.io/gh/hanpama/girin/branch/master/graph/badge.svg)](https://codecov.io/gh/hanpama/girin)
-[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/) [![Greenkeeper badge](https://badges.greenkeeper.io/hanpama/girin.svg)](https://greenkeeper.io/)
 
 > This project is in development. not stable!
 
