@@ -29,7 +29,7 @@ export interface HttpServerConfigs {
 export class HttpServer extends Module {
   get label() { return 'HttpServer'; }
 
-  protected apolloServer: ApolloServer;
+  // protected apolloServer: ApolloServer;
   protected httpServer: http.Server;
 
   constructor(public configs: HttpServerConfigs) {
@@ -75,12 +75,12 @@ export class HttpServer extends Module {
       return results;
     };
 
-    this.apolloServer = new ApolloServer({
+    const apolloServer = new ApolloServer({
       ...apolloServerConfig,
       schema,
       context,
     });
-    this.apolloServer.applyMiddleware({
+    apolloServer.applyMiddleware({
       app,
       path: '/graphql',
       bodyParserConfig: { limit: '50mb' },
@@ -89,7 +89,7 @@ export class HttpServer extends Module {
     this.httpServer = http.createServer(app);
 
     if (apolloServerConfig.subscriptions) {
-      this.apolloServer.installSubscriptionHandlers(this.httpServer);
+      apolloServer.installSubscriptionHandlers(this.httpServer);
     }
 
     return new Promise<void>((resolve, reject) => {

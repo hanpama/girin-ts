@@ -1,5 +1,5 @@
 import { Module } from '@girin/environment';
-import { FrameworkDatastore, contextMap } from '@girin/framework';
+import { FrameworkDatastore, contextMap, ContextArguments } from '@girin/framework';
 
 import * as argon2 from 'argon2';
 import * as crypto from 'crypto';
@@ -38,18 +38,20 @@ export class LocalAuth<TUser extends User> extends Module {
   }
 
   public onLoad() {
-    contextMap.set('user', async ({ req }) => {
-      const token = req.headers.authorization;
-      let user: any;
-      if (token) {
-        user = await this.decodeToken(token);
-      }
-      return user || null;
-    });
+    contextMap.set('user', this.createContext.bind(this));
 
     if (this.configs.extendSchema !== false) {
       loadExtensions();
     }
+  }
+
+  public async createContext({ req }: ContextArguments): Promise<TUser> {
+    const token = req.headers.authorization;
+    let user: any;
+    if (token) {
+      user = await this.decodeToken(token);
+    }
+    return user || null;
   }
 
   public persistUserInstance(user: TUser): Promise<any> {

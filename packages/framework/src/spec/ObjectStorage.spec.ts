@@ -27,10 +27,6 @@ export async function testObjectStorageSpec(mod: ObjectStorage) {
   if (storageObject.contentLength !== fileBuffer.byteLength) {
     throw new Error(`Expected contentLength to be ${fileBuffer.byteLength} but got ${storageObject.contentLength}`);
   }
-  // const expectedContentMD5 = createHash('md5').update(fileBuffer).digest('base64');
-  // if (storageObject.contentMD5 !== expectedContentMD5) {
-  //   throw new Error(`MD5 hash ${storageObject.contentMD5} is different from ${expectedContentMD5}`);
-  // }
 
   const dataStream = storageObject.open();
 
