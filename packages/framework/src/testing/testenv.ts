@@ -4,7 +4,7 @@ import { SchemaBuilder } from '..';
 import { TestHttpServer, NeDBFrameworkDatastore, TestObjectStorage } from '.';
 
 /**
- * @param port if not provided, it create a temporary socket file to run server.
+ * @param port if not provided, creates a temporary socket file to run server.
  */
 export function prepareTestEnv(options: { Query: Function, Mutation?: Function, port?: number}) {
   const { Query, Mutation, port } = options;

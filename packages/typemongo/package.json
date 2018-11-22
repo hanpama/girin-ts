@@ -1,0 +1,33 @@
+{
+  "name": "@girin/typemongo",
+  "version": "0.5.0-alpha.4",
+  "description": "Lightweight ORM-like utility for MongoDB",
+  "main": "dist",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "prepublish": "npm run build",
+    "build": "npm run compile",
+    "compile": "tsc -p tsconfig.package.json"
+  },
+  "keywords": [
+    "mongodb", "graphql", "relay"
+  ],
+  "license": "MIT",
+  "author": "Max Choi <hanpama@gmail.com>",
+  "tags": [
+    "mongodb", "graphql", "relay"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hanpama/girin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hanpama/girin/issues"
+  },
+  "homepage": "https://github.com/hanpama/girin",
+  "dependencies": {
+    "@girin/connection": "^0.5.0-alpha.4",
+    "dataloader": "^1.4.0"
+  },
+  "gitHead": "7f87fc9641454bbe0e6367e5b1f15eea4a6fa956"
+}
