@@ -1,7 +1,7 @@
 {
-  "name": "@girin/app",
+  "name": "@girin/accounts-password",
   "version": "0.5.0-alpha.4",
-  "description": "GraphQL Server Framework: Build better GraphQL schema with less code",
+  "description": "GraphQL bootstrapper up and running",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "keywords": [
@@ -21,11 +21,11 @@
   },
   "homepage": "https://github.com/hanpama/girin",
   "dependencies": {
-    "@girin/framework": "^0.5.0-alpha.4",
     "@girin/environment": "^0.5.0-alpha.4",
-    "@girin/auth-local": "^0.5.0-alpha.4",
-    "@girin/media": "^0.5.0-alpha.4",
-    "@girin/objectstorage-fs": "^0.5.0-alpha.4"
+    "@girin/auth": "^0.5.0-alpha.4",
+    "@girin/framework": "^0.5.0-alpha.4",
+    "@girin/typelink": "^0.5.0-alpha.4",
+    "argon2": "^0.19.3"
   },
   "gitHead": "7f87fc9641454bbe0e6367e5b1f15eea4a6fa956",
   "files": [

@@ -8,6 +8,18 @@
   "references": [
     {
       "path": "../connection/tsconfig.package.json"
+    },
+    {
+      "path": "../environment/tsconfig.package.json"
+    },
+    {
+      "path": "../typelink/tsconfig.package.json"
+    },
+    {
+      "path": "../framework/tsconfig.package.json"
+    },
+    {
+      "path": "../auth/tsconfig.package.json"
     }
   ],
   "include": [

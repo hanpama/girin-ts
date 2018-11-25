@@ -14,7 +14,10 @@
       "path": "./framework/tsconfig.package.json"
     },
     {
-      "path": "./auth-local/tsconfig.package.json"
+      "path": "./accounts/tsconfig.package.json"
+    },
+    {
+      "path": "./auth-password/tsconfig.package.json"
     },
     {
       "path": "./media/tsconfig.package.json"
@@ -23,13 +26,19 @@
       "path": "./objectstorage-fs/tsconfig.package.json"
     },
     {
-      "path": "./girin/tsconfig.package.json"
+      "path": "./app/tsconfig.package.json"
     },
     {
-      "path": "./girin-typeorm/tsconfig.package.json"
+      "path": "./app-typemongo/tsconfig.package.json"
+    },
+    {
+      "path": "./app-typeorm/tsconfig.package.json"
     },
     {
       "path": "./objectstorage-gridfs/tsconfig.package.json"
+    },
+    {
+      "path": "./typemongo/tsconfig.package.json"
     }
   ]
 }

@@ -1,21 +1,20 @@
 {
   "name": "@girin/typemongo",
   "version": "0.5.0-alpha.4",
-  "description": "Lightweight ORM-like utility for MongoDB",
-  "main": "dist",
-  "types": "dist/index.d.ts",
-  "scripts": {
-    "prepublish": "npm run build",
-    "build": "npm run compile",
-    "compile": "tsc -p tsconfig.package.json"
-  },
+  "description": "Lightweight MongoDB ORM optimized for GraphQL",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "keywords": [
-    "mongodb", "graphql", "relay"
+    "mongodb",
+    "graphql",
+    "relay"
   ],
   "license": "MIT",
   "author": "Max Choi <hanpama@gmail.com>",
   "tags": [
-    "mongodb", "graphql", "relay"
+    "mongodb",
+    "graphql",
+    "relay"
   ],
   "repository": {
     "type": "git",
@@ -29,5 +28,15 @@
     "@girin/connection": "^0.5.0-alpha.4",
     "dataloader": "^1.4.0"
   },
-  "gitHead": "7f87fc9641454bbe0e6367e5b1f15eea4a6fa956"
+  "peerDependencies": {
+    "mongodb": "^3.1.10"
+  },
+  "gitHead": "7f87fc9641454bbe0e6367e5b1f15eea4a6fa956",
+  "files": [
+    "./lib"
+  ],
+  "scripts": {
+    "build": "tsc -b .",
+    "prepublish": "npm run build"
+  }
 }

@@ -17,6 +17,18 @@
     },
     {
       "path": "../framework/tsconfig.package.json"
+    },
+    {
+      "path": "../accounts/tsconfig.package.json"
+    },
+    {
+      "path": "../auth-local/tsconfig.package.json"
+    },
+    {
+      "path": "../media/tsconfig.package.json"
+    },
+    {
+      "path": "../objectstorage-fs/tsconfig.package.json"
     }
   ],
   "include": [

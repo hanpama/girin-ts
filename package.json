@@ -14,7 +14,8 @@
     "docs": "docsify serve docs",
     "build": "tsc --build packages/tsconfig.project.json",
     "watch": "tsc --build --watch packages/tsconfig.project.json",
-    "update:tsconfig": "ts-node scripts/update-package-tsconfig.ts"
+    "update:tsconfig.json": "ts-node scripts/update-package-tsconfig.ts",
+    "update:package.json": "ts-node scripts/update-package-json.ts"
   },
   "devDependencies": {
     "@types/express": "^4.16.0",

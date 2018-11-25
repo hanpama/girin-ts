@@ -1,7 +1,7 @@
 {
   "name": "@girin/app-typeorm",
   "version": "0.5.0-alpha.4",
-  "description": "TypeORM integration helpers for Girin: GraphQL Server Framework",
+  "description": "GraphQL server bootstrapper for TypeORM",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "keywords": [

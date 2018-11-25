@@ -1,5 +1,5 @@
-import { LocalAuth } from './module';
-import { AuthContext } from '.';
+import { Auth } from './module';
+import { AuthContext } from './types';
 
 
 export type Resolver = (
@@ -26,14 +26,14 @@ export function loginRequired(): ResolverDecorator {
 
     if (prototypeOrClass instanceof Function) { // is a class
       descriptor.value = function(source: any, args: any, context: AuthContext<any>, info: any) {
-        if (!(context && LocalAuth.object().isValidUserInstance(context.user))) {
+        if (!(context && Auth.object().isValidUserInstance(context.user))) {
           throw new Error('Authentication Error: login required');
         }
         return maybeFunction.apply(this, [source, args, context, info]);
       };
     } else { // is a prototype
       descriptor.value = function(args: any, context: AuthContext<any>, info: any) {
-        if (!(context && LocalAuth.object().isValidUserInstance(context.user))) {
+        if (!(context && Auth.object().isValidUserInstance(context.user))) {
           throw new Error('Authentication Error: login required');
         }
         return maybeFunction.apply(this, [args, context, info]);
