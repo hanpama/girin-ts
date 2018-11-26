@@ -28,14 +28,14 @@
   },
   "gitHead": "48f88b141b7e6ef0db96362451428d949600d358",
   "files": [
-    "./lib",
-    "./src"
+    "lib",
+    "src"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -b ./tsconfig.package.json",
     "prepublish": "npm run build"
-  },
-  "publishConfig": {
-    "access": "public"
   }
 }

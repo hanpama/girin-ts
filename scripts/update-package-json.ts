@@ -15,7 +15,7 @@ packages.forEach(packageName => {
   delete packageJSONData.scripts;
   packageJSONData.main = './lib/index.js';
   packageJSONData.types = './lib/index.d.ts';
-  packageJSONData.files = ['./lib', './src'];
+  packageJSONData.files = ['lib', 'src'];
   packageJSONData.scripts = {
     'build': 'tsc -b ./tsconfig.package.json',
     'prepublish': 'npm run build',
