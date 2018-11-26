@@ -1,6 +1,6 @@
 {
   "name": "@girin/objectstorage-gridfs",
-  "version": "0.5.0-alpha.6",
+  "version": "0.5.0-alpha.7",
   "description": "ObjectStorage GridFS implementation for Girin: GraphQL server framework",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -21,8 +21,8 @@
   },
   "homepage": "https://github.com/hanpama/girin",
   "dependencies": {
-    "@girin/environment": "^0.5.0-alpha.6",
-    "@girin/framework": "^0.5.0-alpha.6"
+    "@girin/environment": "^0.5.0-alpha.7",
+    "@girin/framework": "^0.5.0-alpha.7"
   },
   "peerDependencies": {
     "mongodb": "^3.1.10"

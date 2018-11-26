@@ -1,6 +1,6 @@
 {
   "name": "@girin/mediaservice",
-  "version": "0.5.0-alpha.6",
+  "version": "0.5.0-alpha.7",
   "description": "Media service for Girin: GraphQL server framework",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -21,9 +21,9 @@
   },
   "homepage": "https://github.com/hanpama/girin",
   "dependencies": {
-    "@girin/environment": "^0.5.0-alpha.6",
-    "@girin/framework": "^0.5.0-alpha.6",
-    "@girin/typelink": "^0.5.0-alpha.6",
+    "@girin/environment": "^0.5.0-alpha.7",
+    "@girin/framework": "^0.5.0-alpha.7",
+    "@girin/typelink": "^0.5.0-alpha.7",
     "graphql-iso-date": "^3.6.1"
   },
   "gitHead": "48f88b141b7e6ef0db96362451428d949600d358",
