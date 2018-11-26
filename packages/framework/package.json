@@ -1,6 +1,6 @@
 {
   "name": "@girin/framework",
-  "version": "0.5.0-alpha.5",
+  "version": "0.5.0-alpha.6",
   "description": "Core modules for Girin: GraphQL server framework",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -22,8 +22,8 @@
   "homepage": "https://github.com/hanpama/girin",
   "dependencies": {
     "@apollographql/apollo-upload-server": "^5.0.3",
-    "@girin/environment": "^0.5.0-alpha.5",
-    "@girin/typelink": "^0.5.0-alpha.5",
+    "@girin/environment": "^0.5.0-alpha.6",
+    "@girin/typelink": "^0.5.0-alpha.6",
     "@types/express": "^4.16.0",
     "apollo-server-express": "^2.1.0",
     "apollo-upload-server": "^7.1.0",

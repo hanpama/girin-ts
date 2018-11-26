@@ -1,6 +1,6 @@
 {
   "name": "@girin/app-typeorm",
-  "version": "0.5.0-alpha.5",
+  "version": "0.5.0-alpha.6",
   "private": true,
   "description": "Bootstrap TypeORM entities to GraphQL server",
   "main": "./lib/index.js",
@@ -22,12 +22,12 @@
   },
   "homepage": "https://github.com/hanpama/girin",
   "dependencies": {
-    "@girin/auth": "^0.5.0-alpha.5",
-    "@girin/connection": "^0.5.0-alpha.5",
-    "@girin/environment": "^0.5.0-alpha.5",
-    "@girin/framework": "^0.5.0-alpha.5",
-    "@girin/mediaservice": "^0.5.0-alpha.5",
-    "@girin/objectstorage-fs": "^0.5.0-alpha.5",
+    "@girin/auth": "^0.5.0-alpha.6",
+    "@girin/connection": "^0.5.0-alpha.6",
+    "@girin/environment": "^0.5.0-alpha.6",
+    "@girin/framework": "^0.5.0-alpha.6",
+    "@girin/mediaservice": "^0.5.0-alpha.6",
+    "@girin/objectstorage-fs": "^0.5.0-alpha.6",
     "dataloader": "^1.4.0"
   },
   "peerDependencies": {
