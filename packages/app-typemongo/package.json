@@ -1,6 +1,6 @@
 {
   "name": "@girin/app-typemongo",
-  "version": "0.5.0-alpha.7",
+  "version": "0.5.0-alpha.0+7aaf194",
   "description": "Bootstrap GraphQL server with MongoDB",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -30,13 +30,13 @@
     "@girin/objectstorage-fs": "^0.5.0-alpha.7",
     "@girin/objectstorage-gridfs": "^0.5.0-alpha.7",
     "@girin/typelink": "^0.5.0-alpha.7",
-    "@girin/typemongo": "^0.5.0-alpha.7",
+    "@girin/typemongo": "^0.5.0-alpha.0+7aaf194",
     "dataloader": "^1.4.0"
   },
   "peerDependencies": {
     "typeorm": "^0.2.0"
   },
-  "gitHead": "48f88b141b7e6ef0db96362451428d949600d358",
+  "gitHead": "7aaf19495793576a482a73f74e6432adacf45978",
   "files": [
     "lib",
     "src"
