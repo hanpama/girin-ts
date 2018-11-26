@@ -1,4 +1,5 @@
-import { User } from '@girin/accounts';
+import { User } from '@girin/auth';
+
 
 export interface PasswordUser extends User {
   id: string;

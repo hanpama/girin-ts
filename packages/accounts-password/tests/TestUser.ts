@@ -1,8 +1,8 @@
 import { NeDBModel, field } from '@girin/framework';
-import { User } from '../src';
+import { PasswordUser } from '../src';
 
 
-export class TestUser extends NeDBModel implements User {
+export class TestUser extends NeDBModel implements PasswordUser {
   id: string;
   @field() createdAt: Date;
   @field() username: string;

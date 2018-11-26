@@ -1,5 +1,5 @@
 import { environment } from '@girin/environment';
-import AuthLocalModule, { loginRequired } from '../src';
+import { Auth, loginRequired } from '../src';
 
 import { TestUser } from './TestUser';
 
@@ -7,17 +7,17 @@ import { TestUser } from './TestUser';
 class Profile {
   @loginRequired()
   prototypeSecretInfo(_args: {}, context: any) {
-    return context.user.username;
+    return 'prototype';
   }
 
   @loginRequired()
   static classSecretInfo(_source: null, _args: {}, context: any) {
-    return context.user.username;
+    return 'class';
   }
 }
 
 environment.load(
-  new AuthLocalModule({
+  new Auth({
     userConstructor: TestUser,
     jwtSecretKey: 'FOOBAR'
   })
@@ -25,7 +25,7 @@ environment.load(
 
 describe('auth decorators', () => {
   let user: TestUser = new TestUser();
-  user.username = 'testusername';
+  user.id = 'randomuserid';
 
   describe('loginRequired decorating a prototype', () => {
     it('throws errors when context is not given', () => {
@@ -45,13 +45,13 @@ describe('auth decorators', () => {
     it('throws error when context.user is not an instance of BaseUser', () => {
       const profile = new Profile();
       expect(() => {
-        profile.prototypeSecretInfo({}, { user: { secretInfo: 'testusername' } });
+        profile.prototypeSecretInfo({}, { user: { secretInfo: 'prototype' } });
       }).toThrowError('Authentication Error: login required');
     });
 
     it('works fine when context and user exists', () => {
       const profile = new Profile();
-      expect(profile.prototypeSecretInfo({}, { user })).toBe('testusername');
+      expect(profile.prototypeSecretInfo({}, { user })).toBe('prototype');
     });
   });
 
@@ -70,12 +70,12 @@ describe('auth decorators', () => {
 
     it('throws error when context.user is not an instance of BaseUser', () => {
       expect(() => {
-        Profile.classSecretInfo(null, {}, { user: { secretInfo: 'testusername' } });
+        Profile.classSecretInfo(null, {}, { user: { secretInfo: 'class' } });
       }).toThrowError('Authentication Error: login required');
     });
 
     it('works fine when context and user exists', () => {
-      expect(Profile.classSecretInfo(null, {}, { user })).toBe('testusername');
+      expect(Profile.classSecretInfo(null, {}, { user })).toBe('class');
     });
   });
 });

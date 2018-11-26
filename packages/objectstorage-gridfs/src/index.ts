@@ -11,15 +11,15 @@ import {
 import { ObjectStorage, StorageObjectNotFoundError, StorageObject } from '@girin/framework';
 
 
-export interface ObjectStorageGridFSModuleConfigs {
+export interface GridFSObjectStorageConfigs {
   url: string;
   clientOptions?: MongoClientOptions;
   gridFSOptions?: GridFSBucketOptions;
 }
 
-export default class ObjectStorageGridFSModule extends ObjectStorage {
+export default class GridFSObjectStorage extends ObjectStorage {
 
-  constructor(public configs: ObjectStorageGridFSModuleConfigs) {
+  constructor(public configs: GridFSObjectStorageConfigs) {
     super();
   }
 

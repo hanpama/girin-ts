@@ -8,12 +8,12 @@ import { User, UserConstructor } from './types';
 export interface AuthConfigs<TUser extends User> {
   userConstructor: UserConstructor<TUser>;
   jwtSecretKey: string;
-  extendSchema?: boolean;
 }
 
 export class Auth<TUser extends User> extends Module {
+  get label() { return 'auth'; }
 
-  public onLoad() {
+  public onInit() {
     contextMap.set('user', this.populateUserInContext.bind(this));
   }
 
@@ -71,6 +71,10 @@ export class Auth<TUser extends User> extends Module {
     return FrameworkDatastore.object().save(user);
   }
 
+  public findUser(predicate: { [fieldName: string]: any }) {
+    return FrameworkDatastore.object().find(this.configs.userConstructor, predicate);
+  }
+
   /**
    * Create a user instance which is not saved to database yet.
    */
@@ -82,7 +86,8 @@ export class Auth<TUser extends User> extends Module {
 }
 
 export class AuthenticationError extends Error {
-
-  // constructor(message)
-  get message() { return 'AuthenticationError'; }
+  constructor() {
+    super();
+    this.message = 'AuthenticationError';
+  }
 }

@@ -1,4 +1,4 @@
-import { CollectionInsertOneOptions, CommonOptions, FilterQuery, FindAndModifyWriteOpResultObject, ObjectID, ReplaceOneOptions, UpdateWriteOpResult } from 'mongodb';
+import { CollectionInsertOneOptions, CommonOptions, FilterQuery, FindAndModifyWriteOpResultObject, ObjectID, ReplaceOneOptions, UpdateWriteOpResult, DeleteWriteOpResultObject } from 'mongodb';
 import { ModelManager } from './ModelManager';
 import { Document } from '../types';
 
@@ -45,8 +45,8 @@ export class Model {
 
   // shortcuts and dataloader
   public static async insertOne<TModel extends Model>(this: ModelClass<TModel>, source: Document, options?: CollectionInsertOneOptions): Promise<TModel> {
-    await this.getManager().collection.insertOne(source, options);
-    return new this(source) as any;
+    const res = await this.getManager().collection.insertOne(source, options);
+    return new this({ _id: res.insertedId, ...source }) as any;
   }
 
   public static updateOne<TModel extends Model>(this: ModelClass<TModel>, filter: FilterQuery<TModel>, update: Object, options?: ReplaceOneOptions): Promise<UpdateWriteOpResult> {
@@ -67,16 +67,25 @@ export class Model {
     return docs.map(doc => this.create(doc)!);
   }
 
-  public static async getOne<TModel extends Model> (this: ModelClass<TModel>, id: string | ObjectID): Promise<TModel | null> {
+  public static async getOne<TModel extends Model>(this: ModelClass<TModel>, id: string | ObjectID): Promise<TModel | null> {
     const coercedId = new ObjectID(id);
     return this.getManager().dataloader.load(coercedId).then(doc => this.create(doc));
   }
 
-  public static async getMany<TModel extends Model> (this: ModelClass<TModel>, ids: Array<string | ObjectID>): Promise<(TModel | null)[]> {
+  public static async getMany<TModel extends Model>(this: ModelClass<TModel>, ids: Array<string | ObjectID>): Promise<(TModel | null)[]> {
     const coercedIds = ids.map(id => new ObjectID(id));
     const docs = await this.getManager().dataloader.loadMany(coercedIds);
     return docs.map(doc => this.create(doc));
   }
+
+  public static async deleteOne<TModel extends Model>(this: ModelClass<TModel>, query: FilterQuery<TModel>, options?: CommonOptions): Promise<DeleteWriteOpResultObject> {
+    return this.getManager().collection.deleteOne(query, options);
+  }
+
+  public static async deleteMany<TModel extends Model>(this: ModelClass<TModel>, query: FilterQuery<TModel>, options?: CommonOptions): Promise<DeleteWriteOpResultObject> {
+    return this.getManager().collection.deleteMany(query, options);
+  }
+
 
   /**
    * ObjectID of the document

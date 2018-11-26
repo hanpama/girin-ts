@@ -5,30 +5,41 @@ import * as path from 'path';
 const PACKAGE_TSCONFIG = 'tsconfig.package.json';
 const PROJECT_TSCONFIG = 'tsconfig.project.json';
 
-
-const internalDependencyMap: Map<string, string[]> = new Map();
-const packageDirnameMap: Map<string, string> = new Map();
-
 const packagesRoot = path.join(__dirname, '..', 'packages');
-
-const packagesNames: string[] = fs.readdirSync(packagesRoot).filter(
+const packageDirectories = fs.readdirSync(packagesRoot).filter(
   item => (fs.lstatSync(path.join(packagesRoot, item)).isDirectory())
-).map(packageDirname => {
+);
 
+type DirectoryName = string;
+type PackageName = string;
+
+const packageJSONMap: Map<PackageName, {
+  name: string,
+  dependencies: { [packageName: string]: string },
+  devDependencies: { [packageName: string]: string },
+}> = new Map();
+const packageDirnameMap: Map<PackageName, DirectoryName> = new Map();
+
+packageDirectories.forEach(packageDirname => {
   const packageJSONPath = path.join(packagesRoot, packageDirname, 'package.json');
   const packageJSONData = JSON.parse(fs.readFileSync(packageJSONPath).toString());
   const packageName = packageJSONData.name;
+  packageDirnameMap.set(packageName, packageDirname);
+  packageJSONMap.set(packageName, packageJSONData);
+});
 
-  const { dependencies, devDependencies } = packageJSONData;
+
+const internalDependencyMap: Map<string, string[]> = new Map();
+packageDirnameMap.forEach((_packageDirname, packageName) => {
+
+  const { dependencies, devDependencies } = packageJSONMap.get(packageName)!;
+
   const internalDependencies = [
     ...(dependencies ? Object.keys(dependencies) : []),
     ...(devDependencies ? Object.keys(devDependencies) : []),
-  ].filter(dep => dep.startsWith('@girin'));
+  ].filter(dep => packageDirnameMap.has(dep));
 
   internalDependencyMap.set(packageName, internalDependencies);
-  packageDirnameMap.set(packageName, packageDirname);
-
-  return packageName;
 });
 
 function resolveInternalDependencies(dependencies: string[]): string[] {
@@ -46,9 +57,8 @@ function resolveInternalDependencies(dependencies: string[]): string[] {
   return resolved.filter((item, idx) => resolved.indexOf(item) === idx);
 }
 
+packageDirnameMap.forEach((packageDirname, packageName) => {
 
-packagesNames.forEach(packageName => {
-  const packageDirname = packageDirnameMap.get(packageName)!;
   const tsconfigPath = path.join(packagesRoot, packageDirname, PACKAGE_TSCONFIG);
 
   const internalDependencies = resolveInternalDependencies(
@@ -76,22 +86,10 @@ const projectLevelTsconfigPath = path.join(packagesRoot, PROJECT_TSCONFIG);
 
 const projectLevelTsconfigData = {
   files: [],
-  references: resolveInternalDependencies(packagesNames).map(
+  references: resolveInternalDependencies(Array.from(packageDirnameMap.keys())).map(
     packageName => ({ path: `./${packageDirnameMap.get(packageName)}/${PACKAGE_TSCONFIG}` })
   ),
 };
 
 console.log(projectLevelTsconfigPath, JSON.stringify(projectLevelTsconfigData, null, '  '));
 fs.writeFileSync(projectLevelTsconfigPath, JSON.stringify(projectLevelTsconfigData, null, '  '));
-
-
-// const testsTsconfigPath = path.join('tests', 'tsconfig.json');
-// const testsTsconfigData = {
-//   files: [],
-//   extends: '../tsconfig.base.json',
-//   references: resolveInternalDependencies(packagesNames).map(
-//     packageName => ({ path: `../packages/${packageDirnameMap.get(packageName)}/tsconfig.json` })
-//   ),
-// };
-
-// fs.writeFileSync(testsTsconfigPath, JSON.stringify(testsTsconfigData, null, '  '));

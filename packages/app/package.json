@@ -23,7 +23,7 @@
   "dependencies": {
     "@girin/framework": "^0.5.0-alpha.4",
     "@girin/environment": "^0.5.0-alpha.4",
-    "@girin/auth-local": "^0.5.0-alpha.4",
+    "@girin/auth": "^0.5.0-alpha.4",
     "@girin/media": "^0.5.0-alpha.4",
     "@girin/objectstorage-fs": "^0.5.0-alpha.4"
   },

@@ -36,7 +36,7 @@ export class HttpServer extends Module {
     super();
   }
 
-  onLoad() {
+  onInit() {
     const schemaModule = SchemaBuilder.object();
 
     getGlobalMetadataStorage().registerMetadata([

@@ -1,10 +1,10 @@
 import { testObjectStorageSpec } from '@girin/framework';
 
-import ObjectStorageGridFSModule from '../src';
+import GridFSObjectStorage from '../src';
 
 
 describe('filestroage-gridfs', () => {
-  const mod = new ObjectStorageGridFSModule({
+  const mod = new GridFSObjectStorage({
     url: `mongodb://localhost:27017/test`,
     clientOptions: {
       useNewUrlParser: true,

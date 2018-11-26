@@ -49,6 +49,8 @@ export class TypeORMFrameworkDatastore extends FrameworkDatastore {
       .createQueryBuilder()
       .where(brackets);
     const result = await qb.getOne();
+
+    // TODO: double check the result matches predicate
     return result || null;
   }
 

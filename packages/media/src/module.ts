@@ -25,7 +25,7 @@ export class MediaModule<TMedia extends Media> extends Module {
     super();
   }
 
-  onLoad() {
+  onInit() {
     if (this.configs.endpoint) {
       app.get(this.getMediaURL(':mediaId'), this.serveMedia.bind(this));
     }

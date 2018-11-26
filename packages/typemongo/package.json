@@ -1,7 +1,7 @@
 {
   "name": "@girin/typemongo",
   "version": "0.5.0-alpha.4",
-  "description": "Lightweight MongoDB ORM optimized for GraphQL",
+  "description": "Lightweight MongoDB ODM optimized for GraphQL",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "keywords": [

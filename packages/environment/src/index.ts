@@ -7,7 +7,7 @@ export class Environment {
     this.bootstrapPromiseMap = new Map();
   }
 
-  initialize() {
+  clean() {
     this.moduleMap = new Map();
     this.bootstrapPromiseMap = new Map();
   }
@@ -28,18 +28,31 @@ export class Environment {
     return mod;
   }
 
+  public initialize() {
+    for (let mod of this.moduleMap.values()) {
+      mod.onInit();
+    }
+  }
+
   /**
    * Bootstraps all modules in this environment in reverse of loaded order.
    */
   async run(): Promise<{ [label: string]: any }> {
+    this.initialize();
+
     const addedOrder = Array.from(this.moduleMap.keys());
+
     const reducedResultMap: { [label: string]: any } = {};
     try {
       for (let i = addedOrder.length - 1; i >= 0; i--) {
         reducedResultMap[addedOrder[i]] = await this.getOrCreateReadyPromise(addedOrder[i]);
       }
     } catch (e) {
-      await this.destroy();
+      try {
+        await this.destroy();
+      } catch (e) {
+        console.error(e);
+      }
       throw e;
     }
 
@@ -54,7 +67,7 @@ export class Environment {
     for (let i = bootstrapOrder.length - 1; i >= 0; i--) {
       await bootstrapOrder[i].onDestroy(this);
     }
-    this.initialize();
+    this.clean();
     return;
   }
 
@@ -63,7 +76,6 @@ export class Environment {
    */
   load(mod: Module): this {
     const { label } = mod;
-    mod.onLoad(this);
     this.moduleMap.set(label, mod);
     return this;
   }
@@ -119,7 +131,7 @@ export abstract class Module {
   /**
    * Called when module is loaded to environment
    */
-  public onLoad(context: Environment = environment): void { return; }
+  public onInit(context: Environment = environment): void { return; }
 
   /**
    * Called when environment is being bootstrapped

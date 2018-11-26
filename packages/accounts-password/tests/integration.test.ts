@@ -1,8 +1,9 @@
 import { defineType, gql } from '@girin/typelink';
 import { prepareTestEnv, destroyTestEnv, TestHttpServer, TestClient } from '@girin/framework';
+import { Auth, AuthContext } from '@girin/auth';
 
-import AuthLocalModule, { User, AuthContext } from '../src';
 import { TestUser } from './TestUser';
+import { AccountsPassword } from '../src';
 
 
 @defineType(gql`
@@ -12,7 +13,7 @@ import { TestUser } from './TestUser';
 `)
 export class Query {
   static testGetUserIdFromContext(_source: null, _args: null, context: any) {
-    return context.user && String(context.user.id);
+    return context.user && context.user.id;
   }
 }
 
@@ -22,11 +23,8 @@ export class Query {
   }
 `)
 export class Mutation {
-  static async testChangePassword(_source: null, args: { password: string }, context: AuthContext<User>) {
-    const user = context.user;
-    const authModule = AuthLocalModule.object();
-
-    await authModule.setPassword(user, args.password);
+  static async testChangePassword(_source: null, args: { password: string }, context: AuthContext<TestUser>) {
+    await AccountsPassword.object().setPassword(context.user, args.password);
     return true;
   }
 }
@@ -35,10 +33,11 @@ describe('client auth', () => {
   let client: TestClient;
   beforeAll(async () => {
     await prepareTestEnv({ Query, Mutation })
-      .load(new AuthLocalModule({
+      .load(new Auth({
         jwtSecretKey: 'FOOBARBAZ',
         userConstructor: TestUser,
       }))
+      .load(new AccountsPassword({}))
       .run();
     client = TestHttpServer.object().getClient();
   });
@@ -59,7 +58,7 @@ describe('client auth', () => {
       }
     `});
     expect(errors).toBeFalsy();
-    expect(data.signUp).toBe(true);
+    expect(typeof data.signUp).toBe('string');
 
   });
 
@@ -83,17 +82,6 @@ describe('client auth', () => {
     expect(errors).toBeFalsy();
     expect(typeof data.testGetUserIdFromContext).toBe('string');
   });
-
-  // it('should not allow duplicate username', async () => {
-  //   const res = await fetch(url, {
-  //     method: 'POST',
-  //     headers: { 'Content-Type': 'application/json' },
-  //     body: JSON.stringify({
-  //       query: `mutation {
-  //         signUp(username: "hi123", password: "mypasswordissoostrong")
-  //       }` }),
-  //   });
-  // })
 
   // password is too short
   // password is too common

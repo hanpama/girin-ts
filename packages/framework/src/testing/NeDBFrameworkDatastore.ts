@@ -1,6 +1,6 @@
 import NeDB from 'nedb';
 
-import { FrameworkDatastore } from '../core/FrameworkDatastore';
+import { FrameworkDatastore, TypeNotSupportedError } from '../core/FrameworkDatastore';
 
 
 export class NeDBFrameworkDatastore extends FrameworkDatastore {
@@ -10,18 +10,31 @@ export class NeDBFrameworkDatastore extends FrameworkDatastore {
     super();
   }
 
-  save<T>(obj: T): Promise<T> {
+  save<T extends { id: string }>(obj: T): Promise<T> {
     const collection = this.getCollection(obj.constructor);
+    if (!(obj instanceof NeDBModel)) {
+      throw new TypeNotSupportedError();
+    }
 
     return new Promise<T>((resolve, reject) => {
-      collection.insert(
-        (obj as any).$source,
-        (err, doc) => {
-          if (err) { reject(err); }
-          (obj as any).$source = doc;
-          resolve(obj);
-        }
-      );
+      if (!obj.id) {
+        collection.insert(obj.$source, (err, doc) => {
+          if (err) {
+            reject(err);
+          } else {
+            obj.$source = doc;
+            resolve(obj);
+          }
+        });
+      } else {
+        collection.update({ _id: obj.id }, { $set: obj.$source }, {}, (err, count) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(obj);
+          }
+        });
+      }
     });
   }
 

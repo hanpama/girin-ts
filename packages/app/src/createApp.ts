@@ -1,6 +1,6 @@
 import { environment, Environment } from '@girin/environment';
 import { HttpServer, HttpServerConfigs, SchemaBuilder, SchemaBuilderConfigs } from '@girin/framework';
-import LocalAuth, { LocalAuthConfigs } from '@girin/auth-local';
+import { Auth, AuthConfigs } from '@girin/auth';
 import MediaModule, { MediaModuleConfigs } from '@girin/media';
 import FSObjectStorage from '@girin/objectstorage-fs';
 
@@ -8,7 +8,7 @@ import FSObjectStorage from '@girin/objectstorage-fs';
 export interface GirinTypeORMAppConfigs {
   schema: SchemaBuilderConfigs;
   server?: HttpServerConfigs;
-  auth?: LocalAuthConfigs<any>;
+  auth?: AuthConfigs<any>;
   media?: MediaModuleConfigs<any>;
   mediaRoot?: string;
 }
@@ -19,7 +19,7 @@ export function createApp(configs: GirinTypeORMAppConfigs): Environment {
   .load(new HttpServer(configs.server || {}));
 
   if (configs.auth) {
-    environment.load(new LocalAuth(configs.auth));
+    environment.load(new Auth(configs.auth));
   }
 
   if (configs.media) {
