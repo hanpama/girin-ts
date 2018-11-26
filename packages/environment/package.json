@@ -21,10 +21,12 @@
   },
   "homepage": "https://github.com/hanpama/girin",
   "files": [
-    "./lib"
+    "./lib",
+    "./src"
   ],
+  "gitHead": "b446a9fab10b334cb3f5ce904beaa8018231de54",
   "scripts": {
-    "build": "tsc -b .",
+    "build": "tsc -b ./tsconfig.package.json",
     "prepublish": "npm run build"
   }
 }

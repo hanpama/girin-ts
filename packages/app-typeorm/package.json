@@ -35,10 +35,11 @@
   },
   "gitHead": "7f87fc9641454bbe0e6367e5b1f15eea4a6fa956",
   "files": [
-    "./lib"
+    "./lib",
+    "./src"
   ],
   "scripts": {
-    "build": "tsc -b .",
+    "build": "tsc -b ./tsconfig.package.json",
     "prepublish": "npm run build"
   }
 }

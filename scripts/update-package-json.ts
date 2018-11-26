@@ -15,9 +15,9 @@ packages.forEach(packageName => {
   delete packageJSONData.scripts;
   packageJSONData.main = './lib/index.js';
   packageJSONData.types = './lib/index.d.ts';
-  packageJSONData.files = ['./lib'];
+  packageJSONData.files = ['./lib', './src'];
   packageJSONData.scripts = {
-    'build': 'tsc -b .',
+    'build': 'tsc -b ./tsconfig.package.json',
     'prepublish': 'npm run build',
   };
   fs.writeFileSync(packageJSONPath, JSON.stringify(packageJSONData, null, '  '));

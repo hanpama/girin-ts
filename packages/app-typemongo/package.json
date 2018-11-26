@@ -36,12 +36,13 @@
   "peerDependencies": {
     "typeorm": "^0.2.0"
   },
-  "gitHead": "7f87fc9641454bbe0e6367e5b1f15eea4a6fa956",
+  "gitHead": "b446a9fab10b334cb3f5ce904beaa8018231de54",
   "files": [
-    "./lib"
+    "./lib",
+    "./src"
   ],
   "scripts": {
-    "build": "tsc -b .",
+    "build": "tsc -b ./tsconfig.package.json",
     "prepublish": "npm run build"
   }
 }
