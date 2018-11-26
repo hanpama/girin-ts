@@ -1,7 +1,7 @@
 {
   "name": "@girin/accounts-password",
   "version": "0.5.0-alpha.4",
-  "description": "GraphQL bootstrapper up and running",
+  "description": "Accounts with password and authentication with graphql schema",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "keywords": [

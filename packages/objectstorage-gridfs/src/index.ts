@@ -17,7 +17,7 @@ export interface GridFSObjectStorageConfigs {
   gridFSOptions?: GridFSBucketOptions;
 }
 
-export default class GridFSObjectStorage extends ObjectStorage {
+export class GridFSObjectStorage extends ObjectStorage {
 
   constructor(public configs: GridFSObjectStorageConfigs) {
     super();

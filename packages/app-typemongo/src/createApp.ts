@@ -1,8 +1,8 @@
 import { environment, Environment } from '@girin/environment';
 import { HttpServer, HttpServerConfigs, SchemaBuilder, SchemaBuilderConfigs } from '@girin/framework';
-import MediaModule, { MediaModuleConfigs } from '@girin/media';
-import FSObjectStorage, { FSObjectStorageConfigs } from '@girin/objectstorage-fs';
-import GridFSObjectStorage, { GridFSObjectStorageConfigs } from '@girin/objectstorage-gridfs';
+import { MediaService, MediaServiceConfigs } from '@girin/mediaservice';
+import { FSObjectStorage, FSObjectStorageConfigs } from '@girin/objectstorage-fs';
+import { GridFSObjectStorage, GridFSObjectStorageConfigs } from '@girin/objectstorage-gridfs';
 import { AuthConfigs, Auth } from '@girin/auth';
 import { AccountsPassword, AccountsPasswordConfigs } from '@girin/accounts-password';
 
@@ -16,8 +16,8 @@ export interface GirinTypeMongoAppConfigs {
   schema: SchemaBuilderConfigs;
   server?: HttpServerConfigs;
   auth?: AuthConfigs<any> & AccountsPasswordConfigs;
-  media?: (MediaModuleConfigs<any> & GridFSObjectStorageConfigs)
-    | (MediaModuleConfigs<any> & FSObjectStorageConfigs);
+  media?: (MediaServiceConfigs<any> & GridFSObjectStorageConfigs)
+    | (MediaServiceConfigs<any> & FSObjectStorageConfigs);
 
   mongodb: {
     url: string;
@@ -50,7 +50,7 @@ export function createApp(configs: GirinTypeMongoAppConfigs): Environment {
       };
       environment.load(new GridFSObjectStorage(objectStorageConfigs));
     }
-    environment.load(new MediaModule(configs.media));
+    environment.load(new MediaService(configs.media));
   }
 
   environment.load(new MongoDBConnector(

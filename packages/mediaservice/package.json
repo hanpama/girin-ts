@@ -1,7 +1,7 @@
 {
-  "name": "@girin/media",
+  "name": "@girin/mediaservice",
   "version": "0.5.0-alpha.4",
-  "description": "",
+  "description": "Media service for Girin: GraphQL server framework",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "keywords": [

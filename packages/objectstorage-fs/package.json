@@ -1,7 +1,7 @@
 {
   "name": "@girin/objectstorage-fs",
   "version": "0.5.0-alpha.4",
-  "description": "",
+  "description": "ObjectStorage filesystem implementation for Girin: GraphQL server framework",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "keywords": [

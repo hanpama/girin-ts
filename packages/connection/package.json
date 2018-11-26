@@ -1,7 +1,7 @@
 {
   "name": "@girin/connection",
   "version": "0.5.0-alpha.4",
-  "description": "Base class for Relay cursor connection",
+  "description": "Abstract implementation of Relay cursor connection",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "keywords": [

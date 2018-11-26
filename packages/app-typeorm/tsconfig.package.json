@@ -22,9 +22,6 @@
       "path": "../auth/tsconfig.package.json"
     },
     {
-      "path": "../media/tsconfig.package.json"
-    },
-    {
       "path": "../objectstorage-fs/tsconfig.package.json"
     }
   ],

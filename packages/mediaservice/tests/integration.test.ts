@@ -3,7 +3,7 @@ import { createReadStream, readFileSync } from 'fs';
 import { defineType, gql } from '@girin/typelink';
 import { TestClient, prepareTestEnv, destroyTestEnv, TestHttpServer } from '@girin/framework';
 
-import MediaModule, { FileUpload } from '../src';
+import { MediaService, FileUpload } from '../src';
 import { TestMedia } from './TestMedia';
 
 
@@ -39,12 +39,12 @@ class Mutation {
   }
 
   static async createMedia(_source: null, args: { upload: Promise<FileUpload> }) {
-    const mediaModule = MediaModule.object();
+    const mediaModule = MediaService.object();
     return mediaModule.createMedia(await args.upload);
   }
 
   static async deleteMedia(_source: null, args: { id: string }): Promise<string> {
-    await MediaModule.object().deleteMedia(args.id);
+    await MediaService.object().deleteMedia(args.id);
     return args.id;
   }
 }
@@ -54,7 +54,7 @@ describe('media', () => {
   let client: TestClient;
   beforeAll(async () => {
     await prepareTestEnv({ Query, Mutation })
-      .load(new MediaModule({
+      .load(new MediaService({
         endpoint: '/media',
         mediaConstructor: TestMedia,
       }))

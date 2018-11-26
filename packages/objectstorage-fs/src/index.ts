@@ -17,7 +17,7 @@ export interface FSObjectStorageConfigs {
   dir: string;
 }
 
-export default class FSObjectStorage extends ObjectStorage {
+export class FSObjectStorage extends ObjectStorage {
   indexDir: string;
   contentDir: string;
 

@@ -1,7 +1,7 @@
 {
   "name": "@girin/framework",
   "version": "0.5.0-alpha.4",
-  "description": "GraphQL bootstrapper up and running",
+  "description": "Core modules for Girin: GraphQL server framework",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "keywords": [

@@ -1,7 +1,7 @@
 {
   "name": "@girin/app-typemongo",
   "version": "0.5.0-alpha.4",
-  "description": "GraphQL server bootstrapper for MongoDB",
+  "description": "Bootstrap GraphQL server with MongoDB",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "keywords": [

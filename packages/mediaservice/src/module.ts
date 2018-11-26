@@ -7,7 +7,7 @@ import { FileUpload } from './types';
 import { defineMedia } from './schema';
 
 
-export interface MediaModuleConfigs<TMedia extends Media> {
+export interface MediaServiceConfigs<TMedia extends Media> {
   /**
    * If provided, add an endpoint for media service
    */
@@ -16,12 +16,12 @@ export interface MediaModuleConfigs<TMedia extends Media> {
   mediaConstructor: MediaConstructor<TMedia>;
 }
 
-export class MediaModule<TMedia extends Media> extends Module {
+export class MediaService<TMedia extends Media> extends Module {
   get label() { return 'media'; }
 
   get mediaConstructor() { return this.configs.mediaConstructor; }
 
-  constructor(public configs: MediaModuleConfigs<TMedia>) {
+  constructor(public configs: MediaServiceConfigs<TMedia>) {
     super();
   }
 

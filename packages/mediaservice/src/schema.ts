@@ -1,6 +1,6 @@
 import { Field, NonNull, getGlobalMetadataStorage, ObjectType, type } from '@girin/typelink';
 import { GraphQLDateTime } from 'graphql-iso-date';
-import { MediaModule } from './module';
+import { MediaService } from './module';
 import { defaultFieldResolver, GraphQLInt } from 'graphql';
 
 
@@ -58,7 +58,7 @@ export const defineMedia = (definitionClass: Function) => {
         if (source.url) {
           return defaultFieldResolver(source, args, context, info);
         }
-        return MediaModule.object().getMediaURL(source.id);
+        return MediaService.object().getMediaURL(source.id);
       }
     }),
   ]);

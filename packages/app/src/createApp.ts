@@ -1,19 +1,19 @@
 import { environment, Environment } from '@girin/environment';
 import { HttpServer, HttpServerConfigs, SchemaBuilder, SchemaBuilderConfigs } from '@girin/framework';
 import { Auth, AuthConfigs } from '@girin/auth';
-import MediaModule, { MediaModuleConfigs } from '@girin/media';
-import FSObjectStorage from '@girin/objectstorage-fs';
+import { MediaServiceConfigs, MediaService } from '@girin/mediaservice';
+import { FSObjectStorage } from '@girin/objectstorage-fs';
 
 
-export interface GirinTypeORMAppConfigs {
+export interface GirinAppConfigs {
   schema: SchemaBuilderConfigs;
   server?: HttpServerConfigs;
   auth?: AuthConfigs<any>;
-  media?: MediaModuleConfigs<any>;
+  media?: MediaServiceConfigs<any>;
   mediaRoot?: string;
 }
 
-export function createApp(configs: GirinTypeORMAppConfigs): Environment {
+export function createApp(configs: GirinAppConfigs): Environment {
   environment
   .load(new SchemaBuilder(configs.schema))
   .load(new HttpServer(configs.server || {}));
@@ -24,7 +24,7 @@ export function createApp(configs: GirinTypeORMAppConfigs): Environment {
 
   if (configs.media) {
     environment.load(new FSObjectStorage({ dir: configs.mediaRoot || 'media' }));
-    environment.load(new MediaModule(configs.media));
+    environment.load(new MediaService(configs.media));
   }
   return environment;
 }
