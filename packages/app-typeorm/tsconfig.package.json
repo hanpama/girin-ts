@@ -19,6 +19,9 @@
       "path": "../framework/tsconfig.package.json"
     },
     {
+      "path": "../auth/tsconfig.package.json"
+    },
+    {
       "path": "../media/tsconfig.package.json"
     },
     {

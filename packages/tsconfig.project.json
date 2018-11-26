@@ -26,6 +26,12 @@
       "path": "./accounts-password/tsconfig.package.json"
     },
     {
+      "path": "./objectstorage-gridfs/tsconfig.package.json"
+    },
+    {
+      "path": "./typemongo/tsconfig.package.json"
+    },
+    {
       "path": "./app/tsconfig.package.json"
     },
     {
@@ -33,12 +39,6 @@
     },
     {
       "path": "./app-typeorm/tsconfig.package.json"
-    },
-    {
-      "path": "./objectstorage-gridfs/tsconfig.package.json"
-    },
-    {
-      "path": "./typemongo/tsconfig.package.json"
     }
   ]
 }

@@ -19,10 +19,22 @@
       "path": "../framework/tsconfig.package.json"
     },
     {
+      "path": "../auth/tsconfig.package.json"
+    },
+    {
+      "path": "../accounts-password/tsconfig.package.json"
+    },
+    {
       "path": "../media/tsconfig.package.json"
     },
     {
       "path": "../objectstorage-fs/tsconfig.package.json"
+    },
+    {
+      "path": "../objectstorage-gridfs/tsconfig.package.json"
+    },
+    {
+      "path": "../typemongo/tsconfig.package.json"
     }
   ],
   "include": [
