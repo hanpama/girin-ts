@@ -3,7 +3,7 @@ import { join } from 'path';
 
 import { testObjectStorageSpec } from '@girin/framework';
 
-import FSObjectStorage from '../src';
+import { FSObjectStorage } from '../src';
 
 
 describe('objectstorage-fs', () => {

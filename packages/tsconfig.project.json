@@ -17,6 +17,9 @@
       "path": "./auth/tsconfig.package.json"
     },
     {
+      "path": "./mediaservice/tsconfig.package.json"
+    },
+    {
       "path": "./objectstorage-fs/tsconfig.package.json"
     },
     {
@@ -36,9 +39,6 @@
     },
     {
       "path": "./app-typeorm/tsconfig.package.json"
-    },
-    {
-      "path": "./mediaservice/tsconfig.package.json"
     }
   ]
 }

@@ -1,6 +1,6 @@
 import { testObjectStorageSpec } from '@girin/framework';
 
-import GridFSObjectStorage from '../src';
+import { GridFSObjectStorage } from '../src';
 
 
 describe('filestroage-gridfs', () => {
