@@ -8,6 +8,9 @@ coverage/
 # Ignore the compiled output.
 dist/
 
+# Temporary tar files for publishing
+/packages/*/*.tgz
+
 # Logs
 logs
 *.log

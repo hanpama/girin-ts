@@ -20,5 +20,8 @@ packages.forEach(packageName => {
     'build': 'tsc -b ./tsconfig.package.json',
     'prepublish': 'npm run build',
   };
+  packageJSONData.publishConfig = {
+    access: 'public',
+  };
   fs.writeFileSync(packageJSONPath, JSON.stringify(packageJSONData, null, '  '));
 });

@@ -23,7 +23,7 @@
   "devDependencies": {
     "@girin/connection": "^0.5.0-alpha.6"
   },
-  "gitHead": "b446a9fab10b334cb3f5ce904beaa8018231de54",
+  "gitHead": "48f88b141b7e6ef0db96362451428d949600d358",
   "files": [
     "./lib",
     "./src"
@@ -31,5 +31,8 @@
   "scripts": {
     "build": "tsc -b ./tsconfig.package.json",
     "prepublish": "npm run build"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
