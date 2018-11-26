@@ -1,6 +1,6 @@
 {
   "name": "@girin/app-typemongo",
-  "version": "0.5.0-alpha.4",
+  "version": "0.5.0-alpha.5",
   "description": "Bootstrap GraphQL server with MongoDB",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -21,17 +21,17 @@
   },
   "homepage": "https://github.com/hanpama/girin",
   "dependencies": {
-    "dataloader": "^1.4.0",
-    "@girin/connection": "^0.5.0-alpha.4",
-    "@girin/framework": "^0.5.0-alpha.4",
-    "@girin/environment": "^0.5.0-alpha.4",
-    "@girin/auth": "^0.5.0-alpha.4",
-    "@girin/accounts-password": "^0.5.0-alpha.4",
-    "@girin/mediaservice": "^0.5.0-alpha.4",
-    "@girin/objectstorage-fs": "^0.5.0-alpha.4",
-    "@girin/objectstorage-gridfs": "^0.5.0-alpha.4",
-    "@girin/typemongo":  "^0.5.0-alpha.4",
-    "@girin/typelink":  "^0.5.0-alpha.4"
+    "@girin/accounts-password": "^0.5.0-alpha.5",
+    "@girin/auth": "^0.5.0-alpha.5",
+    "@girin/connection": "^0.5.0-alpha.5",
+    "@girin/environment": "^0.5.0-alpha.5",
+    "@girin/framework": "^0.5.0-alpha.5",
+    "@girin/mediaservice": "^0.5.0-alpha.5",
+    "@girin/objectstorage-fs": "^0.5.0-alpha.5",
+    "@girin/objectstorage-gridfs": "^0.5.0-alpha.5",
+    "@girin/typelink": "^0.5.0-alpha.5",
+    "@girin/typemongo": "^0.5.0-alpha.5",
+    "dataloader": "^1.4.0"
   },
   "peerDependencies": {
     "typeorm": "^0.2.0"

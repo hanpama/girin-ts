@@ -1,6 +1,6 @@
 {
   "name": "@girin/typelink",
-  "version": "0.5.0-alpha.4",
+  "version": "0.5.0-alpha.5",
   "description": "Define GraphQL types linked to classes",
   "author": "Max Choi <hanpama@gmail.com>",
   "main": "./lib/index.js",
@@ -21,7 +21,7 @@
     "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0"
   },
   "devDependencies": {
-    "@girin/connection": "0.5.0-alpha.4"
+    "@girin/connection": "^0.5.0-alpha.5"
   },
   "gitHead": "7f87fc9641454bbe0e6367e5b1f15eea4a6fa956",
   "files": [

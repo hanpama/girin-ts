@@ -1,6 +1,6 @@
 {
   "name": "@girin/accounts-password",
-  "version": "0.5.0-alpha.4",
+  "version": "0.5.0-alpha.5",
   "description": "Accounts with password and authentication with graphql schema",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -21,10 +21,10 @@
   },
   "homepage": "https://github.com/hanpama/girin",
   "dependencies": {
-    "@girin/environment": "^0.5.0-alpha.4",
-    "@girin/auth": "^0.5.0-alpha.4",
-    "@girin/framework": "^0.5.0-alpha.4",
-    "@girin/typelink": "^0.5.0-alpha.4",
+    "@girin/auth": "^0.5.0-alpha.5",
+    "@girin/environment": "^0.5.0-alpha.5",
+    "@girin/framework": "^0.5.0-alpha.5",
+    "@girin/typelink": "^0.5.0-alpha.5",
     "argon2": "^0.19.3"
   },
   "gitHead": "7f87fc9641454bbe0e6367e5b1f15eea4a6fa956",
