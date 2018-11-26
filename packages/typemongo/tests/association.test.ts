@@ -1,7 +1,6 @@
 import 'reflect-metadata';
 
-import { Model, hasMany, field, hasOne } from '../src';
-import { HasMany, HasOne } from '../src/models/association';
+import { Model, hasMany, field, hasOne, HasMany, HasOne } from '../src';
 import { prepareTestEnv, cleanUpTestEnv } from './testenv';
 
 
