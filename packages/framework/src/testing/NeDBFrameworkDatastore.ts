@@ -78,7 +78,7 @@ export class NeDBModel {
   set id(value: any) { this.$source._id = value; }
 }
 
-export function field(alias?: string) {
+export function nedbField(alias?: string) {
   return function(prototype: any, propertyKey: string) {
     const fieldName = alias || propertyKey;
     const get = function getField(this: any) {
