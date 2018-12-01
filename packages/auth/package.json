@@ -1,6 +1,6 @@
 {
   "name": "@girin/auth",
-  "version": "0.5.0-alpha.1+eb37476",
+  "version": "0.5.1-alpha.0",
   "description": "Base authentication module for Girin: GraphQL server framework",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -21,12 +21,12 @@
   },
   "homepage": "https://github.com/hanpama/girin",
   "dependencies": {
-    "@girin/environment": "^0.5.0-alpha.7",
-    "@girin/framework": "^0.5.0-alpha.1+eb37476",
+    "@girin/environment": "^0.5.1-alpha.0",
+    "@girin/framework": "^0.5.1-alpha.0",
     "jsonwebtoken": "^8.4.0"
   },
   "devDependencies": {
-    "@girin/typelink": "^0.5.0-alpha.7"
+    "@girin/typelink": "^0.5.1-alpha.0"
   },
   "gitHead": "eb374763298b63b971db283c125b817ebf7a689f",
   "files": [

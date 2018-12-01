@@ -1,6 +1,6 @@
 {
   "name": "@girin/app",
-  "version": "0.5.0-alpha.7",
+  "version": "0.5.1-alpha.0",
   "private": true,
   "description": "GraphQL Server Framework: Build better GraphQL schema with less code",
   "main": "./lib/index.js",
@@ -23,7 +23,7 @@
   "homepage": "https://github.com/hanpama/girin",
   "dependencies": {
     "@girin/auth": "^0.5.0-alpha.7",
-    "@girin/environment": "^0.5.0-alpha.7",
+    "@girin/environment": "^0.5.1-alpha.0",
     "@girin/framework": "^0.5.0-alpha.7",
     "@girin/mediaservice": "^0.5.0-alpha.7",
     "@girin/objectstorage-fs": "^0.5.0-alpha.7"
