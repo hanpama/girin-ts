@@ -1,7 +1,7 @@
-import { User } from '@girin/auth';
+import { IUser } from '@girin/auth';
 
 
-export interface PasswordUser extends User {
+export interface PasswordUser extends IUser {
   id: string;
   username: string;
   hashedPassword: string;
