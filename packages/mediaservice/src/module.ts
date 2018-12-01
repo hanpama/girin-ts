@@ -2,12 +2,12 @@ import { Module } from '@girin/environment';
 import { app, FrameworkDatastore, ObjectStorage } from '@girin/framework';
 import { Request, Response } from 'express';
 
-import { Media, MediaConstructor } from './Media';
-import { FileUpload } from './types';
+
+import { FileUpload, IMedia, MediaConstructor } from './types';
 import { defineMedia } from './schema';
 
 
-export interface MediaServiceConfigs<TMedia extends Media> {
+export interface MediaServiceConfigs<TMedia extends IMedia> {
   /**
    * If provided, add an endpoint for media service
    */
@@ -16,7 +16,7 @@ export interface MediaServiceConfigs<TMedia extends Media> {
   mediaConstructor: MediaConstructor<TMedia>;
 }
 
-export class MediaService<TMedia extends Media> extends Module {
+export class MediaService<TMedia extends IMedia> extends Module {
   get label() { return 'media'; }
 
   get mediaConstructor() { return this.configs.mediaConstructor; }
