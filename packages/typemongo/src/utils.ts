@@ -31,3 +31,13 @@ export class CompositeKeySorter<T> {
     return -1;
   }
 }
+
+export function resolveMaybeThunk<T>(maybeThunk: MaybeThunk<T>): T {
+  // Arrow functions have no prototype
+  if (maybeThunk instanceof Function && maybeThunk.prototype === undefined) {
+    return maybeThunk() as T;
+  }
+  return maybeThunk as unknown as T;
+}
+
+export type MaybeThunk<T> = T | (() => T);
