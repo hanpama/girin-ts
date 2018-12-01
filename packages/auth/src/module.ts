@@ -2,15 +2,15 @@ import { Module } from '@girin/environment';
 import { contextMap, ContextArguments, FrameworkDatastore } from '@girin/framework';
 import * as jwt from 'jsonwebtoken';
 
-import { User, UserConstructor } from './types';
+import { IUser, UserConstructor } from './types';
 
 
-export interface AuthConfigs<TUser extends User> {
+export interface AuthConfigs<TUser extends IUser> {
   userConstructor: UserConstructor<TUser>;
   jwtSecretKey: string;
 }
 
-export class Auth<TUser extends User> extends Module {
+export class Auth<TUser extends IUser> extends Module {
   get label() { return 'auth'; }
 
   public onInit() {
