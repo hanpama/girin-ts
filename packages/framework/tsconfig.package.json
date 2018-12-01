@@ -20,6 +20,7 @@
     "src"
   ],
   "exclude": [
-    "tests"
+    "tests",
+    "lib"
   ]
 }
