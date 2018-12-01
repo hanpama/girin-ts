@@ -19,8 +19,16 @@ export function field(alias?: string) {
  * @param modelClass
  * @param alias
  */
-export function hasOne(modelClass: ModelClass<any>, alias?: string) {
+export function hasOneField(modelClass: ModelClass<any>, alias?: string) {
   return function(prototype: any, propertyKey: string) {
+    if (modelClass === undefined) {
+      throw new TypeMongoPropertyDecoratorError(
+        prototype,
+        propertyKey,
+        `The first argument given to @${hasOneField.name} decorator should be a class but undefined.`
+      );
+    }
+
     const fieldName = alias || propertyKey;
     const get = function(this: Model) {
       return new HasOne(modelClass, this, fieldName);
@@ -34,8 +42,16 @@ export function hasOne(modelClass: ModelClass<any>, alias?: string) {
  * @param modelClass
  * @param alias
  */
-export function hasMany(modelClass: ModelClass<any>, alias?: string) {
+export function hasManyField(modelClass: ModelClass<any>, alias?: string) {
   return function(prototype: any, propertyKey: string) {
+    if (modelClass === undefined) {
+      throw new TypeMongoPropertyDecoratorError(
+        prototype,
+        propertyKey,
+        `The first argument given to @${hasManyField.name} decorator should be a class but undefined.`
+      );
+    }
+
     const fieldName = alias || propertyKey;
     const get = function(this: Model) {
       return new HasMany(modelClass, this, fieldName);
@@ -45,8 +61,17 @@ export function hasMany(modelClass: ModelClass<any>, alias?: string) {
 }
 
 
-export function embedOne(embedClass: EmbedClass<any>, alias?: string) {
+export function embedOneField(embedClass: EmbedClass<any>, alias?: string) {
   return function(prototype: any, propertyKey: string) {
+
+    if (embedClass === undefined) {
+      throw new TypeMongoPropertyDecoratorError(
+        prototype,
+        propertyKey,
+        `The first argument given to @${embedOneField.name} decorator should be a class but undefined.`
+      );
+    }
+
     const fieldName = alias || propertyKey;
     const get = function(this: Model) {
       return this.$source[fieldName] && new embedClass(this.$source[fieldName]);
@@ -58,8 +83,17 @@ export function embedOne(embedClass: EmbedClass<any>, alias?: string) {
   };
 }
 
-export function embedMany(embedClass: EmbedClass<any>, alias?: string) {
+export function embedManyField(embedClass: EmbedClass<any>, alias?: string) {
   return function(prototype: any, propertyKey: string) {
+
+    if (embedClass === undefined) {
+      throw new TypeMongoPropertyDecoratorError(
+        prototype,
+        propertyKey,
+        `The first argument given to @${embedManyField.name} decorator should be a class but undefined.`
+      );
+    }
+
     const fieldName = alias || propertyKey;
     const get = function(this: Model) {
       return this.$source[fieldName] && this.$source[fieldName].map((value: any) => new embedClass(value));
@@ -69,4 +103,13 @@ export function embedMany(embedClass: EmbedClass<any>, alias?: string) {
     };
     Object.defineProperty(prototype, propertyKey, { get, set });
   };
+}
+
+
+class TypeMongoPropertyDecoratorError extends Error {
+  constructor(prototype: Object, propertyKey: string, message?: string) {
+    const fullMessage = `TypeMongoPropertyDecoratorError: ${prototype.constructor.toString()}.prototype.${propertyKey}`;
+      + (message ? ': ' + message : '');
+    super(fullMessage);
+  }
 }

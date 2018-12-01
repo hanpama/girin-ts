@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import { Model, hasMany, field, hasOne, HasMany, HasOne } from '../src';
+import { Model, hasManyField, field, hasOneField, HasMany, HasOne } from '../src';
 import { prepareTestEnv, cleanUpTestEnv } from './testenv';
 
 
@@ -13,15 +13,15 @@ class Comment extends Model {
   static collectionName = 'association_comments';
   @field() content: string;
 
-  @hasOne(User) author: HasOne<User>;
+  @hasOneField(User) author: HasOne<User>;
 }
 
 class Post extends Model {
   static collectionName = 'association_posts';
   @field() content: string;
 
-  @hasOne(User) author: HasOne<User>;
-  @hasMany(Comment) comments: HasMany<Comment>;
+  @hasOneField(User) author: HasOne<User>;
+  @hasManyField(Comment) comments: HasMany<Comment>;
 }
 
 

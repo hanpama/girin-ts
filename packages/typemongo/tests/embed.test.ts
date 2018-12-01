@@ -1,4 +1,4 @@
-import { Model, Embed, field, embedOne, embedMany } from '../src';
+import { Model, Embed, field, embedOneField, embedManyField } from '../src';
 import { prepareTestEnv, cleanUpTestEnv } from './testenv';
 
 
@@ -15,8 +15,8 @@ export class User extends Model {
   static collectionName = 'embed_users';
 
   @field() username: string;
-  @embedOne(Profile) profile: Profile;
-  @embedMany(EmailEntry) emails: EmailEntry[];
+  @embedOneField(Profile) profile: Profile;
+  @embedManyField(EmailEntry) emails: EmailEntry[];
 }
 
 
