@@ -24,9 +24,9 @@ export interface StorageObject {
 export abstract class ObjectStorage extends Module {
   get label() { return 'ObjectStorage'; }
 
-  public abstract save(filename: string, content: Readable): Promise<StorageObject>;
-  public abstract delete(id: string): Promise<void>;
-  public abstract get(id: string): Promise<StorageObject>;
+  public abstract save(bucket: string, filename: string, content: Readable): Promise<StorageObject>;
+  public abstract delete(bucket: string, id: string): Promise<void>;
+  public abstract get(bucket: string, id: string): Promise<StorageObject>;
 }
 
 export class StorageObjectNotFoundError extends Error {

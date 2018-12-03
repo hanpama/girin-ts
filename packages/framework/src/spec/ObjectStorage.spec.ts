@@ -7,19 +7,19 @@ export async function testObjectStorageSpec(mod: ObjectStorage) {
   const fileString = fileBuffer.toString();
 
   // should save data to a file and returns the id as string
-  const { id: storageObjectId } = await mod.save('myfile', createReadStream('./LICENSE'));
+  const { id: storageObjectId } = await mod.save('test', 'myfile', createReadStream('./LICENSE'));
 
   if (typeof storageObjectId !== 'string') {
     throw new Error(`should retrieve fileId which type is string: but got ${storageObjectId}`);
   }
 
-  const { id: nextObjectId } = await mod.save('myfile', createReadStream('./LICENSE'));
+  const { id: nextObjectId } = await mod.save('test', 'myfile', createReadStream('./LICENSE'));
   if (storageObjectId === nextObjectId) {
     throw new Error('should generate unique id for every object');
   }
 
   // should refetch the data with its id
-  const storageObject = await mod.get(storageObjectId);
+  const storageObject = await mod.get('test', storageObjectId);
 
   if (storageObject.filename !== 'myfile') {
     throw new Error(`Expected filename to be myfile but got ${storageObject.filename}`);
@@ -43,12 +43,12 @@ export async function testObjectStorageSpec(mod: ObjectStorage) {
   }
 
   // deleting object
-  await mod.delete(storageObjectId);
+  await mod.delete('test', storageObjectId);
   let error = null;
 
   // opening id with no corresponding object should raise error
   try {
-    await mod.get(storageObjectId);
+    await mod.get('test', storageObjectId);
   } catch (e) {
     error = e;
   }
