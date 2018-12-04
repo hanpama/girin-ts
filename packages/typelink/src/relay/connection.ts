@@ -6,6 +6,7 @@ import {
   Field, ObjectType
 } from '..';
 import { bindStaticResolver } from '../sdl/ast';
+import { NonNull } from '../type-expression';
 
 
 type ConnectionByNode = { node: TypeArg | TypeExpression, edge?: undefined };
@@ -40,7 +41,7 @@ export function defineConnection(options: DefineConnectionOptions) {
         }),
         new Field({
           source: definitionClass,
-          target: type(pageInfoType),
+          target: NonNull.of(type(pageInfoType)),
           fieldName: 'pageInfo',
           description: 'Information to aid in pagination.',
           args: [],
@@ -48,7 +49,7 @@ export function defineConnection(options: DefineConnectionOptions) {
         }),
         new Field({
           source: definitionClass,
-          target: List.of(edge),
+          target: NonNull.of(List.of(NonNull.of(edge))),
           fieldName: 'edges',
           description: 'A list of edges.',
           args: [],
@@ -80,7 +81,7 @@ export function defineEdge(options: DefineEdgeOptions) {
         }),
         new Field({
           source: definitionClass || edgeName,
-          target: node,
+          target: NonNull.of(node),
           fieldName: 'node',
           description: 'The item at the end of the edge',
           args: [],
@@ -88,7 +89,7 @@ export function defineEdge(options: DefineEdgeOptions) {
         }),
         new Field({
           source: definitionClass || edgeName,
-          target: type('String'),
+          target: NonNull.of(type('String')),
           fieldName: 'cursor',
           description: 'A cursor for use in pagination',
           args: [],
