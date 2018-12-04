@@ -1,6 +1,6 @@
 {
   "name": "@girin/typemongo",
-  "version": "0.5.1-alpha.0",
+  "version": "0.5.2-alpha.0",
   "description": "Lightweight MongoDB ODM optimized for GraphQL",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/hanpama/girin",
   "dependencies": {
-    "@girin/connection": "^0.5.1-alpha.0",
+    "@girin/connection": "^0.5.2-alpha.0",
     "dataloader": "^1.4.0"
   },
   "peerDependencies": {
