@@ -5,6 +5,7 @@ import { Request, Response } from 'express';
 
 import { IMedia, MediaConstructor } from './types';
 import { defineMedia } from './schema';
+import { Readable } from 'stream';
 
 
 export interface MediaServiceConfigs<TMedia extends IMedia> {
@@ -32,7 +33,7 @@ export class MediaService<TMedia extends IMedia> extends Module {
 
   onInit() {
     if (this.configs.endpoint) {
-      app.get(this.getMediaURL(':mediaId'), this.serveMedia.bind(this));
+      app.get(this.resolveMediaURL(':mediaId'), this.serveMedia.bind(this));
     }
     if (this.configs.extendSchema !== false) {
       defineMedia(this.mediaConstructor);
@@ -62,8 +63,8 @@ export class MediaService<TMedia extends IMedia> extends Module {
     }
   }
 
-  public getMediaURL(mediaId: string): string {
-    return `${this.configs.endpoint}/${mediaId}`;
+  public resolveMediaURL(id: string): string {
+    return `${this.configs.endpoint}/${id}`;
   }
 
   public async getMedia(id: string): Promise<TMedia> {
@@ -74,14 +75,13 @@ export class MediaService<TMedia extends IMedia> extends Module {
     return media;
   }
 
-  async createMedia(upload: FileUpload): Promise<TMedia> {
+  async createMedia(filename: string, content: Readable) {
     const ost = ObjectStorage.object();
     const persistence = FrameworkDatastore.object();
 
-    // const { filename, stream } = upload;
     const media = new this.mediaConstructor();
 
-    const { id, contentLength, filename } = await ost.save(this.bucketName, upload.filename, upload.stream);
+    const { id, contentLength } = await ost.save(this.bucketName, filename, content);
     media.fileId = id;
     media.filename = filename;
     media.size = contentLength;
@@ -93,6 +93,10 @@ export class MediaService<TMedia extends IMedia> extends Module {
       await ost.delete(this.bucketName, media.fileId);
       throw e;
     }
+  }
+
+  createMediaFromUpload(upload: FileUpload): Promise<TMedia> {
+    return this.createMedia(upload.filename, upload.stream);
   }
 
   async deleteMedia(id: any) {

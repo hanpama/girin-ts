@@ -1,5 +1,5 @@
 import { NeDBModel, nedbField } from '@girin/framework';
-import { IMedia } from '../src';
+import { IMedia, MediaService } from '../src';
 
 
 export class TestMedia extends NeDBModel implements IMedia {
@@ -7,4 +7,7 @@ export class TestMedia extends NeDBModel implements IMedia {
   @nedbField() size: number;
   @nedbField() uploadedAt: Date;
   @nedbField() fileId: string;
+  get url() {
+    return MediaService.object().resolveMediaURL(this.id);
+  }
 }

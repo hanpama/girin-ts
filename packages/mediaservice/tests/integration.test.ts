@@ -40,7 +40,7 @@ class Mutation {
 
   static async createMedia(_source: null, args: { upload: Promise<FileUpload> }) {
     const mediaModule = MediaService.object();
-    return mediaModule.createMedia(await args.upload);
+    return mediaModule.createMediaFromUpload(await args.upload);
   }
 
   static async deleteMedia(_source: null, args: { id: string }): Promise<string> {
