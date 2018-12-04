@@ -29,7 +29,6 @@ export class GridFSObjectStorage extends ObjectStorage {
   async onBootstrap() {
     this.client = new MongoClient(this.configs.url, this.configs.clientOptions);
     await this.client.connect();
-    // this.gridFSBucket = new GridFSBucket(this.client.db(), this.configs.gridFSOptions);
   }
 
   async onDestroy() {
