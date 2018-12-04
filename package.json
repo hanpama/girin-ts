@@ -10,7 +10,7 @@
     "coverage": "npm test -- --coverage",
     "coverage:upload": "codecov",
     "lint": "tslint --project tslint.json packages/*/src/**/*.ts",
-    "clean": "git clean -Xdf packages/",
+    "clean": "git clean -Xdf packages/ & find packages/ -type d -empty -delete",
     "docs": "docsify serve docs",
     "build": "tsc --build packages/tsconfig.project.json",
     "watch": "tsc --build --watch packages/tsconfig.project.json",
