@@ -1,9 +1,9 @@
 import { Module } from '@girin/environment';
-import { app, FrameworkDatastore, ObjectStorage } from '@girin/framework';
+import { app, FrameworkDatastore, ObjectStorage, FileUpload } from '@girin/framework';
 import { Request, Response } from 'express';
 
 
-import { FileUpload, IMedia, MediaConstructor } from './types';
+import { IMedia, MediaConstructor } from './types';
 import { defineMedia } from './schema';
 
 
@@ -11,6 +11,7 @@ export interface MediaServiceConfigs<TMedia extends IMedia> {
   /**
    * If provided, add an endpoint for media service
    */
+  bucketName?: string;
   endpoint?: string;
   extendSchema?: boolean;
   mediaConstructor: MediaConstructor<TMedia>;
@@ -20,6 +21,10 @@ export class MediaService<TMedia extends IMedia> extends Module {
   get label() { return 'media'; }
 
   get mediaConstructor() { return this.configs.mediaConstructor; }
+
+  get bucketName() {
+    return this.configs.bucketName || 'media';
+  }
 
   constructor(public configs: MediaServiceConfigs<TMedia>) {
     super();
@@ -48,7 +53,7 @@ export class MediaService<TMedia extends IMedia> extends Module {
 
     try {
       const media = await this.getMedia(mediaId);
-      const storageObject = await ObjectStorage.object().get(media.fileId);
+      const storageObject = await ObjectStorage.object().get(this.bucketName, media.fileId);
       const downloadStream = storageObject.open();
       downloadStream.pipe(res);
     } catch (e) {
@@ -76,7 +81,7 @@ export class MediaService<TMedia extends IMedia> extends Module {
     // const { filename, stream } = upload;
     const media = new this.mediaConstructor();
 
-    const { id, contentLength, filename } = await ost.save(upload.filename, upload.stream);
+    const { id, contentLength, filename } = await ost.save(this.bucketName, upload.filename, upload.stream);
     media.fileId = id;
     media.filename = filename;
     media.size = contentLength;
@@ -85,7 +90,7 @@ export class MediaService<TMedia extends IMedia> extends Module {
       await persistence.save(media);
       return media;
     } catch (e) {
-      await ost.delete(media.fileId);
+      await ost.delete(this.bucketName, media.fileId);
       throw e;
     }
   }
@@ -96,7 +101,7 @@ export class MediaService<TMedia extends IMedia> extends Module {
 
     const media = await this.getMedia(id);
 
-    await ost.delete(media.fileId);
+    await ost.delete(this.bucketName, media.fileId);
     await persistence.delete(this.mediaConstructor, id);
   }
 }

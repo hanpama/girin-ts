@@ -1,9 +1,9 @@
 import { createReadStream, readFileSync } from 'fs';
 
 import { defineType, gql } from '@girin/typelink';
-import { TestClient, prepareTestEnv, destroyTestEnv, TestHttpServer } from '@girin/framework';
+import { TestClient, prepareTestEnv, destroyTestEnv, TestHttpServer, FileUpload } from '@girin/framework';
 
-import { MediaService, FileUpload } from '../src';
+import { MediaService } from '../src';
 import { TestMedia } from './TestMedia';
 
 
