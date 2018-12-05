@@ -16,7 +16,10 @@ describe('filestroage-gridfs', () => {
     },
   });
   beforeAll(() => mod.onBootstrap());
-  afterAll(() => mod.onDestroy());
+  afterAll(async () => {
+    await mod.gridFSBucketMap.get('test')!.drop();
+    await mod.onDestroy();
+  });
 
   it('meets specification', async () => {
     await testObjectStorageSpec(mod);

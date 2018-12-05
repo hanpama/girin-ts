@@ -1,15 +1,12 @@
-import { ObjectStorage, StorageObjectNotFoundError, StorageObject } from '@girin/framework';
+import { ObjectStorage, StorageObjectNotFoundError, StorageObject, FileAlreadyExistsError } from '@girin/framework';
 import { Readable } from 'stream';
 import { promisify } from 'util';
 
 import * as fs from 'fs';
 import * as path from 'path';
-import uuidv1 from 'uuid/v1';
 import { mkdirp } from 'fs-extra';
 
 
-const readFilePromise = promisify(fs.readFile);
-const writeFilePromise = promisify(fs.writeFile);
 const unlinkPromise = promisify(fs.unlink);
 const statPromise = promisify(fs.stat);
 
@@ -17,14 +14,8 @@ export interface FSObjectStorageConfigs {
   dir: string;
 }
 
-interface BucketContext {
-  bucketDir: string;
-  indexDir: string;
-  contentDir: string;
-}
-
 export class FSObjectStorage extends ObjectStorage {
-  buckets: Map<string, BucketContext> = new Map();
+  buckets: Map<string, string> = new Map();
 
   constructor(public configs: FSObjectStorageConfigs) {
     super();
@@ -34,123 +25,70 @@ export class FSObjectStorage extends ObjectStorage {
     await mkdirp(this.configs.dir);
   }
 
-  getBucketContext(bucket: string): BucketContext | undefined {
+  getBucketDirectory(bucket: string): string | undefined {
     return this.buckets.get(bucket);
   }
 
-  async createBucketContext(bucket: string): Promise<BucketContext> {
+  async createBucketDirectory(bucket: string): Promise<string> {
     const bucketDir = path.join(this.configs.dir, bucket);
-    const indexDir = path.join(bucketDir, 'index');
-    const contentDir = path.join(bucketDir, 'content');
 
     await mkdirp(bucketDir);
-    await Promise.all([
-      mkdirp(indexDir),
-      mkdirp(contentDir),
-    ]);
 
-    const bucketContext = { indexDir, contentDir, bucketDir };
-    this.buckets.set(bucket, bucketContext);
-    return bucketContext;
+    this.buckets.set(bucket, bucketDir);
+    return bucketDir;
   }
 
-  public save(bucket: string, filename: string, content: Readable): Promise<StorageObject> {
+  public async save(bucket: string, filename: string, content: Readable): Promise<StorageObject> {
     this.validateFilename(filename);
 
-    return new Promise(async (resolve, reject) => {
-      const fileId = uuidv1();
+    let bucketDir = this.getBucketDirectory(bucket) || await this.createBucketDirectory(bucket);
 
-      let contentFilename = fileId;
+    return new Promise((resolve, reject) => {
+      const contentFilePath = path.join(bucketDir, filename);
 
-      let { indexDir, contentDir } = this.getBucketContext(bucket) || await this.createBucketContext(bucket);
-
-      const { ext, name } = path.parse(filename);
-      if (name) {
-        contentFilename = `${name}-${contentFilename}`;
-      } if (ext) {
-        contentFilename = `${contentFilename}${ext}`;
-      }
-      const indexFile = path.join(indexDir, fileId);
-      const contentFile = path.join(contentDir, contentFilename);
-
-      try {
-        await writeFilePromise(indexFile, JSON.stringify([
-          filename,
-          contentFilename,
-        ]));
-      } catch (e) {
-        throw new Error(`Failed to create index file: ${e}`);
-      }
-
-      const writeStream = fs.createWriteStream(contentFile);
+      const writeStream = fs.createWriteStream(contentFilePath, { flags: 'wx' });
       content.pipe(writeStream);
-      writeStream.once('finish', () => { resolve(this.get(bucket, fileId)); });
-      writeStream.once('error', async (e) => {
-        try {
-          await unlinkPromise(indexFile);
-        } catch (e) {}
-        reject(e);
+      writeStream.once('finish', () => { resolve(this.get(bucket, filename)); });
+      writeStream.once('error', (err) => {
+        if (err.code === 'EEXIST') {
+          reject(new FileAlreadyExistsError(bucket, filename));
+        } else {
+          reject(err);
+        }
       });
     });
   }
 
-  public async delete(bucket: string, id: string): Promise<void> {
-    let { indexDir, contentDir } = this.getBucketContext(bucket) || await this.createBucketContext(bucket);
+  public async delete(bucket: string, filename: string): Promise<void> {
+    this.validateFilename(filename);
 
-    const [filename, contentFilename] = await this.resolveIndex(indexDir, id);
-
-    const indexFile = path.join(indexDir, id);
-    const contentFile = path.join(contentDir, contentFilename);
-
-    try {
-      await unlinkPromise(indexFile);
-    } catch (e) {
-      throw new Error(`Cannot delete index file: ${e}`);
-    }
-    try {
-      await unlinkPromise(contentFile);
-    } catch (e) {
-      await writeFilePromise(indexFile, JSON.stringify([filename, contentFilename]));
-      throw e;
-    }
+    const bucketDir = this.getBucketDirectory(bucket) || await this.createBucketDirectory(bucket);
+    const contentFile = path.join(bucketDir, filename);
+    await unlinkPromise(contentFile);
   }
 
-  public async get(bucket: string, id: string): Promise<StorageObject> {
+  public async get(bucket: string, filename: string): Promise<StorageObject> {
+    this.validateFilename(filename);
 
-    let { indexDir, contentDir } = this.getBucketContext(bucket) || await this.createBucketContext(bucket);
-
-    const [filename, contentFilename] = await this.resolveIndex(indexDir, id);
-    const contentFile = path.join(contentDir, contentFilename);
+    const bucketDir = this.getBucketDirectory(bucket) || await this.createBucketDirectory(bucket);
+    const contentFilePath = path.join(bucketDir, filename);
 
     try {
-      const { size } = await statPromise(contentFile);
+      const { size } = await statPromise(contentFilePath);
       return {
-        id,
         filename,
-        open: fs.createReadStream.bind(undefined, contentFile),
+        open: () => fs.createReadStream(contentFilePath),
         contentLength: size,
       };
     } catch (e) {
-      throw new StorageObjectNotFoundError(id);
+      throw new StorageObjectNotFoundError(filename);
     }
-  }
-
-  protected async resolveIndex(indexDir: string, id: string): Promise<[string, string]> {
-    this.validateId(id);
-    try {
-      const index = await readFilePromise(path.join(indexDir, id));
-      return JSON.parse(index.toString());
-    } catch (e) {
-      throw new StorageObjectNotFoundError(id);
-    }
-  }
-
-  protected validateId(id: string) {
-    const isValidId = /^[\w\d-]+$/.test(id);
-    if (!isValidId) { throw new Error('Invalid File ID'); }
   }
 
   protected validateFilename(filename: string) {
-    if (/^\.\.?$/.test(filename)) { throw new Error('Invalid Filename'); }
+    const { root, dir } = path.parse(filename);
+    if (root !== '' || dir !== '') {
+      throw new Error('Invalid Filename');
+    }
   }
 }

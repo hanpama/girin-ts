@@ -90,6 +90,9 @@ describe('media', () => {
           createMedia(upload: $upload) {
             id
             url
+            filename
+            originalFilename
+            uuid
             size
             uploadedAt
           }
@@ -103,11 +106,15 @@ describe('media', () => {
         createReadStream('./LICENSE'),
       ],
     });
-    /* { id: '5bdfd7d2293cf86a0ae95d82',
-            mimetype: null,
-            url: '/media/5bdfd7d2293cf86a0ae95d80',
-            size: 1085,
-            uploadedAt: '2018-11-05T05:40:34.545Z' } } */
+
+    // { createMedia:
+    //   { id: 'UxcN56fCZYVJxauI',
+    //     url: '/media/UxcN56fCZYVJxauI',
+    //     filename: 'LICENSE_ef103170-f853-11e8-8321-1bcfd5df385c',
+    //     originalFilename: 'LICENSE',
+    //     uuid: 'ef103170-f853-11e8-8321-1bcfd5df385c',
+    //     size: 1085,
+    //     uploadedAt: '2018-12-05T06:06:41.162Z' } }
     expect(errors).toBeUndefined();
     const { createMedia } = data;
     expect(typeof createMedia.id).toBe('string');
@@ -115,9 +122,15 @@ describe('media', () => {
     expect(typeof createMedia.size).toBe('number');
     expect(typeof createMedia.uploadedAt).toBe('string');
 
-    const { res: resMaybe200, body } = await client.request('GET', createMedia.url);
+
+    let { res: resMaybe200, body } = await client.request('GET', createMedia.url);
     expect(resMaybe200.statusCode).toBe(200);
     expect(body.toString()).toEqual(fileContent);
+    expect(resMaybe200.headers.etag).toBe(data.createMedia.uuid);
+
+    const { res: headRes } = await client.request('HEAD', createMedia.url);
+    expect(headRes.statusCode).toBe(200);
+    expect(headRes.headers.etag).toBe(data.createMedia.uuid);
 
     const deleteMediaMutation = await client.sendQuery({
       query: `
@@ -132,7 +145,7 @@ describe('media', () => {
       deleteMedia: createMedia.id,
     });
 
-    const { res: resMaybe404 } = await client.request('GET', createMedia.url);
+    let { res: resMaybe404 } = await client.request('GET', createMedia.url);
 
     expect(resMaybe404.statusCode).toBe(404);
   });

@@ -4,11 +4,7 @@ import { Readable } from 'stream';
 
 export interface StorageObject {
   /**
-   * ID of storage object
-   */
-  id: string;
-  /**
-   * filename
+   * filename. should be unique in a bucket
    */
   filename: string;
   /**
@@ -25,12 +21,18 @@ export abstract class ObjectStorage extends Module {
   get label() { return 'ObjectStorage'; }
 
   public abstract save(bucket: string, filename: string, content: Readable): Promise<StorageObject>;
-  public abstract delete(bucket: string, id: string): Promise<void>;
-  public abstract get(bucket: string, id: string): Promise<StorageObject>;
+  public abstract delete(bucket: string, filename: string): Promise<void>;
+  public abstract get(bucket: string, filename: string): Promise<StorageObject>;
 }
 
 export class StorageObjectNotFoundError extends Error {
-  constructor(objectId: string) {
-    super(`StorageObjectNotFoundError: no file matched with id ${objectId}`);
+  constructor(filename: string) {
+    super(`StorageObjectNotFoundError: no file matched with filename ${filename}`);
+  }
+}
+
+export class FileAlreadyExistsError extends Error {
+  constructor(bucket: string, filename: string) {
+    super(`FileAlreadyExistsError: A file with the filename ${filename} already exists in ${bucket}`);
   }
 }

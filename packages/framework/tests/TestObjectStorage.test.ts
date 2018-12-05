@@ -1,4 +1,6 @@
 import { testObjectStorageSpec, TestObjectStorage } from '../src';
 
 
-test('TestObjectStorageModule', () => testObjectStorageSpec(new TestObjectStorage()));
+test('TestObjectStorageModule', async () => {
+  await testObjectStorageSpec(new TestObjectStorage());
+});

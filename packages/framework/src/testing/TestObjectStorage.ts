@@ -1,16 +1,21 @@
 import { Readable, Duplex } from 'stream';
-import { StorageObjectNotFoundError, ObjectStorage, StorageObject } from '../core/ObjectStorage';
+import { StorageObjectNotFoundError, ObjectStorage, StorageObject, FileAlreadyExistsError } from '../core/ObjectStorage';
 
 
-type Entry = { buffer: Buffer, filename: string };
-type Bucket = Map<string, Entry | null>;
+// type Entry = { buffer: Buffer, filename: string };
+type Bucket = Map<string, Buffer>;
 
 export class TestObjectStorage extends ObjectStorage {
   buckets: Map<string, Bucket> = new Map();
-  nextId: number = 1;
 
-  public save(bucket: string, filename: string, content: Readable): Promise<StorageObject> {
+  public async save(bucket: string, filename: string, content: Readable): Promise<StorageObject> {
+
+    if (await this.getEntry(bucket, filename)) {
+      throw new FileAlreadyExistsError(bucket, filename);
+    }
+
     return new Promise((resolve, reject) => {
+
       const buffers: Buffer[] = [];
 
       if (!content.readable) {
@@ -21,13 +26,8 @@ export class TestObjectStorage extends ObjectStorage {
         buffers.push(data);
       });
       content.on('end', () => {
-        const id = String(this.nextId);
-        this.nextId += 1;
-        this.getOrCreateBucket(bucket).set(id, {
-          buffer: Buffer.concat(buffers),
-          filename,
-        });
-        resolve(this.get(bucket, id));
+        this.getOrCreateBucket(bucket).set(filename, Buffer.concat(buffers));
+        resolve(this.get(bucket, filename));
       });
       content.on('error', (err) => {
         reject(err);
@@ -44,26 +44,28 @@ export class TestObjectStorage extends ObjectStorage {
     return bucketMap;
   }
 
-  protected getEntryOrFail(bucket: string, id: string) {
-    const entry = this.getOrCreateBucket(bucket).get(id);
-    if (!entry) {
-      throw new StorageObjectNotFoundError(id);
+  protected getEntry(bucket: string, filename: string): Buffer | undefined {
+    const buffer = this.getOrCreateBucket(bucket).get(filename);
+    return buffer;
+  }
+
+  public async delete(bucket: string, filename: string): Promise<void> {
+    const buffer = this.getEntry(bucket, filename);
+    if (!buffer) {
+      throw new StorageObjectNotFoundError(filename);
     }
-    return entry;
+    this.getOrCreateBucket(bucket).delete(filename);
   }
 
-  public async delete(bucket: string, id: string): Promise<void> {
-    this.getEntryOrFail(bucket, id);
-    this.getOrCreateBucket(bucket).delete(id);
-  }
-
-  public async get(bucket: string, id: string): Promise<StorageObject> {
-    const { buffer, filename } = this.getEntryOrFail(bucket, id);
+  public async get(bucket: string, filename: string): Promise<StorageObject> {
+    const buffer = this.getEntry(bucket, filename);
+    if (!buffer) {
+      throw new StorageObjectNotFoundError(filename);
+    }
     const dupl = new Duplex();
     dupl.push(buffer);
     dupl.push(null);
     return {
-      id,
       filename,
       contentLength: buffer.byteLength,
       open() { return dupl; }
