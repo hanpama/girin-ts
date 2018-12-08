@@ -1,8 +1,9 @@
 import { GraphQLFieldConfig, GraphQLFieldConfigMap, GraphQLInterfaceType, GraphQLObjectType, GraphQLOutputType } from 'graphql';
 
-import { Definition, DefinitionConfig, DefinitionKind } from '../metadata';
-import { Field, Implement } from '../reference';
-import { TypeResolvingContext } from '../type-expression';
+import { Definition, DefinitionConfig, DefinitionKind } from '../metadata/Definition';
+import { Field } from '../reference/Field';
+import { Implement } from '../reference/Implement';
+import { TypeResolvingContext } from '../type-expression/types';
 
 
 export interface ObjectTypeConfig extends DefinitionConfig {

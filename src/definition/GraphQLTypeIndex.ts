@@ -1,4 +1,4 @@
-import { Definition, DefinitionConfig } from '../metadata';
+import { Definition, DefinitionConfig } from '../metadata/Definition';
 import { GraphQLNamedType } from 'graphql';
 import { isOutputType, isInputType } from 'graphql/type/definition';
 

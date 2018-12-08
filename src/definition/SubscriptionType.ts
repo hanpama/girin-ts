@@ -1,6 +1,6 @@
 import { ObjectType } from './ObjectType';
-import { Field } from '../reference';
-import { TypeResolvingContext } from '../type-expression';
+import { Field } from '../reference/Field';
+import { TypeResolvingContext } from '../type-expression/types';
 
 
 export class SubscriptionType extends ObjectType {

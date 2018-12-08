@@ -1,4 +1,5 @@
-import { defineType, gql } from '..';
+import { defineType } from '../global';
+import { gql } from '../sdl/gql';
 
 
 @defineType(gql`

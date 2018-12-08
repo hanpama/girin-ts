@@ -1,6 +1,6 @@
 import { GraphQLNamedType } from 'graphql';
 import { defaultInputFieldInstantiator, Instantiator } from '../types';
-import { TypeResolvingContext } from '../type-expression';
+import { TypeResolvingContext } from '../type-expression/types';
 import { Reference } from './Reference';
 
 

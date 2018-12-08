@@ -1,5 +1,5 @@
 import { GraphQLString, GraphQLBoolean, GraphQLFloat, GraphQLInt, GraphQLID } from 'graphql';
-import { MetadataStorage } from '../metadata';
+import { MetadataStorage } from '../metadata/MetadataStorage';
 import { GraphQLTypeIndex } from './GraphQLTypeIndex';
 
 /**

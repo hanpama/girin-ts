@@ -1,12 +1,13 @@
-import { GraphQLObjectType, GraphQLBoolean, GraphQLString, GraphQLNonNull, defaultFieldResolver } from 'graphql';
+import { defaultFieldResolver, GraphQLBoolean, GraphQLNonNull, GraphQLObjectType, GraphQLString } from 'graphql';
 
-import {
-  TypeArg, TypeExpression, type, List,
-  getGlobalMetadataStorage,
-  Field, ObjectType
-} from '..';
+import { ObjectType } from '../definition/ObjectType';
+import { getGlobalMetadataStorage } from '../global';
+import { Field } from '../reference/Field';
 import { bindStaticResolver } from '../sdl/ast';
-import { NonNull } from '../type-expression';
+import { coerceType } from '../type-expression/coerceType';
+import { List, NonNull } from '../type-expression/structure';
+import { TypeExpression } from '../type-expression/TypeExpression';
+import { TypeArg } from '../type-expression/types';
 
 
 type ConnectionByNode = { node: TypeArg | TypeExpression, edge?: undefined };
@@ -22,15 +23,15 @@ export function defineConnection(options: DefineConnectionOptions) {
       const connectionName = options.typeName || definitionClass.name;
 
       let edge: TypeExpression;
-      const node = type(options.node!);
+      const node = coerceType(options.node!);
       const nodeTypeName = node.getTypeName({ storage, kind: 'output' });
 
       if (options.edge) {
-        edge = type(options.edge);
+        edge = coerceType(options.edge);
       } else {
         const edgeTypeName = `${nodeTypeName}Edge`;
         defineEdge({ typeName: edgeTypeName, node })(null);
-        edge = type(edgeTypeName);
+        edge = coerceType(edgeTypeName);
       }
 
       storage.registerMetadata([
@@ -41,7 +42,7 @@ export function defineConnection(options: DefineConnectionOptions) {
         }),
         new Field({
           source: definitionClass,
-          target: NonNull.of(type(pageInfoType)),
+          target: NonNull.of(coerceType(pageInfoType)),
           fieldName: 'pageInfo',
           description: 'Information to aid in pagination.',
           args: [],
@@ -66,7 +67,7 @@ export function defineEdge(options: DefineEdgeOptions) {
   return function registerEdgeMetadata(definitionClass: Function | null) {
     const storage = getGlobalMetadataStorage();
     storage.deferRegister(() => {
-      const node = type(options.node);
+      const node = coerceType(options.node);
       const nodeTypeName = node.getTypeName({ storage, kind: 'output' });
 
       const edgeName = options.typeName
@@ -89,7 +90,7 @@ export function defineEdge(options: DefineEdgeOptions) {
         }),
         new Field({
           source: definitionClass || edgeName,
-          target: NonNull.of(type('String')),
+          target: NonNull.of(coerceType('String')),
           fieldName: 'cursor',
           description: 'A cursor for use in pagination',
           args: [],

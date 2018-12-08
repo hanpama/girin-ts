@@ -1,4 +1,4 @@
-import { Reference, ReferenceConfig } from '../metadata';
+import { Reference, ReferenceConfig } from '../metadata/Reference';
 
 
 export interface ImplementConfig extends ReferenceConfig {}

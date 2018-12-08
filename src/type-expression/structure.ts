@@ -1,14 +1,15 @@
 import { GraphQLType } from 'graphql';
 
-import { TypeExpression, TypeResolvingContext } from './TypeExpression';
+import { TypeExpression } from './TypeExpression';
 import { Instantiator } from '../types';
 import { GraphQLList, GraphQLNonNull } from 'graphql/type/definition';
-import { TypeArg, type } from './type';
+import { coerceType } from './coerceType';
+import { TypeResolvingContext, TypeArg } from './types';
 
 
 export class List extends TypeExpression {
   static of(inner: TypeArg | TypeExpression) {
-    return new List(type(inner));
+    return new List(coerceType(inner));
   }
 
   constructor(protected innerExp: TypeExpression) {
@@ -30,7 +31,7 @@ export class List extends TypeExpression {
 
 export class NonNull extends TypeExpression {
   static of(inner: TypeArg | TypeExpression) {
-    return new NonNull(type(inner));
+    return new NonNull(coerceType(inner));
   }
 
   constructor(protected innerExp: TypeExpression) { super(); }

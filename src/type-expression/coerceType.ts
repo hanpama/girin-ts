@@ -1,18 +1,17 @@
-import { GraphQLType, isType } from 'graphql';
+import { isType } from 'graphql';
 
 import { TypeExpression } from './TypeExpression';
 import { GraphQLTypeExpression } from './GraphQLTypeExpression';
 import { DefinitionTypeExpression } from './DefinitionTypeExpression';
 import { formatObjectInfo } from '../utilities/formatObjectInfo';
+import { TypeArg } from './types';
 
-
-export type TypeArg = GraphQLType | Function | string;
 
 /**
  * Coerce the given argument to a [TypeExpression]
  * @param arg
  */
-export function type(arg: TypeArg | TypeExpression): TypeExpression {
+export function coerceType(arg: TypeArg | TypeExpression): TypeExpression {
   if (arg instanceof TypeExpression) {
     return arg;
   }

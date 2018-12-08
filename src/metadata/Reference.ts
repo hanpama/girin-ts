@@ -1,6 +1,6 @@
 import { GraphQLType } from 'graphql';
 
-import { TypeExpression } from '../type-expression';
+import { TypeExpression } from '../type-expression/TypeExpression';
 import { Instantiator } from '../types';
 import { MetadataStorage } from './MetadataStorage';
 

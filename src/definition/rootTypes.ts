@@ -1,6 +1,6 @@
-import { MetadataStorage } from '../metadata';
+import { MetadataStorage } from '../metadata/MetadataStorage';
 import { ObjectType } from './ObjectType';
-import { SubscriptionType } from '../definition';
+import { SubscriptionType } from './SubscriptionType';
 
 
 /**

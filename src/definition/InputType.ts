@@ -1,8 +1,8 @@
 import { GraphQLInputFieldConfig, GraphQLInputFieldConfigMap, GraphQLInputObjectType, GraphQLInputType } from 'graphql';
 
-import { Definition, DefinitionConfig, DefinitionKind } from '../metadata';
-import { InputField } from '../reference';
-import { TypeResolvingContext } from '../type-expression';
+import { Definition, DefinitionConfig, DefinitionKind } from '../metadata/Definition';
+import { InputField } from '../reference/InputField';
+import { TypeResolvingContext } from '../type-expression/types';
 import { defaultInputFieldInstantiator } from '../types';
 
 

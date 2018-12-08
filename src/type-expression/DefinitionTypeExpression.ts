@@ -1,8 +1,9 @@
 import { GraphQLType } from 'graphql';
 
 import { defaultInputFieldInstantiator, Instantiator } from '../types';
-import { TypeResolvingContext, TypeExpression } from './TypeExpression';
-import { Definition } from '../metadata';
+import { TypeExpression } from './TypeExpression';
+import { Definition } from '../metadata/Definition';
+import { TypeResolvingContext } from './types';
 
 
 /**

@@ -18,11 +18,19 @@ import {
   defaultFieldResolver,
 } from 'graphql';
 
-import { Metadata } from '../metadata';
-import { ObjectType, InterfaceType, InputType, SubscriptionType } from '../definition';
-import { Field, InputField, Implement } from '../reference';
-import { TypeExpression, TypeArg, List, NonNull, type } from '../type-expression';
+import { Metadata } from '../metadata/MetadataStorage';
 import { GraphQLFieldResolver } from 'graphql/type/definition';
+import { SubscriptionType } from '../definition/SubscriptionType';
+import { ObjectType } from '../definition/ObjectType';
+import { InterfaceType } from '../definition/InterfaceType';
+import { InputType } from '../definition/InputType';
+import { TypeExpression } from '../type-expression/TypeExpression';
+import { coerceType } from '../type-expression/coerceType';
+import { List, NonNull } from '../type-expression/structure';
+import { Field } from '../reference/Field';
+import { InputField } from '../reference/InputField';
+import { Implement } from '../reference/Implement';
+import { TypeArg } from '../type-expression/types';
 
 
 export interface SubstitutionMap {
@@ -77,7 +85,7 @@ export class DefinitionParser {
       return new NonNull(this.completeTypeExpression(typeNode.type));
     }
     const subType = subsMap[typeNode.name.value];
-    return type(subType || typeNode.name.value);
+    return coerceType(subType || typeNode.name.value);
   }
 
   protected handleObjectTypeDefinition(rootNode: ObjectTypeDefinitionNode, definitionClass: Function): void {

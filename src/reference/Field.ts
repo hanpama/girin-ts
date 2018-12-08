@@ -1,8 +1,8 @@
 import { GraphQLFieldConfigArgumentMap, GraphQLInputType, GraphQLFieldResolver } from 'graphql';
 
 import { InputField } from './InputField';
-import { Reference, ReferenceConfig } from '../metadata';
-import { TypeResolvingContext } from '../type-expression';
+import { Reference, ReferenceConfig } from '../metadata/Reference';
+import { TypeResolvingContext } from '../type-expression/types';
 
 
 export interface FieldConfig extends ReferenceConfig {
