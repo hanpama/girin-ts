@@ -41,8 +41,8 @@ class Ship extends ResolverContext<ShipSource> implements Node {
 
 @defineConnection({ node: Ship })
 class ShipConnection extends ArrayConnection<Ship, string> {
-  resolveNode(shipId: string) {
-    return Ship.getById(shipId);
+  resolveNode(edge: { source: string }) {
+    return Ship.getById(edge.source);
   }
 }
 

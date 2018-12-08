@@ -1,8 +1,8 @@
-import { Connection, ConnectionArguments, Edge } from 'cursor-connection';
+import { Connection, ConnectionArguments } from 'cursor-connection';
 import { getOffsetWithDefault, offsetToCursor } from 'graphql-relay';
 
 
-export abstract class ArrayConnection<TNode, TEdgeSource> extends Connection<TNode, TEdgeSource> {
+export abstract class ArrayConnection<TNode, TEdgeSource> extends Connection<TNode, { source: TEdgeSource, index: number }> {
   constructor(protected array: TEdgeSource[], args: ConnectionArguments) {
     super(args);
 
@@ -33,20 +33,11 @@ export abstract class ArrayConnection<TNode, TEdgeSource> extends Connection<TNo
 
   getEdgeSources() {
     return this.array.slice(this.startOffset, this.endOffset)
-      .map((nodeSource, index) => nodeSource);
+      .map((source, index) => ({ source, index: index + this.startOffset }));
   }
 
-  // In most cases, cursors should be resolved from the source
-  // But in ArrayConnection example, it formats cursor simply from its index in the array
-  get edges() {
-    const edgeSources = this.getEdgeSources();
-    return edgeSources.map((source, index) => new ArrayConnectionEdge(this, source, this.startOffset + index));
-  }
-  resolveCursor(): string {
-    throw new Error('ArrayConenction uses index based cursor');
-  }
-  resolveIndexBasedCursor(index: number) {
-    return offsetToCursor(index);
+  resolveCursor(source: { index: number }) {
+    return offsetToCursor(source.index);
   }
 
   resolveHasNextPage() {
@@ -55,20 +46,11 @@ export abstract class ArrayConnection<TNode, TEdgeSource> extends Connection<TNo
     const upperBound = args.before ? beforeOffset : array.length;
     return typeof args.first === 'number' ? endOffset < upperBound : false;
   }
+
   resolveHasPreviousPage() {
     const { args, startOffset, afterOffset } = this;
 
     const lowerBound = args.after ? afterOffset + 1 : 0;
     return typeof args.last === 'number' ? startOffset > lowerBound : false;
-  }
-}
-
-export class ArrayConnectionEdge<TConnection extends ArrayConnection<any, any>> extends Edge<TConnection> {
-  constructor(public connection: TConnection, source: any, public index: number) {
-    super(connection, source);
-  }
-
-  get cursor() {
-    return this.connection.resolveIndexBasedCursor(this.index) as ReturnType<TConnection['resolveCursor']>; // ?
   }
 }
