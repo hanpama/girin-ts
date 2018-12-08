@@ -1,6 +1,6 @@
 {
   "name": "girin",
-  "version": "0.5.2-alpha.0",
+  "version": "0.5.2",
   "description": "Define GraphQL types linked to classes",
   "author": "Max Choi <hanpama@gmail.com>",
   "main": "./lib/index.js",
