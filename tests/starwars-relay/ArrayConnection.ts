@@ -1,4 +1,4 @@
-import { Connection, ConnectionArguments, Edge } from '@girin/connection';
+import { Connection, ConnectionArguments, Edge } from 'cursor-connection';
 import { getOffsetWithDefault, offsetToCursor } from 'graphql-relay';
 
 
