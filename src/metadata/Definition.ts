@@ -7,7 +7,7 @@ import { Reference } from './Reference';
 export type DefinitionKind = 'any' | 'input' | 'output';
 
 export interface DefinitionConfig {
-  definitionClass: Function | null;
+  definitionClass: Object | null;
   definitionName: string;
   description?: string;
   directives?: any;

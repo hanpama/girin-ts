@@ -18,7 +18,7 @@ export function coerceType(arg: TypeArg | TypeExpression): TypeExpression {
   if (isType(arg)) {
     return new GraphQLTypeExpression(arg);
   }
-  if (arg instanceof Function || typeof arg === 'string') {
+  if (arg instanceof Function || typeof arg === 'string' || arg instanceof Object) {
     return new DefinitionTypeExpression(arg);
   }
   throw new Error(`Cannot coerce argument to type: ${formatObjectInfo(arg)}`);

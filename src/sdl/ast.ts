@@ -31,6 +31,7 @@ import { Field } from '../reference/Field';
 import { InputField } from '../reference/InputField';
 import { Implement } from '../reference/Implement';
 import { TypeArg } from '../type-expression/types';
+import { ResolverMap } from '../types';
 
 
 export interface SubstitutionMap {
@@ -46,7 +47,7 @@ export class DefinitionParser {
     protected subsMap: SubstitutionMap,
   ) {}
 
-  public parse(definitionClass: Function): Metadata[] {
+  public parseWithResolverMap(definitionClass: ResolverMap): Metadata[] {
     const { rootNode } = this;
     this.metadata = [];
 
@@ -88,7 +89,7 @@ export class DefinitionParser {
     return coerceType(subType || typeNode.name.value);
   }
 
-  protected handleObjectTypeDefinition(rootNode: ObjectTypeDefinitionNode, definitionClass: Function): void {
+  protected handleObjectTypeDefinition(rootNode: ObjectTypeDefinitionNode, definitionClass: ResolverMap): void {
     const { name, interfaces, fields, description } = rootNode;
 
     if (fields) {
@@ -118,7 +119,7 @@ export class DefinitionParser {
     this.metadata.push(metadata);
   }
 
-  protected handleObjectTypeExtension(rootNode: ObjectTypeExtensionNode, definitionClass: Function): void {
+  protected handleObjectTypeExtension(rootNode: ObjectTypeExtensionNode, definitionClass: ResolverMap): void {
     const { name, interfaces, fields } = rootNode;
 
     if (fields) {
@@ -129,7 +130,7 @@ export class DefinitionParser {
     }
   }
 
-  protected handleInterfaceTypeDefinition(rootNode: InterfaceTypeDefinitionNode, definitionClass: Function): void {
+  protected handleInterfaceTypeDefinition(rootNode: InterfaceTypeDefinitionNode, definitionClass: ResolverMap): void {
     const { name, description, fields } = rootNode;
 
     if (fields) {
@@ -144,7 +145,7 @@ export class DefinitionParser {
     }));
   }
 
-  protected handleInterfaceTypeExtension(rootNode: InterfaceTypeExtensionNode, definitionClass: Function): void {
+  protected handleInterfaceTypeExtension(rootNode: InterfaceTypeExtensionNode, definitionClass: ResolverMap): void {
     const { name, fields } = rootNode;
 
     if (fields) {
@@ -152,7 +153,7 @@ export class DefinitionParser {
     }
   }
 
-  protected handleInputObjectTypeDefinition(node: InputObjectTypeDefinitionNode, definitionClass: Function): void {
+  protected handleInputObjectTypeDefinition(node: InputObjectTypeDefinitionNode, definitionClass: ResolverMap): void {
     const { name, description, fields } = node;
 
     if (fields) {
@@ -167,7 +168,7 @@ export class DefinitionParser {
     }));
   }
 
-  protected handleInputObjectExtension(node: InputObjectTypeExtensionNode, definitionClass: Function): void {
+  protected handleInputObjectExtension(node: InputObjectTypeExtensionNode, definitionClass: ResolverMap): void {
     const { name, fields } = node;
 
     if (fields) {
@@ -175,7 +176,7 @@ export class DefinitionParser {
     }
   }
 
-  protected appendFieldMetadataConfig(node: FieldDefinitionNode, definitionClass: Function, extendingTypeName?: string): void {
+  protected appendFieldMetadataConfig(node: FieldDefinitionNode, definitionClass: ResolverMap, extendingTypeName?: string): void {
     const { name, type, description, directives, arguments: args } = node;
 
     const argumentRefs = args && args.map(argumentNode => (
@@ -196,7 +197,7 @@ export class DefinitionParser {
     }));
   }
 
-  protected createInputField(node: InputValueDefinitionNode, definitionClass: Function, extendingTypeName?: string): InputField {
+  protected createInputField(node: InputValueDefinitionNode, definitionClass: ResolverMap, extendingTypeName?: string): InputField {
     const { name, type, description, defaultValue, directives } = node;
 
     return new InputField({
@@ -210,12 +211,12 @@ export class DefinitionParser {
     });
   }
 
-  protected appendInputFieldMetadataConfig(node: InputValueDefinitionNode, definitionClass: Function, extendingTypeName?: string): void {
+  protected appendInputFieldMetadataConfig(node: InputValueDefinitionNode, definitionClass: ResolverMap, extendingTypeName?: string): void {
     const field = this.createInputField(node, definitionClass, extendingTypeName);
     this.metadata.push(field);
   }
 
-  protected appendImplementTypeExpression(node: NamedTypeNode, definitionClass: Function, extendingTypeName?: string): void {
+  protected appendImplementTypeExpression(node: NamedTypeNode, definitionClass: ResolverMap, extendingTypeName?: string): void {
     this.metadata.push(new Implement({
       source: extendingTypeName || definitionClass,
       target: this.completeTypeExpression(node),
@@ -258,7 +259,7 @@ export class DefinitionParser {
 
 export type DirectiveMap = { [key: string]: any };
 
-export function bindStaticResolver(definitionClass: Function, fieldName: string): GraphQLFieldResolver<any, any> | null {
+export function bindStaticResolver(definitionClass: ResolverMap, fieldName: string): GraphQLFieldResolver<any, any> | null {
   const maybeStaticResolver = (definitionClass as any)[fieldName];
   return maybeStaticResolver instanceof Function
     ? maybeStaticResolver.bind(definitionClass)

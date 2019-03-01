@@ -8,4 +8,4 @@ export interface TypeResolvingContext {
   kind: DefinitionKind;
 }
 
-export type TypeArg = GraphQLType | Function | string;
+export type TypeArg = GraphQLType | Function | string | Object;

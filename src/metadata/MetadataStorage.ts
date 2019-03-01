@@ -39,18 +39,18 @@ export class MetadataStorage {
    *
    * Get a [[Definition]] object which is instance of the `metadataClass` and associated to `linkedClass`
    * @param metadataClass A [[Definition]] subclass to query
-   * @param classOrName A class associated with metadata to query
+   * @param definitionKey A class associated with metadata to query
    * @param asKind
    */
-  public getDefinition<T extends Definition>(metadataClass: { new (...args: any[]): T; }, classOrName: Function | string, asKind: DefinitionKind): T | undefined {
+  public getDefinition<T extends Definition>(metadataClass: { new (...args: any[]): T; }, definitionKey: Object, asKind: DefinitionKind): T | undefined {
     this.resolveDeferred();
 
     const entry = this.definitions.find(metadata => {
       let classOrNameMatched: boolean;
-      if (typeof classOrName === 'string') {
-        classOrNameMatched = metadata.definitionName === classOrName;
+      if (typeof definitionKey === 'string') {
+        classOrNameMatched = metadata.definitionName === definitionKey;
       } else {
-        classOrNameMatched = metadata.definitionClass === classOrName;
+        classOrNameMatched = metadata.definitionClass === definitionKey;
       }
       const typeMatched = asKind === 'any' || metadata.kind === 'any' || metadata.kind === asKind;
       return classOrNameMatched && (metadata instanceof metadataClass) && typeMatched;
@@ -59,15 +59,16 @@ export class MetadataStorage {
     return entry as T;
   }
 
-  public findReference<T extends Reference>(metadataClass: { new (...args: any[]): T }, classOrName: Function | string): T[] {
+  public findReference<T extends Reference>(metadataClass: { new (...args: any[]): T }, definitionKey: Object): T[] {
     this.resolveDeferred();
 
     const entries = this.references.filter(metadata => {
       let classOrNameMatched: boolean;
-      if (typeof classOrName === 'string') {
-        classOrNameMatched = metadata.source === classOrName;
-      } else {
-        classOrNameMatched = metadata.source instanceof Function && equalsOrInherits(classOrName, metadata.source);
+      if (definitionKey instanceof Function) {
+        classOrNameMatched = metadata.source instanceof Function && equalsOrInherits(definitionKey, metadata.source);
+      }
+      else {
+        classOrNameMatched = metadata.source === definitionKey;
       }
       // const typeMatched = metadata.kind === asKind;
       return classOrNameMatched && (metadata instanceof metadataClass);

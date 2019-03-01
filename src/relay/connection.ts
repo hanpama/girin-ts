@@ -8,6 +8,7 @@ import { coerceType } from '../type-expression/coerceType';
 import { List, NonNull } from '../type-expression/structure';
 import { TypeExpression } from '../type-expression/TypeExpression';
 import { TypeArg } from '../type-expression/types';
+import { ResolverMap } from '../types';
 
 
 type ConnectionByNode = { node: TypeArg | TypeExpression, edge?: undefined };
@@ -16,11 +17,14 @@ type DefineConnectionOptions = { typeName?: string } & (ConnectionByNode | Conne
 
 
 export function defineConnection(options: DefineConnectionOptions) {
-  return function registerConnectionMetadata(definitionClass: Function) {
+  return function registerConnectionMetadata(definitionClass: ResolverMap) {
     const storage = getGlobalMetadataStorage();
 
     storage.deferRegister(() => {
-      const connectionName = options.typeName || definitionClass.name;
+      const connectionName = options.typeName || (definitionClass as any).name;
+      if (!connectionName) {
+        throw new Error(`Should provide connection typeName`);
+      }
 
       let edge: TypeExpression;
       const node = coerceType(options.node!);
@@ -64,14 +68,14 @@ export function defineConnection(options: DefineConnectionOptions) {
 type DefineEdgeOptions = { typeName?: string, node: TypeArg | TypeExpression };
 
 export function defineEdge(options: DefineEdgeOptions) {
-  return function registerEdgeMetadata(definitionClass: Function | null) {
+  return function registerEdgeMetadata(definitionClass: ResolverMap | null) {
     const storage = getGlobalMetadataStorage();
     storage.deferRegister(() => {
       const node = coerceType(options.node);
       const nodeTypeName = node.getTypeName({ storage, kind: 'output' });
 
       const edgeName = options.typeName
-        || (definitionClass && definitionClass.name)
+        || (definitionClass && (definitionClass as any).name)
         || `${nodeTypeName}Edge`;
 
       storage.registerMetadata([

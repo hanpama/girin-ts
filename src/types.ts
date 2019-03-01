@@ -1,3 +1,5 @@
+export type ResolverMap = Object;
+
 export type ResolvedValue<T> = T | Promise<T>;
 export type ResolvedList<T> = T[] | Promise<T[]> | Promise<T>[];
 

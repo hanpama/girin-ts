@@ -64,7 +64,7 @@ export class InputType<T extends InputTypeConfig = InputTypeConfig> extends Defi
       return this.instantiationCache.get(values);
     };
 
-    Object.defineProperty(instantiator, 'name', { value: 'instantiate' + this.definitionClass.name});
+    Object.defineProperty(instantiator, 'name', { value: 'instantiate' + this.definitionName });
     return instantiator;
   }
 }

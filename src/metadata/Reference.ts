@@ -6,7 +6,7 @@ import { MetadataStorage } from './MetadataStorage';
 
 
 export interface ReferenceConfig {
-  source: Function | string;
+  source: Object;
   target: TypeExpression;
 }
 

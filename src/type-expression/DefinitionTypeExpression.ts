@@ -11,7 +11,7 @@ import { TypeResolvingContext } from './types';
  */
 export class DefinitionTypeExpression extends TypeExpression {
 
-  constructor(protected typeArg: string | Function) { super(); }
+  constructor(protected typeArg: Object | string) { super(); }
 
   getTypeName(context: TypeResolvingContext): string {
     return this.resolveDefinition(context).definitionName;

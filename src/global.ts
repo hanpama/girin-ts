@@ -5,7 +5,7 @@ import { MetadataStorage } from './metadata/MetadataStorage';
 import { DefinitionParser } from './sdl/ast';
 import { coerceType } from './type-expression/coerceType';
 import { TypeExpression } from './type-expression/TypeExpression';
-import { Thunk } from './types';
+import { Thunk, ResolverMap } from './types';
 import { TypeArg } from './type-expression/types';
 
 
@@ -49,18 +49,15 @@ export function getType(typeArg: TypeExpression | TypeArg, kind: DefinitionKind 
  */
 export function defineType(parsersOrThunk: DefinitionParser[] | Thunk<DefinitionParser[]>) {
   const storage = getGlobalMetadataStorage();
-  return function defDecoratorFn<T extends Function>(definitionClass: T) {
-    if (Array.isArray(parsersOrThunk)) {
-      parsersOrThunk.forEach(parser => {
-        storage.registerMetadata(parser.parse(definitionClass));
+
+  return function defDecoratorFn<T extends ResolverMap>(definitionClass: T) {
+
+    storage.deferRegister(() => {
+      (Array.isArray(parsersOrThunk) ? parsersOrThunk : parsersOrThunk()).forEach(parser => {
+        storage.registerMetadata(parser.parseWithResolverMap(definitionClass));
       });
-    } else {
-      storage.deferRegister(() => {
-        parsersOrThunk().forEach(parser => {
-          storage.registerMetadata(parser.parse(definitionClass));
-        });
-      });
-    }
+    });
+
     return definitionClass;
   };
 }
