@@ -23,7 +23,7 @@ export class DefinitionTypeExpression extends TypeExpression {
 
   public getInstantiator(context: TypeResolvingContext): Instantiator {
     let def;
-    try { def = this.resolveDefinition(context); } catch {}
+    try { def = this.resolveDefinition(context); } catch(err) {}
     return def ? def.buildInstantiator(context) : defaultInputFieldInstantiator;
   }
 
