@@ -106,6 +106,6 @@ describe('field with GraphQLType', () => {
         erroneousBaz
       }
     `});
-    expect(result.errors[0].message).toEqual('Expected a value of type "Baz" but received: "D"');
+    expect(result.errors[0].message).toEqual('Enum \"Baz\" cannot represent value: \"D\"');
   });
 });

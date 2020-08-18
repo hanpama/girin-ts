@@ -53,7 +53,7 @@ class Query {
 
 const schema = new GraphQLSchema({ query: getType(Query) });
 
-describe('Schema generation and query of recursive types', async () => {
+describe('Schema generation and query of recursive types', () => {
 
   it('generates schema as expected', () => {
     expect(printSchema(schema)).toMatchSnapshot();

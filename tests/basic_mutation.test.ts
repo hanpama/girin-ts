@@ -46,7 +46,7 @@ const schema = new GraphQLSchema({
 });
 
 
-describe('Basic mutation and schema generation', async () => {
+describe('Basic mutation and schema generation', () => {
 
   it('generates schema as expected', () => {
     expect(printSchema(schema)).toMatchSnapshot();

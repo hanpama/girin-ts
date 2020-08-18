@@ -1,8 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Root types and extensions should generate schema as expected 1`] = `
-"type Mutation {
-  createUser(user: UserInput!): User!
+"type User {
+  id: Int!
+  username: String!
 }
 
 type Query {
@@ -10,9 +11,8 @@ type Query {
   userClassName: String!
 }
 
-type User {
-  id: Int!
-  username: String!
+type Mutation {
+  createUser(user: UserInput!): User!
 }
 
 input UserInput {

@@ -51,7 +51,7 @@ class Query extends ResolverContext {
 const schema = new GraphQLSchema({ query: getType(Query) });
 
 
-describe('Basic queries and schema generation', async () => {
+describe('Basic queries and schema generation', () => {
 
   it('generates schema as expected', () => {
     expect(printSchema(schema)).toMatchSnapshot();

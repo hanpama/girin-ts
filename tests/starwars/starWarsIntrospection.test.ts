@@ -29,10 +29,7 @@ describe('Star Wars Introspection Tests', () => {
         __schema: {
           types: [
             {
-              name: 'Query',
-            },
-            {
-              name: 'Episode',
+              name: 'Human',
             },
             {
               name: 'Character',
@@ -41,10 +38,16 @@ describe('Star Wars Introspection Tests', () => {
               name: 'String',
             },
             {
-              name: 'Human',
+              name: 'Episode',
             },
             {
               name: 'Droid',
+            },
+            {
+              name: 'Query',
+            },
+            {
+              name: 'Boolean',
             },
             {
               name: '__Schema',
@@ -54,9 +57,6 @@ describe('Star Wars Introspection Tests', () => {
             },
             {
               name: '__TypeKind',
-            },
-            {
-              name: 'Boolean',
             },
             {
               name: '__Field',

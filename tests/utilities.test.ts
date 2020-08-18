@@ -1,5 +1,5 @@
 import { formatObjectInfo } from '../src/utilities/formatObjectInfo';
-import { PathMap } from '../src/utilities/PathMap';
+
 
 test('formatObjectInfo', () => {
   class Foo {}
@@ -13,11 +13,4 @@ test('formatObjectInfo', () => {
   expect(formatObjectInfo({})).toBe('[object Object]<Object>');
   expect(formatObjectInfo(Object)).toBe('Object<function>');
   expect(formatObjectInfo((() => {}))).toBe('[anonymous function]<function>');
-});
-
-test('pathmap', () => {
-  const pm = new PathMap();
-  pm.set([1, 2, 3], 'K');
-  expect(pm.get([1, 2, 3])).toBe('K');
-  expect(pm.get([1])).toBe(undefined);
 });

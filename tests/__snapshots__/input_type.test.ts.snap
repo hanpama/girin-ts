@@ -1,13 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Input type generates schema and works as expected 1`] = `
-"type Group {
+"type Query {
+  formatFullName(input: NameInput): String!
+  personInputInstantiated(person: PersonInput): Boolean!
+  personNonNullInputWorks(person: PersonInput!): Boolean!
+  personNonNullListInputWorks(people: [PersonInput!]): Boolean!
   echoPerson(person: PersonInput): Person!
-}
-
-type Name {
-  firstName: String!
-  lastName: String!
+  tenGroups: [Group]!
 }
 
 input NameInput {
@@ -15,23 +15,23 @@ input NameInput {
   lastName: String!
 }
 
-type Person {
-  address: String!
-  name: Name
-}
-
 input PersonInput {
   address: String!
   name: NameInput
 }
 
-type Query {
-  formatFullName(input: NameInput): String!
-  personInputInstantiated(person: PersonInput): Boolean!
-  personNonNullInputWorks(person: PersonInput!): Boolean!
-  personNonNullListInputWorks(people: [PersonInput!]): Boolean!
+type Person {
+  address: String!
+  name: Name
+}
+
+type Name {
+  firstName: String!
+  lastName: String!
+}
+
+type Group {
   echoPerson(person: PersonInput): Person!
-  tenGroups: [Group]!
 }
 "
 `;
